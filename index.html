@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lightman App</title>
+
+    <!-- PWA Setup -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link class="apple-touch-icon" href="icon-192.png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="logo-container">
+            <i class="fa-solid fa-lightbulb"></i>
+            <h1>Lightman</h1>
+        </div>
+        <button id="sync-btn" class="icon-btn" title="Synchroniser avec Google Sheets" style="position: relative;">
+            <i class="fa-solid fa-rotate"></i>
+            <span id="sync-badge" class="badge hidden">0</span>
+        </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+
+        <!-- VIEW: REGISTRO -->
+        <section id="view-registro" class="view active">
+            <div class="card">
+                <h2>Nouveau Remplacement</h2>
+                <form id="record-form">
+
+                    <div class="form-group">
+                        <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tache"><i class="fa-solid fa-wrench"></i> Type de tâche</label>
+                        <select id="tache" name="tache" required>
+                            <option value="" disabled selected>Sélectionnez le type de tâche</option>
+                            <!-- Llenado fijo por JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden-field" id="group-bon">
+                        <label for="num_bon"><i class="fa-solid fa-hashtag"></i> # Bon de travail</label>
+                        <input type="text" id="num_bon" name="num_bon" placeholder="Entrez le numéro">
+                    </div>
+
+                    <div class="form-group hidden-field" id="group-soumission">
+                        <label for="num_soumission"><i class="fa-solid fa-hashtag"></i> # Soumission</label>
+                        <input type="text" id="num_soumission" name="num_soumission" placeholder="Entrez le numéro">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="etage"><i class="fa-solid fa-building"></i> Étage</label>
+                        <select id="etage" name="etage" required>
+                            <option value="" disabled selected>Sélectionnez l'étage</option>
+                            <!-- Llenado fijo por JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categorie"><i class="fa-solid fa-tags"></i> Catégorie</label>
+                        <select id="categorie" name="categorie" required>
+                            <option value="">Sélectionnez une catégorie</option>
+                            <!-- Llenado por Google Sheets -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description"><i class="fa-solid fa-align-left"></i> Description</label>
+                        <select id="description" name="description" required>
+                            <option value="" disabled selected>Sélectionnez une description</option>
+                            <!-- Llenado por Google Sheets -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantite"><i class="fa-solid fa-hashtag"></i> Quantité</label>
+                        <input type="number" id="quantite" name="quantite" min="1" value="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_item"><i class="fa-solid fa-barcode"></i> Id</label>
+                        <input type="text" id="id_item" name="id_item" readonly placeholder="Sera rempli automatiquement en sélectionnant la description">
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-check"></i> Enregistrer
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: ESTADISTICAS -->
+        <section id="view-stats" class="view">
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem;">
+                <h2 style="margin-bottom: 0;">Résumé</h2>
+                <button id="export-pdf-btn" class="icon-btn" style="background: var(--primary);" title="Exporter PDF">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </button>
+            </div>
+            <div class="card">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Total Remplacements</span>
+                        <span id="stat-total" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Ce mois-ci</span>
+                        <span id="stat-month" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Tendances mensuelles (Total de rechanges)</h3>
+                <div class="chart-container">
+                    <canvas id="monthlyTrendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Top 5 produits</h3>
+                <div class="chart-container">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Par type de tâche</h3>
+                <div class="chart-container">
+                    <canvas id="taskTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Nombre d'interventions par étage</h3>
+                <div class="chart-container">
+                    <canvas id="etageInterventionsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Total d'ampoules par étage</h3>
+                <div class="chart-container">
+                    <canvas id="etageBulbsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Par catégorie</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: HISTORIQUE -->
+        <section id="view-historique" class="view">
+            <div class="card">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Historique Récent</h2>
+                <div id="history-container">
+                    <p class="help-text">Aucun enregistrement récent.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CONFIGURACION -->
+        <section id="view-config" class="view">
+            <div class="card">
+                <h2>Configuration</h2>
+                <p class="help-text">Pour connecter l'application avec votre Google Sheet, collez ici l'URL de la Web App (Google Apps Script).</p>
+
+                <div class="form-group">
+                    <label for="api-url">URL de la Web App (Google Sheets)</label>
+                    <input type="url" id="api-url" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+
+                <button id="save-config-btn" class="btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+                </button>
+
+                <hr class="divider">
+
+                <h3>Statut de la connexion</h3>
+                <div id="connection-status" class="status-badge error">Non configuré</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-target="view-registro">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Saisie</span>
+        </a>
+        <a href="#" class="nav-item" data-target="view-historique">
+            <i class="fa-solid fa-list-ul"></i>
+            <span>Historique</span>
+        </a>
+        <a href="#" class="nav-item" data-target="view-stats">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Stats</span>
+        </a>
+        <a href="#" class="nav-item" data-target="view-config">
+            <i class="fa-solid fa-gear"></i>
+            <span>Config</span>
+        </a>
+    </nav>
+
+    <!-- Overlay Loader -->
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p id="loader-text">Chargement...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    
+                    // Forzar verificación de actualización
+                    registration.update();
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+
+            // Recargar la página automáticamente cuando el nuevo Service Worker toma el control
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
