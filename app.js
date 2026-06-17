@@ -1,7 +1,7 @@
 // app.js
 
 const CONFIG_KEY = "lightman_api_url";
-let apiUrl = localStorage.getItem(CONFIG_KEY) || "";
+let apiUrl = localStorage.getItem(CONFIG_KEY) || "https://script.google.com/macros/s/AKfycbwI3o54GHtgvGu7pafOkRiDL8jWoLw2sHSw2TfAGD2k_KCRtZO6f-ma2RQYx_gZD5OHvQ/exec";
 
 // Mock Data actualizado
 const mockOptions = {
