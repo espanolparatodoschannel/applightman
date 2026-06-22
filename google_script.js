@@ -12,7 +12,7 @@ function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_ENDROIT, ["Étage", "Endroit"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de travail", "# Soumission", "Étage", "Endroit", "Catégorie", "Description", "Quantité", "Id"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de travail", "# Soumission", "Étage", "Endroit", "Catégorie", "Description", "Quantité", "Id", "Note"]);
 }
 
 function doPost(e) {
@@ -46,12 +46,16 @@ function doPost(e) {
       const quantIdx = headers.indexOf("Quantité");
       const tacheIdx = headers.indexOf("Type de tâche");
       const numTacheIdx = headers.indexOf("# Type de tâche");
-      const numBonIdx = headers.indexOf("# Bon de travail");
+      let numBonIdx = headers.indexOf("# Bon de travail");
+      if (numBonIdx === -1) {
+        numBonIdx = headers.indexOf("# Bon de trabajo");
+      }
       const numSoumIdx = headers.indexOf("# Soumission");
+      const noteIdx = headers.indexOf("Note");
 
       // Si la hoja estaba totalmente vacía o sin cabeceras
       if (headers.length === 0 || (headers.length === 1 && headers[0] === "")) {
-        const defaultHeaders = ["Date", "Type de tâche", "# Type de tâche", "# Bon de travail", "# Soumission", "Étage", "Endroit", "Catégorie", "Description", "Quantité", "Id"];
+        const defaultHeaders = ["Date", "Type de tâche", "# Type de tâche", "# Bon de travail", "# Soumission", "Étage", "Endroit", "Catégorie", "Description", "Quantité", "Id", "Note"];
         sheet.appendRow(defaultHeaders);
         sheet.appendRow([
           record.fecha,
@@ -64,7 +68,8 @@ function doPost(e) {
           record.categorie,
           record.description,
           record.quantite,
-          record.id_item
+          record.id_item,
+          record.note
         ]);
       } else {
         // Crear una fila vacía con el tamaño de las cabeceras
@@ -85,6 +90,7 @@ function doPost(e) {
         if (numTacheIdx > -1) row[numTacheIdx] = record.num_tache;
         if (numBonIdx > -1) row[numBonIdx] = record.num_bon;
         if (numSoumIdx > -1) row[numSoumIdx] = record.num_soumission;
+        if (noteIdx > -1) row[noteIdx] = record.note;
 
         sheet.appendRow(row);
       }
@@ -192,6 +198,7 @@ function doGet(e) {
         const tacheIdx = headers.indexOf("Type de tâche");
         const numTacheIdx = headers.indexOf("# Type de tâche");
         const idIdx = headers.indexOf("Id");
+        const noteIdx = headers.indexOf("Note");
 
         for (let i = 1; i < recordsData.length; i++) {
           const row = recordsData[i];
@@ -204,7 +211,8 @@ function doGet(e) {
             quantite: quantIdx > -1 ? row[quantIdx] : 0,
             tache: tacheIdx > -1 ? row[tacheIdx] : "",
             num_tache: numTacheIdx > -1 ? row[numTacheIdx] : "",
-            id_item: idIdx > -1 ? row[idIdx] : ""
+            id_item: idIdx > -1 ? row[idIdx] : "",
+            note: noteIdx > -1 ? row[noteIdx] : ""
           });
         }
       }

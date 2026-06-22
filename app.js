@@ -221,7 +221,8 @@ function setupEventListeners() {
             tache: formData.get('tache'),
             num_bon: formData.get('num_bon') || "",
             num_soumission: formData.get('num_soumission') || "",
-            num_tache: formData.get('num_tache') || ""
+            num_tache: formData.get('num_tache') || "",
+            note: formData.get('note') || ""
         };
 
         if (apiUrl) {
