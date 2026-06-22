@@ -46,7 +46,10 @@
 
                     <div class="form-group">
                         <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
-                        <input type="date" id="date" name="date" required>
+                        <div class="date-input-container">
+                            <input type="date" id="date" name="date" required>
+                            <span id="date-display" class="date-display-overlay"></span>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -67,11 +70,24 @@
                         <input type="text" id="num_soumission" name="num_soumission" placeholder="Entrez le numéro">
                     </div>
 
+                    <div class="form-group hidden-field" id="group-tache-num">
+                        <label for="num_tache"><i class="fa-solid fa-hashtag"></i> # Type de tâche</label>
+                        <input type="text" id="num_tache" name="num_tache" placeholder="Entrez le numéro">
+                    </div>
+
                     <div class="form-group">
                         <label for="etage"><i class="fa-solid fa-building"></i> Étage</label>
                         <select id="etage" name="etage" required>
                             <option value="" disabled selected>Sélectionnez l'étage</option>
                             <!-- Llenado fijo por JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endroit"><i class="fa-solid fa-location-dot"></i> Endroit</label>
+                        <select id="endroit" name="endroit" required>
+                            <option value="" disabled selected>Sélectionnez l'endroit</option>
+                            <!-- Llenado por Google Sheets -->
                         </select>
                     </div>
 
@@ -98,7 +114,8 @@
 
                     <div class="form-group">
                         <label for="id_item"><i class="fa-solid fa-barcode"></i> Id</label>
-                        <input type="text" id="id_item" name="id_item" readonly placeholder="Sera rempli automatiquement en sélectionnant la description">
+                        <input type="text" id="id_item" name="id_item" readonly
+                            placeholder="Sera rempli automatiquement en sélectionnant la description">
                     </div>
 
                     <button type="submit" class="btn-primary">
@@ -110,7 +127,8 @@
 
         <!-- VIEW: ESTADISTICAS -->
         <section id="view-stats" class="view">
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem;">
+            <div class="card"
+                style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem;">
                 <h2 style="margin-bottom: 0;">Résumé</h2>
                 <button id="export-pdf-btn" class="icon-btn" style="background: var(--primary);" title="Exporter PDF">
                     <i class="fa-solid fa-file-pdf"></i>
@@ -186,7 +204,8 @@
         <section id="view-config" class="view">
             <div class="card">
                 <h2>Configuration</h2>
-                <p class="help-text">Pour connecter l'application avec votre Google Sheet, collez ici l'URL de la Web App (Google Apps Script).</p>
+                <p class="help-text">Pour connecter l'application avec votre Google Sheet, collez ici l'URL de la Web
+                    App (Google Apps Script).</p>
 
                 <div class="form-group">
                     <label for="api-url">URL de la Web App (Google Sheets)</label>
@@ -242,7 +261,7 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(registration => {
                     console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    
+
                     // Forzar verificación de actualización
                     registration.update();
                 }, err => {

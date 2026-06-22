@@ -11,13 +11,19 @@ const mockOptions = {
         { id: "LED-01", description: "Foco LED 10W", categorie: "Éclairage Général" }
     ],
     etage: ["25", "24", "23", "22", "21", "20", "19", "18", "17", "16A", "16", "15", "14", "12", "11", "10", "9", "8", "7A", "7", "6", "5", "4", "3", "2", "1", "RDC", "SS1", "SS2", "SS3"],
-    tache: ["Bon de travail", "Tournée"]
+    tache: ["Bon de travail", "Tournée"],
+    endroit: [
+        { etage: "23", endroit: "Couloir A" },
+        { etage: "23", endroit: "Couloir B" },
+        { etage: "25", endroit: "Couloir C" }
+    ]
 };
 
 let appOptions = {
     opciones: [],
     etage: [],
-    tache: []
+    tache: [],
+    endroit: []
 };
 
 let records = [];
@@ -36,14 +42,19 @@ const elements = {
     connStatus: document.getElementById('connection-status'),
     syncBtn: document.getElementById('sync-btn'),
     dateInput: document.getElementById('date'),
+    dateDisplay: document.getElementById('date-display'),
     catSelect: document.getElementById('categorie'),
     idInput: document.getElementById('id_item'),
     descSelect: document.getElementById('description'),
     tacheSelect: document.getElementById('tache'),
     groupBon: document.getElementById('group-bon'),
     groupSoumission: document.getElementById('group-soumission'),
+    groupTacheNum: document.getElementById('group-tache-num'),
     numBonInput: document.getElementById('num_bon'),
     numSoumissionInput: document.getElementById('num_soumission'),
+    numTacheInput: document.getElementById('num_tache'),
+    etageSelect: document.getElementById('etage'),
+    endroitSelect: document.getElementById('endroit'),
     exportPdfBtn: document.getElementById('export-pdf-btn'),
     historyContainer: document.getElementById('history-container'),
     syncBadge: document.getElementById('sync-badge')
@@ -56,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Set default date to today
     elements.dateInput.valueAsDate = new Date();
+    updateDateDisplay();
     
     // Load config
     if (apiUrl) {
@@ -79,6 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
+    // Eventos para el input de fecha y su visualización personalizada
+    elements.dateInput.addEventListener('input', updateDateDisplay);
+    elements.dateInput.addEventListener('change', updateDateDisplay);
+    elements.dateInput.addEventListener('click', () => {
+        try {
+            elements.dateInput.showPicker();
+        } catch (e) {}
+    });
+
     // Navigation
     elements.navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -100,29 +121,51 @@ function setupEventListeners() {
     // Mostrar/ocultar campos de tarea
     elements.tacheSelect.addEventListener('change', (e) => {
         const val = e.target.value.trim().toLowerCase();
+        
+        elements.groupBon.classList.add('hidden-field');
+        elements.groupSoumission.classList.add('hidden-field');
+        elements.groupTacheNum.classList.add('hidden-field');
+        elements.numBonInput.required = false;
+        elements.numSoumissionInput.required = false;
+        elements.numTacheInput.required = false;
+        elements.numBonInput.value = "";
+        elements.numSoumissionInput.value = "";
+        elements.numTacheInput.value = "";
+
         if (val === 'bon de travail') {
             elements.groupBon.classList.remove('hidden-field');
             elements.numBonInput.required = true;
-            elements.groupSoumission.classList.add('hidden-field');
-            elements.numSoumissionInput.required = false;
-            elements.numSoumissionInput.value = "";
         } else if (val === 'soumission') {
             elements.groupSoumission.classList.remove('hidden-field');
             elements.numSoumissionInput.required = true;
-            elements.groupBon.classList.add('hidden-field');
-            elements.numBonInput.required = false;
-            elements.numBonInput.value = "";
-        } else {
-            elements.groupBon.classList.add('hidden-field');
-            elements.groupSoumission.classList.add('hidden-field');
-            elements.numBonInput.required = false;
-            elements.numSoumissionInput.required = false;
-            elements.numBonInput.value = "";
-            elements.numSoumissionInput.value = "";
+        } else if (val === 'tournée' || val === 'tournee') {
+            elements.groupTacheNum.classList.remove('hidden-field');
+            elements.numTacheInput.required = true;
         }
     });
 
     // Filtros cruzados
+    elements.etageSelect.addEventListener('change', (e) => {
+        const selectedEtage = e.target.value;
+        const currentEndroit = elements.endroitSelect.value;
+        
+        let filteredEndroits = [];
+        if (appOptions.endroit) {
+            filteredEndroits = appOptions.endroit
+                .filter(opt => String(opt.etage).trim() === String(selectedEtage).trim())
+                .map(opt => opt.endroit)
+                .filter(Boolean);
+        }
+        
+        populateSelect('endroit', filteredEndroits);
+        
+        if (filteredEndroits.includes(currentEndroit)) {
+            elements.endroitSelect.value = currentEndroit;
+        } else {
+            elements.endroitSelect.value = "";
+        }
+    });
+
     elements.catSelect.addEventListener('change', (e) => {
         const selectedCat = e.target.value;
         const currentDesc = elements.descSelect.value;
@@ -174,9 +217,11 @@ function setupEventListeners() {
             categorie: formData.get('categorie'),
             quantite: parseInt(formData.get('quantite')),
             etage: formData.get('etage'),
+            endroit: formData.get('endroit'),
             tache: formData.get('tache'),
             num_bon: formData.get('num_bon') || "",
-            num_soumission: formData.get('num_soumission') || ""
+            num_soumission: formData.get('num_soumission') || "",
+            num_tache: formData.get('num_tache') || ""
         };
 
         if (apiUrl) {
@@ -280,6 +325,7 @@ function populateAllSelects() {
     populateSelect('categorie', allCategories);
     populateSelect('etage', appOptions.etage || []);
     populateSelect('tache', appOptions.tache || []);
+    populateSelect('endroit', []);
     elements.idInput.value = "";
 }
 
@@ -400,14 +446,41 @@ function updateSyncBadge() {
 function resetFormAndRefresh(doFetch = true) {
     elements.form.reset();
     elements.dateInput.valueAsDate = new Date();
+    updateDateDisplay();
     elements.groupBon.classList.add('hidden-field');
     elements.groupSoumission.classList.add('hidden-field');
+    elements.groupTacheNum.classList.add('hidden-field');
     elements.numBonInput.required = false;
     elements.numSoumissionInput.required = false;
+    elements.numTacheInput.required = false;
     populateAllSelects();
     if (doFetch && navigator.onLine && apiUrl) {
         fetchDataFromCloud();
     }
+}
+
+function updateDateDisplay() {
+    if (!elements.dateDisplay) return;
+    const val = elements.dateInput.value;
+    if (val) {
+        const parts = val.split('-');
+        if (parts.length === 3) {
+            const year = parts[0];
+            const monthIndex = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            
+            // Usamos abreviaciones en español según tu ejemplo ("16-jun-2026")
+            const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+            
+            // Nota: Si en el futuro prefieres abreviaciones en francés ("16-juin-2026"), 
+            // puedes reemplazar la línea de arriba por:
+            // const months = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
+            
+            elements.dateDisplay.textContent = `${day}-${months[monthIndex]}-${year}`;
+            return;
+        }
+    }
+    elements.dateDisplay.textContent = "Sélectionnez la date";
 }
 
 function addToHistory(record) {
