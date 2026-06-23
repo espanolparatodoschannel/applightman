@@ -11,19 +11,13 @@ const mockOptions = {
         { id: "LED-01", description: "Foco LED 10W", categorie: "Éclairage Général" }
     ],
     etage: ["25", "24", "23", "22", "21", "20", "19", "18", "17", "16A", "16", "15", "14", "12", "11", "10", "9", "8", "7A", "7", "6", "5", "4", "3", "2", "1", "RDC", "SS1", "SS2", "SS3"],
-    tache: ["Bon de travail", "Tournée"],
-    endroit: [
-        { etage: "23", endroit: "Couloir A" },
-        { etage: "23", endroit: "Couloir B" },
-        { etage: "25", endroit: "Couloir C" }
-    ]
+    tache: ["Bon de trabajo", "Tournée"]
 };
 
 let appOptions = {
     opciones: [],
     etage: [],
-    tache: [],
-    endroit: []
+    tache: []
 };
 
 let records = [];
@@ -54,7 +48,6 @@ const elements = {
     numSoumissionInput: document.getElementById('num_soumission'),
     numTacheInput: document.getElementById('num_tache'),
     etageSelect: document.getElementById('etage'),
-    endroitSelect: document.getElementById('endroit'),
     exportPdfBtn: document.getElementById('export-pdf-btn'),
     historyContainer: document.getElementById('history-container'),
     syncBadge: document.getElementById('sync-badge')
@@ -144,27 +137,7 @@ function setupEventListeners() {
         }
     });
 
-    // Filtros cruzados
-    elements.etageSelect.addEventListener('change', (e) => {
-        const selectedEtage = e.target.value;
-        const currentEndroit = elements.endroitSelect.value;
-        
-        let filteredEndroits = [];
-        if (appOptions.endroit) {
-            filteredEndroits = appOptions.endroit
-                .filter(opt => String(opt.etage).trim() === String(selectedEtage).trim())
-                .map(opt => opt.endroit)
-                .filter(Boolean);
-        }
-        
-        populateSelect('endroit', filteredEndroits);
-        
-        if (filteredEndroits.includes(currentEndroit)) {
-            elements.endroitSelect.value = currentEndroit;
-        } else {
-            elements.endroitSelect.value = "";
-        }
-    });
+
 
     elements.catSelect.addEventListener('change', (e) => {
         const selectedCat = e.target.value;
@@ -217,7 +190,6 @@ function setupEventListeners() {
             categorie: formData.get('categorie'),
             quantite: parseInt(formData.get('quantite')),
             etage: formData.get('etage'),
-            endroit: formData.get('endroit'),
             tache: formData.get('tache'),
             num_bon: formData.get('num_bon') || "",
             num_soumission: formData.get('num_soumission') || "",
@@ -326,7 +298,6 @@ function populateAllSelects() {
     populateSelect('categorie', allCategories);
     populateSelect('etage', appOptions.etage || []);
     populateSelect('tache', appOptions.tache || []);
-    populateSelect('endroit', []);
     elements.idInput.value = "";
 }
 

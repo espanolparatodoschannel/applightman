@@ -4,15 +4,13 @@
 const SHEET_NAME_OPTIONS = "Opciones";
 const SHEET_NAME_ETAGES = "Étages";
 const SHEET_NAME_TACHES = "Tâches";
-const SHEET_NAME_ENDROIT = "Endroit";
 const SHEET_NAME_RECORDS = "Registros";
 
 function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_OPTIONS, ["Id", "Description", "Catégorie"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_ENDROIT, ["Étage", "Endroit"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de travail", "# Soumission", "Étage", "Endroit", "Catégorie", "Description", "Quantité", "Id", "Note"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note"]);
 }
 
 function doPost(e) {
@@ -40,22 +38,21 @@ function doPost(e) {
         fechaIdx = headers.indexOf("Fecha");
       }
       const etageIdx = headers.indexOf("Étage");
-      const endroitIdx = headers.indexOf("Endroit");
       const descIdx = headers.indexOf("Description");
       const catIdx = headers.indexOf("Catégorie");
       const quantIdx = headers.indexOf("Quantité");
       const tacheIdx = headers.indexOf("Type de tâche");
       const numTacheIdx = headers.indexOf("# Type de tâche");
-      let numBonIdx = headers.indexOf("# Bon de travail");
+      let numBonIdx = headers.indexOf("# Bon de trabajo");
       if (numBonIdx === -1) {
-        numBonIdx = headers.indexOf("# Bon de trabajo");
+        numBonIdx = headers.indexOf("# Bon de travail");
       }
       const numSoumIdx = headers.indexOf("# Soumission");
       const noteIdx = headers.indexOf("Note");
 
       // Si la hoja estaba totalmente vacía o sin cabeceras
       if (headers.length === 0 || (headers.length === 1 && headers[0] === "")) {
-        const defaultHeaders = ["Date", "Type de tâche", "# Type de tâche", "# Bon de travail", "# Soumission", "Étage", "Endroit", "Catégorie", "Description", "Quantité", "Id", "Note"];
+        const defaultHeaders = ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note"];
         sheet.appendRow(defaultHeaders);
         sheet.appendRow([
           record.fecha,
@@ -64,7 +61,6 @@ function doPost(e) {
           record.num_bon,
           record.num_soumission,
           record.etage,
-          record.endroit,
           record.categorie,
           record.description,
           record.quantite,
@@ -82,7 +78,6 @@ function doPost(e) {
         if (idIdx > -1) row[idIdx] = record.id_item;
         if (fechaIdx > -1) row[fechaIdx] = record.fecha;
         if (etageIdx > -1) row[etageIdx] = record.etage;
-        if (endroitIdx > -1) row[endroitIdx] = record.endroit;
         if (descIdx > -1) row[descIdx] = record.description;
         if (catIdx > -1) row[catIdx] = record.categorie;
         if (quantIdx > -1) row[quantIdx] = record.quantite;
@@ -159,29 +154,7 @@ function doGet(e) {
         }
       }
 
-      // 4. Obtener Endroit
-      const endroitSheet = ss.getSheetByName(SHEET_NAME_ENDROIT);
-      const endroitList = [];
-      if (endroitSheet) {
-          const endroitData = endroitSheet.getDataRange().getValues();
-          if (endroitData.length > 1) {
-            const headers = endroitData[0];
-            let etageIdx = headers.indexOf("Étage");
-            if (etageIdx === -1) etageIdx = headers.indexOf("Étages");
-            if (etageIdx === -1) etageIdx = headers.indexOf("etage");
-            if (etageIdx === -1) etageIdx = headers.indexOf("etages");
-            const endroitIdx = headers.indexOf("Endroit");
-            for (let i = 1; i < endroitData.length; i++) {
-              const etageVal = etageIdx > -1 ? endroitData[i][etageIdx] : "";
-              const endroitVal = endroitIdx > -1 ? endroitData[i][endroitIdx] : "";
-              if (etageVal && endroitVal) {
-                endroitList.push({ etage: etageVal, endroit: endroitVal });
-              }
-            }
-          }
-      }
-
-      // 5. Obtener Registros
+      // 4. Obtener Registros
       const recordsData = ss.getSheetByName(SHEET_NAME_RECORDS).getDataRange().getValues();
       const records = [];
       if (recordsData.length > 1) {
@@ -191,7 +164,6 @@ function doGet(e) {
           fechaIdx = headers.indexOf("Fecha");
         }
         const etageIdx = headers.indexOf("Étage");
-        const endroitIdx = headers.indexOf("Endroit");
         const descIdx = headers.indexOf("Description");
         const catIdx = headers.indexOf("Catégorie");
         const quantIdx = headers.indexOf("Quantité");
@@ -205,7 +177,6 @@ function doGet(e) {
           records.push({
             date: fechaIdx > -1 ? row[fechaIdx] : "",
             etage: etageIdx > -1 ? row[etageIdx] : "",
-            endroit: endroitIdx > -1 ? row[endroitIdx] : "",
             description: descIdx > -1 ? row[descIdx] : "",
             categorie: catIdx > -1 ? row[catIdx] : "",
             quantite: quantIdx > -1 ? row[quantIdx] : 0,
@@ -220,8 +191,7 @@ function doGet(e) {
       const options = {
         opciones: opcionesList,
         etage: etagesList,
-        tache: tachesList,
-        endroit: endroitList
+        tache: tachesList
       };
 
       return createJsonResponse({ status: 'success', options: options, records: records });
