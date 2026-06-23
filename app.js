@@ -498,21 +498,6 @@ function updateDashboard() {
     document.getElementById('stat-total').textContent = totalBulbs;
     document.getElementById('stat-month').textContent = monthBulbs;
 
-    // 1. Tendencias Mensuales (Total de rechanges)
-    const monthlyData = {};
-    records.forEach(r => {
-        const d = new Date(r.date || r.fecha);
-        if (!isNaN(d.getTime())) {
-            const monthStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-            monthlyData[monthStr] = (monthlyData[monthStr] || 0) + Number(r.quantite || 0);
-        }
-    });
-    const sortedMonths = Object.keys(monthlyData).sort();
-    const sortedMonthlyQuantities = sortedMonths.map(m => monthlyData[m]);
-    const monthsFriendly = sortedMonths.map(m => {
-        const parts = m.split('-');
-        return parts[1] + '/' + parts[0];
-    });
 
     // 2. Top 5 Productos
     const productData = {};
@@ -569,11 +554,7 @@ function updateDashboard() {
     });
 
     // Renderizar todos los gráficos
-    renderChart('monthlyTrendChart', 'line', monthsFriendly, sortedMonthlyQuantities, '#3b82f6', {
-        datasetLabel: 'Ampoules'
-    });
-
-    renderChart('topProductsChart', 'bar', sortedProducts, sortedProductQuantities, '#f59e0b', {
+    renderChart('topProductsChart', 'bar', sortedProducts, sortedProductQuantities, ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], {
         indexAxis: 'y',
         datasetLabel: 'Ampoules'
     });
