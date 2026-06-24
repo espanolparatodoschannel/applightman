@@ -48,7 +48,6 @@ const elements = {
     numSoumissionInput: document.getElementById('num_soumission'),
     numTacheInput: document.getElementById('num_tache'),
     etageSelect: document.getElementById('etage'),
-    exportPdfBtn: document.getElementById('export-pdf-btn'),
     historyContainer: document.getElementById('history-container'),
     syncBadge: document.getElementById('sync-badge'),
     filterMonth: document.getElementById('filter-month'),
@@ -257,28 +256,7 @@ function setupEventListeners() {
         }
     });
 
-    // PDF Export
-    if (elements.exportPdfBtn) {
-        elements.exportPdfBtn.addEventListener('click', () => {
-            const statsElement = document.getElementById('view-stats');
-            const opt = {
-                margin:       10,
-                filename:     `Lightman_Stats_${new Date().toISOString().split('T')[0]}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            elements.exportPdfBtn.style.display = 'none';
-            showLoader("Génération du PDF...");
-            html2pdf().set(opt).from(statsElement).save().then(() => {
-                elements.exportPdfBtn.style.display = 'block';
-                hideLoader();
-            }).catch(err => {
-                console.error("PDF Error:", err);
-                elements.exportPdfBtn.style.display = 'block';
-            });
-        });
-    }
+
 
     // Stepper Logic
     const stepperMinus = document.getElementById('stepper-minus');
