@@ -707,6 +707,34 @@ function updateDashboard() {
         };
     });
 
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const textColor = isDarkMode ? '#94a3b8' : '#475569';
+
+    // Añadir dataset invisible para el total
+    datasetsForEtage.push({
+        label: 'Total',
+        data: sortedEtages.map(() => 0),
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        borderWidth: 0,
+        datalabels: {
+            display: true,
+            anchor: 'end',
+            align: 'right',
+            color: textColor,
+            font: { weight: 'bold', family: 'Inter', size: 13 },
+            formatter: (value, context) => {
+                let sum = 0;
+                context.chart.data.datasets.forEach(ds => {
+                    if (ds.label !== 'Total' && ds.data[context.dataIndex]) {
+                        sum += ds.data[context.dataIndex];
+                    }
+                });
+                return sum > 0 ? sum : '';
+            }
+        }
+    });
+
     const topProductsColors = sortedProducts.map(p => {
         const cat = productCategoryMap[p];
         return cat ? (catColorMap[cat] || '#cbd5e1') : '#cbd5e1';
@@ -776,7 +804,12 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
             legend: {
                 display: (['pie', 'doughnut'].includes(type) || customOptions.datasets !== undefined),
                 position: ['pie', 'doughnut'].includes(type) ? 'right' : 'bottom',
-                labels: { color: textColor, padding: 20, font: { family: 'Inter', size: 12 } }
+                labels: { 
+                    color: textColor, 
+                    padding: 20, 
+                    font: { family: 'Inter', size: 12 },
+                    filter: (item) => item.text !== 'Total'
+                }
             },
             datalabels: {
                 display: true,
