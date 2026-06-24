@@ -763,11 +763,17 @@ function updateDashboard() {
         datasetLabel: 'Ampoules'
     });
 
-    const etageChartHeight = Math.max(320, sortedEtages.length * 64);
+    // Ajustar alturas dinámicas de los contenedores de gráficos horizontales para unificar el espaciado
+    const topProductsHeight = Math.max(250, sortedProducts.length * 48);
+    const topProductsContainer = document.getElementById('topProductsChart')?.parentElement;
+    if (topProductsContainer) topProductsContainer.style.height = `${topProductsHeight}px`;
+
+    const etageChartHeight = Math.max(250, sortedEtages.length * 48);
     const interContainer = document.getElementById('etageInterventionsChart')?.parentElement;
     if (interContainer) interContainer.style.height = `${etageChartHeight}px`;
     const bulbsContainer = document.getElementById('etageBulbsChart')?.parentElement;
     if (bulbsContainer) bulbsContainer.style.height = `${etageChartHeight}px`;
+
 
     renderChart('etageInterventionsChart', 'bar', sortedEtages, [], null, {
         indexAxis: 'y',
@@ -863,18 +869,29 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         options.plugins = { ...defaultOptions.plugins, ...customOptions.plugins };
     }
 
+    let finalDatasets = customOptions.datasets || [{
+        label: customOptions.datasetLabel || 'Quantité',
+        data: data,
+        backgroundColor: colors,
+        borderColor: type === 'line' ? (Array.isArray(colors) ? colors[0] : colors) : (isDarkMode ? '#0f172a' : '#ffffff'),
+        borderWidth: type === 'line' ? 3 : 2,
+        fill: type === 'line' ? false : undefined
+    }];
+
+    // Si es una gráfica de barras horizontales, fijar un grosor de barra uniforme (barThickness)
+    if (type === 'bar' && customOptions.indexAxis === 'y') {
+        finalDatasets.forEach(ds => {
+            if (ds.label !== 'Total') {
+                ds.barThickness = 26;
+            }
+        });
+    }
+
     charts[canvasId] = new Chart(ctx, {
         type: type,
         data: {
             labels: labels,
-            datasets: customOptions.datasets || [{
-                label: customOptions.datasetLabel || 'Quantité',
-                data: data,
-                backgroundColor: colors,
-                borderColor: type === 'line' ? (Array.isArray(colors) ? colors[0] : colors) : (isDarkMode ? '#0f172a' : '#ffffff'),
-                borderWidth: type === 'line' ? 3 : 2,
-                fill: type === 'line' ? false : undefined
-            }]
+            datasets: finalDatasets
         },
         options: options
     });
