@@ -763,16 +763,17 @@ function updateDashboard() {
         datasetLabel: 'Ampoules'
     });
 
-    // Ajustar alturas dinámicas de los contenedores de gráficos horizontales para unificar el espaciado
+    // Ajustar alturas dinámicas de las tarjetas contenedoras de gráficos horizontales para unificar el espaciado y evitar solapamientos
     const topProductsHeight = Math.max(250, sortedProducts.length * 48);
-    const topProductsContainer = document.getElementById('topProductsChart')?.parentElement;
-    if (topProductsContainer) topProductsContainer.style.height = `${topProductsHeight}px`;
+    const topProductsCard = document.getElementById('topProductsChart')?.closest('.chart-card');
+    if (topProductsCard) topProductsCard.style.height = `${topProductsHeight + 80}px`;
 
     const etageChartHeight = Math.max(250, sortedEtages.length * 48);
-    const interContainer = document.getElementById('etageInterventionsChart')?.parentElement;
-    if (interContainer) interContainer.style.height = `${etageChartHeight}px`;
-    const bulbsContainer = document.getElementById('etageBulbsChart')?.parentElement;
-    if (bulbsContainer) bulbsContainer.style.height = `${etageChartHeight}px`;
+    const interCard = document.getElementById('etageInterventionsChart')?.closest('.chart-card');
+    if (interCard) interCard.style.height = `${etageChartHeight + 80}px`;
+    const bulbsCard = document.getElementById('etageBulbsChart')?.closest('.chart-card');
+    if (bulbsCard) bulbsCard.style.height = `${etageChartHeight + 80}px`;
+
 
 
     renderChart('etageInterventionsChart', 'bar', sortedEtages, [], null, {
@@ -878,13 +879,11 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         fill: type === 'line' ? false : undefined
     }];
 
-    // Si es una gráfica de barras horizontales, fijar un grosor de barra uniforme (barThickness)
+    // Si es una gráfica de barras horizontales, fijar un grosor de barra uniforme (barThickness) de forma global en las opciones
     if (type === 'bar' && customOptions.indexAxis === 'y') {
-        finalDatasets.forEach(ds => {
-            if (ds.label !== 'Total') {
-                ds.barThickness = 26;
-            }
-        });
+        if (!options.datasets) options.datasets = {};
+        if (!options.datasets.bar) options.datasets.bar = {};
+        options.datasets.bar.barThickness = 26;
     }
 
     charts[canvasId] = new Chart(ctx, {
