@@ -695,7 +695,7 @@ function updateDashboard() {
             label: cat,
             data: catData,
             backgroundColor: catColorMap[cat] || '#cbd5e1',
-            borderColor: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#0f172a' : '#ffffff',
+            borderColor: isDarkMode ? '#0f172a' : '#ffffff',
             borderWidth: 2
         };
     });
