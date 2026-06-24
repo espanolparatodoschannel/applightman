@@ -774,8 +774,8 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         color: textColor,
         plugins: {
             legend: {
-                display: ['pie', 'doughnut'].includes(type),
-                position: 'right',
+                display: (['pie', 'doughnut'].includes(type) || customOptions.datasets !== undefined),
+                position: ['pie', 'doughnut'].includes(type) ? 'right' : 'bottom',
                 labels: { color: textColor, padding: 20, font: { family: 'Inter', size: 12 } }
             },
             datalabels: {
