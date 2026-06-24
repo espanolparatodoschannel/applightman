@@ -356,7 +356,7 @@ body {
 
 /* Charts */
 .chart-card {
-    height: 320px;
+    min-height: 320px;
     display: flex;
     flex-direction: column;
 }

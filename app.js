@@ -703,20 +703,23 @@ function updateDashboard() {
             data: catData,
             backgroundColor: catColorMap[cat] || '#cbd5e1',
             borderColor: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#0f172a' : '#ffffff',
-            borderWidth: 2
+            borderWidth: 2,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
         };
     });
 
     const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const textColor = isDarkMode ? '#94a3b8' : '#475569';
 
-    // Añadir dataset invisible para el total
     datasetsForEtage.push({
         label: 'Total',
         data: sortedEtages.map(() => 0),
         backgroundColor: 'transparent',
         borderColor: 'transparent',
         borderWidth: 0,
+        barPercentage: 0.65,
+        categoryPercentage: 0.8,
         datalabels: {
             display: true,
             anchor: 'end',
@@ -764,9 +767,23 @@ function updateDashboard() {
         datasetLabel: 'Ampoules'
     });
 
-    renderChart('etageInterventionsChart', 'bar', sortedEtages, etageInterventionsValues, '#60a5fa', {
-        datasetLabel: 'Interventions',
-        indexAxis: 'y'
+    const etageChartHeight = Math.max(320, sortedEtages.length * 40);
+    const interContainer = document.getElementById('etageInterventionsChart')?.parentElement;
+    if (interContainer) interContainer.style.height = `${etageChartHeight}px`;
+    const bulbsContainer = document.getElementById('etageBulbsChart')?.parentElement;
+    if (bulbsContainer) bulbsContainer.style.height = `${etageChartHeight}px`;
+
+    renderChart('etageInterventionsChart', 'bar', sortedEtages, [], null, {
+        indexAxis: 'y',
+        datasets: [{
+            label: 'Interventions',
+            data: etageInterventionsValues,
+            backgroundColor: '#60a5fa',
+            borderColor: isDarkMode ? '#0f172a' : '#ffffff',
+            borderWidth: 2,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+        }]
     });
 
     renderChart('etageBulbsChart', 'bar', sortedEtages, [], null, {
