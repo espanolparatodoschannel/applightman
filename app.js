@@ -606,15 +606,10 @@ function updateDashboard() {
     // Calcular totales de bombillas (ampoules)
     const totalBulbs = dashboardRecords.reduce((sum, r) => sum + Number(r.quantite || 0), 0);
     
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    const monthBulbs = dashboardRecords.filter(r => {
-        const d = new Date(r.date || r.fecha);
-        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    }).reduce((sum, r) => sum + Number(r.quantite || 0), 0);
-
-    document.getElementById('stat-total').textContent = totalBulbs;
-    document.getElementById('stat-month').textContent = monthBulbs;
+    const totalElement = document.getElementById('stat-total');
+    if (totalElement) {
+        totalElement.textContent = totalBulbs;
+    }
 
 
     // 1.5 Ampoules changées par mois
