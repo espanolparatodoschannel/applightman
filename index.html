@@ -19,6 +19,13 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('lightman_theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', savedTheme || (prefersDark ? 'dark' : 'light'));
+        })();
+    </script>
 </head>
 
 <body>
@@ -26,7 +33,7 @@
     <!-- Header -->
     <header class="app-header">
         <div class="logo-container">
-            <i class="fa-solid fa-lightbulb"></i>
+            <i class="fa-regular fa-lightbulb" id="theme-toggle" title="Changer de thème"></i>
             <h1>Lightman</h1>
         </div>
         <button id="sync-btn" class="icon-btn" title="Synchroniser avec Google Sheets" style="position: relative;">

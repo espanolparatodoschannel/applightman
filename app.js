@@ -59,6 +59,7 @@ const elements = {
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+    ThemeManager.init();
     if (typeof ChartDataLabels !== 'undefined') {
         Chart.register(ChartDataLabels);
     }
@@ -721,7 +722,7 @@ function updateDashboard() {
         };
     });
 
-    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const textColor = isDarkMode ? '#94a3b8' : '#475569';
 
     datasetsForEtage.push({
@@ -824,7 +825,7 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         charts[canvasId].destroy();
     }
 
-    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     const textColor = isDarkMode ? '#94a3b8' : '#475569';
     const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
@@ -909,3 +910,61 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         options: options
     });
 }
+
+// Theme manager
+const ThemeManager = {
+    init() {
+        const savedTheme = localStorage.getItem('lightman_theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // Determinar el tema activo
+        const activeTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', activeTheme);
+        this.updateIcon(activeTheme === 'dark');
+        
+        // Escuchar cambios de tema del sistema
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('lightman_theme')) {
+                const newSystemTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newSystemTheme);
+                this.updateIcon(e.matches);
+            }
+        });
+        
+        // Configurar el click en el bombillo
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('lightman_theme', newTheme);
+                this.updateIcon(newTheme === 'dark');
+                
+                // Actualizar los gráficos si están visibles para cambiar su combinación de colores si es necesario
+                if (typeof updateDashboard === 'function') {
+                    // Esperar un tick para que las CSS variables se apliquen antes de redibujar gráficos
+                    setTimeout(() => {
+                        updateDashboard();
+                    }, 0);
+                }
+            });
+        }
+    },
+    
+    updateIcon(isDark) {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (!themeToggle) return;
+        
+        if (isDark) {
+            themeToggle.style.color = '#fbbf24'; // Amber 400
+            themeToggle.style.filter = 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.95))';
+            themeToggle.className = 'fa-solid fa-lightbulb';
+        } else {
+            themeToggle.style.color = ''; // Reset to CSS default (var(--primary-light))
+            themeToggle.style.filter = '';
+            themeToggle.className = 'fa-regular fa-lightbulb'; // Outline icon when light/off
+        }
+    }
+};
