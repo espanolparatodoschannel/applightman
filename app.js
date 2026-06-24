@@ -703,9 +703,7 @@ function updateDashboard() {
             data: catData,
             backgroundColor: catColorMap[cat] || '#cbd5e1',
             borderColor: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#0f172a' : '#ffffff',
-            borderWidth: 2,
-            barPercentage: 0.65,
-            categoryPercentage: 0.8
+            borderWidth: 2
         };
     });
 
@@ -718,8 +716,6 @@ function updateDashboard() {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
         borderWidth: 0,
-        barPercentage: 0.65,
-        categoryPercentage: 0.8,
         datalabels: {
             display: true,
             anchor: 'end',
@@ -767,7 +763,7 @@ function updateDashboard() {
         datasetLabel: 'Ampoules'
     });
 
-    const etageChartHeight = Math.max(320, sortedEtages.length * 40);
+    const etageChartHeight = Math.max(320, sortedEtages.length * 64);
     const interContainer = document.getElementById('etageInterventionsChart')?.parentElement;
     if (interContainer) interContainer.style.height = `${etageChartHeight}px`;
     const bulbsContainer = document.getElementById('etageBulbsChart')?.parentElement;
@@ -780,9 +776,7 @@ function updateDashboard() {
             data: etageInterventionsValues,
             backgroundColor: '#60a5fa',
             borderColor: isDarkMode ? '#0f172a' : '#ffffff',
-            borderWidth: 2,
-            barPercentage: 0.65,
-            categoryPercentage: 0.8
+            borderWidth: 2
         }]
     });
 
