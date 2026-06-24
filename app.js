@@ -50,7 +50,11 @@ const elements = {
     etageSelect: document.getElementById('etage'),
     exportPdfBtn: document.getElementById('export-pdf-btn'),
     historyContainer: document.getElementById('history-container'),
-    syncBadge: document.getElementById('sync-badge')
+    syncBadge: document.getElementById('sync-badge'),
+    filterMonth: document.getElementById('filter-month'),
+    filterEtage: document.getElementById('filter-etage'),
+    filterTache: document.getElementById('filter-tache'),
+    clearFiltersBtn: document.getElementById('clear-filters-btn')
 };
 
 // Initialize App
@@ -73,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appOptions = mockOptions;
         populateAllSelects();
         records = JSON.parse(localStorage.getItem('lightman_local_records')) || [];
+        populateFilters();
         updateDashboard();
     }
 
@@ -110,6 +115,18 @@ function setupEventListeners() {
             }
         });
     });
+
+    if (elements.filterMonth) {
+        elements.filterMonth.addEventListener('change', updateDashboard);
+        elements.filterEtage.addEventListener('change', updateDashboard);
+        elements.filterTache.addEventListener('change', updateDashboard);
+        elements.clearFiltersBtn.addEventListener('click', () => {
+            elements.filterMonth.value = 'all';
+            elements.filterEtage.value = 'all';
+            elements.filterTache.value = 'all';
+            updateDashboard();
+        });
+    }
 
     // Mostrar/ocultar campos de tarea
     elements.tacheSelect.addEventListener('change', (e) => {
@@ -311,7 +328,9 @@ async function fetchDataFromCloud() {
             appOptions = data.options;
             populateAllSelects();
             records = data.records || [];
+            populateFilters();
             updateDashboard();
+            renderHistory();
         } else {
             throw new Error(data.message || "Error desconocido");
         }
@@ -465,7 +484,9 @@ function addToHistory(record) {
 
 function renderHistory() {
     if (!elements.historyContainer) return;
-    const history = JSON.parse(localStorage.getItem('lightman_history')) || [];
+    
+    // Obtenemos los últimos 5 registros guardados en Google Sheets
+    const history = records.slice(-5).reverse();
     
     if (history.length === 0) {
         elements.historyContainer.innerHTML = '<p class="help-text">Aucun enregistrement récent.</p>';
@@ -483,14 +504,92 @@ function renderHistory() {
     `).join('');
 }
 
+function populateFilters() {
+    if (!elements.filterMonth) return;
+
+    // Month Filter
+    const months = new Set();
+    records.forEach(r => {
+        if (!r.date && !r.fecha) return;
+        const d = new Date(r.date || r.fecha);
+        if (!isNaN(d)) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            months.add(`${y}-${m}`);
+        }
+    });
+    const sortedMonths = Array.from(months).sort().reverse();
+    const monthNames = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
+    elements.filterMonth.innerHTML = '<option value="all">Tous les mois</option>';
+    sortedMonths.forEach(key => {
+        const [y, m] = key.split('-');
+        const label = `${monthNames[parseInt(m, 10) - 1]} ${y}`;
+        elements.filterMonth.innerHTML += `<option value="${key}">${label}</option>`;
+    });
+
+    // Etage Filter
+    const etages = new Set();
+    records.forEach(r => {
+        if (r.etage !== undefined && r.etage !== null && r.etage !== "") {
+            etages.add(String(r.etage).trim());
+        }
+    });
+    const sortedEtages = Array.from(etages).sort();
+    elements.filterEtage.innerHTML = '<option value="all">Tous les étages</option>';
+    sortedEtages.forEach(e => {
+        elements.filterEtage.innerHTML += `<option value="${e}">${e}</option>`;
+    });
+
+    // Tache Filter
+    const taches = new Set();
+    records.forEach(r => {
+        if (r.tache) taches.add(r.tache);
+    });
+    elements.filterTache.innerHTML = '<option value="all">Toutes les tâches</option>';
+    Array.from(taches).sort().forEach(t => {
+        elements.filterTache.innerHTML += `<option value="${t}">${t}</option>`;
+    });
+}
+
+function getFilteredRecords() {
+    let filtered = records;
+    if (!elements.filterMonth) return filtered;
+
+    const mVal = elements.filterMonth.value;
+    const eVal = elements.filterEtage.value;
+    const tVal = elements.filterTache.value;
+
+    if (mVal !== 'all') {
+        filtered = filtered.filter(r => {
+            const d = new Date(r.date || r.fecha);
+            if (isNaN(d)) return false;
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            return `${y}-${m}` === mVal;
+        });
+    }
+
+    if (eVal !== 'all') {
+        filtered = filtered.filter(r => String(r.etage).trim() === eVal);
+    }
+
+    if (tVal !== 'all') {
+        filtered = filtered.filter(r => r.tache === tVal);
+    }
+
+    return filtered;
+}
+
 // Charts & Stats Logic
 function updateDashboard() {
+    const dashboardRecords = getFilteredRecords();
+
     // Calcular totales de bombillas (ampoules)
-    const totalBulbs = records.reduce((sum, r) => sum + Number(r.quantite || 0), 0);
+    const totalBulbs = dashboardRecords.reduce((sum, r) => sum + Number(r.quantite || 0), 0);
     
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
-    const monthBulbs = records.filter(r => {
+    const monthBulbs = dashboardRecords.filter(r => {
         const d = new Date(r.date || r.fecha);
         return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     }).reduce((sum, r) => sum + Number(r.quantite || 0), 0);
@@ -499,20 +598,50 @@ function updateDashboard() {
     document.getElementById('stat-month').textContent = monthBulbs;
 
 
+    // 1.5 Ampoules changées par mois
+    const monthlyData = {};
+    dashboardRecords.forEach(r => {
+        if (!r.date && !r.fecha) return;
+        const d = new Date(r.date || r.fecha);
+        if (!isNaN(d)) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const key = `${y}-${m}`;
+            monthlyData[key] = (monthlyData[key] || 0) + Number(r.quantite || 0);
+        }
+    });
+    const sortedMonths = Object.keys(monthlyData).sort();
+    const monthNames = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
+    const monthlyLabels = sortedMonths.map(key => {
+        const [y, m] = key.split('-');
+        return `${monthNames[parseInt(m, 10) - 1]} ${y}`;
+    });
+    const monthlyValues = sortedMonths.map(key => monthlyData[key]);
+
     // 2. Top 5 Productos
     const productData = {};
-    records.forEach(r => {
-        const idKey = r.id_item || r.description;
+    const productCategoryMap = {};
+    const productDescMap = {};
+    dashboardRecords.forEach(r => {
+        const idKey = r.id_item || "Inconnu";
+        const desc = r.description || idKey;
         if (idKey) {
             productData[idKey] = (productData[idKey] || 0) + Number(r.quantite || 0);
+            if (r.categorie && !productCategoryMap[idKey]) {
+                productCategoryMap[idKey] = r.categorie;
+            }
+            if (!productDescMap[idKey]) {
+                productDescMap[idKey] = desc;
+            }
         }
     });
     const sortedProducts = Object.keys(productData).sort((a, b) => productData[b] - productData[a]).slice(0, 5);
     const sortedProductQuantities = sortedProducts.map(p => productData[p]);
+    const topProductsFullDesc = sortedProducts.map(p => productDescMap[p]);
 
     // 3. Distribución por tipo de tarea
     const taskTypeData = {};
-    records.forEach(r => {
+    dashboardRecords.forEach(r => {
         if (r.tache) {
             taskTypeData[r.tache] = (taskTypeData[r.tache] || 0) + Number(r.quantite || 0);
         }
@@ -521,7 +650,7 @@ function updateDashboard() {
     // 4 & 5. Intervenciones y bombillas por planta (étage)
     const etageInterventions = {};
     const etageBulbs = {};
-    records.forEach(r => {
+    dashboardRecords.forEach(r => {
         if (r.etage !== undefined && r.etage !== null) {
             const etageStr = String(r.etage).trim();
             if (etageStr) {
@@ -547,16 +676,42 @@ function updateDashboard() {
 
     // 6. Categorías
     const catCounts = {};
-    records.forEach(r => {
+    dashboardRecords.forEach(r => {
         if (r.categorie) {
             catCounts[r.categorie] = (catCounts[r.categorie] || 0) + Number(r.quantite || 0);
         }
     });
 
+    const catLabels = Object.keys(catCounts);
+    const catPalette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+    const catColorMap = {};
+    catLabels.forEach((cat, index) => {
+        catColorMap[cat] = catPalette[index % catPalette.length];
+    });
+
+    const topProductsColors = sortedProducts.map(p => {
+        const cat = productCategoryMap[p];
+        return cat ? (catColorMap[cat] || '#cbd5e1') : '#cbd5e1';
+    });
+
     // Renderizar todos los gráficos
-    renderChart('topProductsChart', 'bar', sortedProducts, sortedProductQuantities, ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], {
-        indexAxis: 'y',
+    renderChart('monthlyBulbsChart', 'bar', monthlyLabels, monthlyValues, '#10b981', {
         datasetLabel: 'Ampoules'
+    });
+
+    renderChart('topProductsChart', 'bar', sortedProducts, sortedProductQuantities, topProductsColors, {
+        indexAxis: 'y',
+        datasetLabel: 'Ampoules',
+        fullDescriptions: topProductsFullDesc,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(context) {
+                        return context[0].chart.options.fullDescriptions[context[0].dataIndex] || context[0].label;
+                    }
+                }
+            }
+        }
     });
 
     renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#3b82f6', '#10b981', '#ef4444', '#f59e0b'], {
@@ -564,14 +719,16 @@ function updateDashboard() {
     });
 
     renderChart('etageInterventionsChart', 'bar', sortedEtages, etageInterventionsValues, '#60a5fa', {
-        datasetLabel: 'Interventions'
+        datasetLabel: 'Interventions',
+        indexAxis: 'y'
     });
 
     renderChart('etageBulbsChart', 'bar', sortedEtages, etageBulbsValues, '#3b82f6', {
-        datasetLabel: 'Ampoules'
+        datasetLabel: 'Ampoules',
+        indexAxis: 'y'
     });
 
-    renderChart('categoryChart', 'pie', Object.keys(catCounts), Object.values(catCounts), ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'], {
+    renderChart('categoryChart', 'pie', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
         datasetLabel: 'Ampoules'
     });
 }
@@ -600,8 +757,11 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
                 labels: { color: textColor, padding: 20, font: { family: 'Inter', size: 12 } }
             },
             datalabels: {
-                display: ['pie', 'doughnut'].includes(type),
-                color: '#fff',
+                display: true,
+                anchor: ['pie', 'doughnut'].includes(type) ? 'center' : 'end',
+                align: ['pie', 'doughnut'].includes(type) ? 'center' : (customOptions.indexAxis === 'y' ? 'right' : 'top'),
+                color: ['pie', 'doughnut'].includes(type) ? '#fff' : textColor,
+                offset: 4,
                 font: { weight: 'bold', family: 'Inter' },
                 formatter: (value) => {
                     return value > 0 ? value : '';
@@ -610,11 +770,11 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         },
         scales: ['pie', 'doughnut'].includes(type) ? {} : {
             x: {
-                ticks: { color: textColor, font: { family: 'Inter' } },
+                ticks: { precision: 0, color: textColor, font: { family: 'Inter' } },
                 grid: { color: gridColor, drawBorder: false }
             },
             y: {
-                ticks: { color: textColor, font: { family: 'Inter' } },
+                ticks: { precision: 0, color: textColor, font: { family: 'Inter' } },
                 grid: { color: gridColor, drawBorder: false }
             }
         },
@@ -625,6 +785,9 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
     };
 
     const options = { ...defaultOptions, ...customOptions };
+    if (customOptions.fullDescriptions) {
+        options.fullDescriptions = customOptions.fullDescriptions;
+    }
     if (customOptions.plugins) {
         options.plugins = { ...defaultOptions.plugins, ...customOptions.plugins };
     }
