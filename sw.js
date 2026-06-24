@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lightman-cache-v16';
+const CACHE_NAME = 'lightman-cache-v19';
 const urlsToCache = [
   '/',
   '/index.html',

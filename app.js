@@ -275,8 +275,25 @@ function setupEventListeners() {
             }).catch(err => {
                 console.error("PDF Error:", err);
                 elements.exportPdfBtn.style.display = 'block';
-                hideLoader();
             });
+        });
+    }
+
+    // Stepper Logic
+    const stepperMinus = document.getElementById('stepper-minus');
+    const stepperPlus = document.getElementById('stepper-plus');
+    const quantiteInput = document.getElementById('quantite');
+
+    if (stepperMinus && stepperPlus && quantiteInput) {
+        stepperMinus.addEventListener('click', () => {
+            let val = parseInt(quantiteInput.value) || 1;
+            if (val > 1) {
+                quantiteInput.value = val - 1;
+            }
+        });
+        stepperPlus.addEventListener('click', () => {
+            let val = parseInt(quantiteInput.value) || 0;
+            quantiteInput.value = val + 1;
         });
     }
 }
@@ -468,10 +485,12 @@ function updateDateDisplay() {
             // const months = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
             
             elements.dateDisplay.textContent = `${day}-${months[monthIndex]}-${year}`;
+            elements.dateDisplay.classList.remove('placeholder-active');
             return;
         }
     }
     elements.dateDisplay.textContent = "Sélectionnez la date";
+    elements.dateDisplay.classList.add('placeholder-active');
 }
 
 function addToHistory(record) {
