@@ -649,13 +649,15 @@ function updateDashboard() {
 
     // 4 & 5. Intervenciones y bombillas por planta (étage)
     const etageInterventions = {};
-    const etageBulbs = {};
+    const etageBulbsByCategory = {};
     dashboardRecords.forEach(r => {
         if (r.etage !== undefined && r.etage !== null) {
             const etageStr = String(r.etage).trim();
+            const cat = r.categorie || 'Inconnu';
             if (etageStr) {
                 etageInterventions[etageStr] = (etageInterventions[etageStr] || 0) + 1;
-                etageBulbs[etageStr] = (etageBulbs[etageStr] || 0) + Number(r.quantite || 0);
+                if (!etageBulbsByCategory[etageStr]) etageBulbsByCategory[etageStr] = {};
+                etageBulbsByCategory[etageStr][cat] = (etageBulbsByCategory[etageStr][cat] || 0) + Number(r.quantite || 0);
             }
         }
     });
@@ -663,7 +665,7 @@ function updateDashboard() {
     let sortedEtages = [];
     if (appOptions.etage && appOptions.etage.length > 0) {
         const appEtages = appOptions.etage.map(et => String(et).trim()).filter(Boolean);
-        sortedEtages = appEtages.filter(et => etageInterventions[et] !== undefined || etageBulbs[et] !== undefined);
+        sortedEtages = appEtages.filter(et => etageInterventions[et] !== undefined || etageBulbsByCategory[et] !== undefined);
         const otherEtages = Object.keys(etageInterventions).filter(et => !sortedEtages.includes(et));
         sortedEtages = sortedEtages.concat(otherEtages);
         sortedEtages = [...new Set(sortedEtages)];
@@ -672,7 +674,6 @@ function updateDashboard() {
     }
 
     const etageInterventionsValues = sortedEtages.map(et => etageInterventions[et] || 0);
-    const etageBulbsValues = sortedEtages.map(et => etageBulbs[et] || 0);
 
     // 6. Categorías
     const catCounts = {};
@@ -687,6 +688,23 @@ function updateDashboard() {
     const catColorMap = {};
     catLabels.forEach((cat, index) => {
         catColorMap[cat] = catPalette[index % catPalette.length];
+    });
+
+    // Crear datasets apilados para etageBulbsChart
+    const etageCategories = new Set();
+    Object.values(etageBulbsByCategory).forEach(etageData => {
+        Object.keys(etageData).forEach(cat => etageCategories.add(cat));
+    });
+    
+    const datasetsForEtage = Array.from(etageCategories).map(cat => {
+        const catData = sortedEtages.map(et => etageBulbsByCategory[et]?.[cat] || 0);
+        return {
+            label: cat,
+            data: catData,
+            backgroundColor: catColorMap[cat] || '#cbd5e1',
+            borderColor: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#0f172a' : '#ffffff',
+            borderWidth: 2
+        };
     });
 
     const topProductsColors = sortedProducts.map(p => {
@@ -723,9 +741,13 @@ function updateDashboard() {
         indexAxis: 'y'
     });
 
-    renderChart('etageBulbsChart', 'bar', sortedEtages, etageBulbsValues, '#3b82f6', {
-        datasetLabel: 'Ampoules',
-        indexAxis: 'y'
+    renderChart('etageBulbsChart', 'bar', sortedEtages, [], null, {
+        indexAxis: 'y',
+        datasets: datasetsForEtage,
+        scales: {
+            x: { stacked: true },
+            y: { stacked: true }
+        }
     });
 
     renderChart('categoryChart', 'pie', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
@@ -758,10 +780,10 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
             },
             datalabels: {
                 display: true,
-                anchor: ['pie', 'doughnut'].includes(type) ? 'center' : 'end',
-                align: ['pie', 'doughnut'].includes(type) ? 'center' : (customOptions.indexAxis === 'y' ? 'right' : 'top'),
-                color: ['pie', 'doughnut'].includes(type) ? '#fff' : textColor,
-                offset: 4,
+                anchor: (['pie', 'doughnut'].includes(type) || customOptions.datasets) ? 'center' : 'end',
+                align: (['pie', 'doughnut'].includes(type) || customOptions.datasets) ? 'center' : (customOptions.indexAxis === 'y' ? 'right' : 'top'),
+                color: (['pie', 'doughnut'].includes(type) || customOptions.datasets) ? '#fff' : textColor,
+                offset: customOptions.datasets ? 0 : 4,
                 font: { weight: 'bold', family: 'Inter' },
                 formatter: (value) => {
                     return value > 0 ? value : '';
@@ -788,6 +810,11 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
     if (customOptions.fullDescriptions) {
         options.fullDescriptions = customOptions.fullDescriptions;
     }
+    if (customOptions.scales) {
+        options.scales = { ...defaultOptions.scales, ...customOptions.scales };
+        if (customOptions.scales.x) options.scales.x = { ...defaultOptions.scales.x, ...customOptions.scales.x };
+        if (customOptions.scales.y) options.scales.y = { ...defaultOptions.scales.y, ...customOptions.scales.y };
+    }
     if (customOptions.plugins) {
         options.plugins = { ...defaultOptions.plugins, ...customOptions.plugins };
     }
@@ -796,7 +823,7 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         type: type,
         data: {
             labels: labels,
-            datasets: [{
+            datasets: customOptions.datasets || [{
                 label: customOptions.datasetLabel || 'Quantité',
                 data: data,
                 backgroundColor: colors,
