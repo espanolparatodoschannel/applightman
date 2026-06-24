@@ -695,8 +695,7 @@ function updateDashboard() {
             label: cat,
             data: catData,
             backgroundColor: catColorMap[cat] || '#cbd5e1',
-            borderColor: isDarkMode ? '#0f172a' : '#ffffff',
-            borderWidth: 2
+            borderWidth: 0
         };
     });
 
