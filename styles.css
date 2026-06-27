@@ -146,6 +146,14 @@ body {
     transition: transform var(--transition-snappy), color var(--transition-smooth), filter var(--transition-smooth);
 }
 
+.app-logo {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    transition: transform var(--transition-snappy);
+}
+
 .logo-container i:hover {
     transform: scale(1.15);
 }
