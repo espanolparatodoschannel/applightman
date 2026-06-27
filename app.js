@@ -82,7 +82,20 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.configInput.value = apiUrl;
         elements.connStatus.textContent = "Connecté à Google Sheets";
         elements.connStatus.className = "status-badge success";
-        fetchDataFromCloud();
+        
+        const cachedOptions = localStorage.getItem('lightman_app_options');
+        const cachedRecords = localStorage.getItem('lightman_cloud_records');
+        
+        if (cachedOptions && cachedRecords) {
+            appOptions = JSON.parse(cachedOptions);
+            records = JSON.parse(cachedRecords);
+            populateAllSelects();
+            populateFilters();
+            updateDashboard();
+            fetchDataFromCloud(false); // Background sync
+        } else {
+            fetchDataFromCloud(true); // Blocking sync
+        }
     } else {
         // Load mocks
         appOptions = mockOptions;
@@ -350,16 +363,26 @@ function populateAllSelects() {
     elements.idInput.value = "";
 }
 
-async function fetchDataFromCloud() {
-    showLoader("Synchronisation des données...");
+async function fetchDataFromCloud(showBlockingLoader = true) {
+    if (showBlockingLoader) {
+        showLoader("Synchronisation des données...");
+    } else {
+        const icon = elements.syncBtn.querySelector('i');
+        if (icon) icon.classList.add('fa-spin');
+    }
+
     try {
         const response = await fetch(apiUrl + "?action=getData");
         const data = await response.json();
         
         if (data.status === 'success') {
             appOptions = data.options;
-            populateAllSelects();
             records = data.records || [];
+            
+            localStorage.setItem('lightman_app_options', JSON.stringify(appOptions));
+            localStorage.setItem('lightman_cloud_records', JSON.stringify(records));
+
+            populateAllSelects();
             populateFilters();
             updateDashboard();
             renderHistory();
@@ -368,11 +391,18 @@ async function fetchDataFromCloud() {
         }
     } catch (error) {
         console.error("Fetch Error:", error);
-        alert("Erreur de connexion à Google Sheets. Utilisation de données locales temporaires.");
-        appOptions = mockOptions;
-        populateAllSelects();
+        if (showBlockingLoader) {
+            alert("Erreur de connexion à Google Sheets. Utilisation de données locales temporaires.");
+            appOptions = mockOptions;
+            populateAllSelects();
+        }
     } finally {
-        hideLoader();
+        if (showBlockingLoader) {
+            hideLoader();
+        } else {
+            const icon = elements.syncBtn.querySelector('i');
+            if (icon) icon.classList.remove('fa-spin');
+        }
     }
 }
 
