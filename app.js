@@ -939,11 +939,20 @@ function updateDashboard() {
                         sum += Number(data);
                     });
                     if (sum === 0) return '';
-                    const percentage = (value * 100 / sum).toFixed(1) + "%";
+                    
+                    const percentageValue = (value * 100 / sum);
+                    // Si representa menos del 6% del total, no dibujamos la etiqueta para evitar desbordamientos
+                    if (percentageValue < 6) return '';
+                    
+                    const percentage = percentageValue.toFixed(1) + "%";
                     return `${value}\n(${percentage})`;
                 },
                 color: '#ffffff',
-                font: { weight: 'bold', family: 'Inter', size: 11 }
+                font: { 
+                    weight: 'bold', 
+                    family: 'Inter', 
+                    size: window.innerWidth < 480 ? 9 : 10 
+                }
             }
         }
     });
