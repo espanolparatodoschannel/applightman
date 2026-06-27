@@ -150,30 +150,30 @@ body {
     height: 52px;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(37, 99, 235, 0.45));
+    filter: brightness(1.4) contrast(1.1) drop-shadow(0 2px 6px rgba(37, 99, 235, 0.45));
     transition: transform var(--transition-snappy), filter var(--transition-smooth);
     cursor: pointer;
 }
 
 .app-logo:hover {
     transform: scale(1.08) rotate(-3deg);
-    filter: drop-shadow(0 4px 10px rgba(37, 99, 235, 0.7));
+    filter: brightness(1.6) contrast(1.15) drop-shadow(0 4px 10px rgba(37, 99, 235, 0.7));
 }
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .app-logo {
-        filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.5));
+        filter: brightness(1.6) contrast(1.1) drop-shadow(0 2px 8px rgba(96, 165, 250, 0.5));
     }
     :root:not([data-theme="light"]) .app-logo:hover {
-        filter: drop-shadow(0 4px 12px rgba(96, 165, 250, 0.8));
+        filter: brightness(1.8) contrast(1.15) drop-shadow(0 4px 12px rgba(96, 165, 250, 0.8));
     }
 }
 
 :root[data-theme="dark"] .app-logo {
-    filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.5));
+    filter: brightness(1.6) contrast(1.1) drop-shadow(0 2px 8px rgba(96, 165, 250, 0.5));
 }
 :root[data-theme="dark"] .app-logo:hover {
-    filter: drop-shadow(0 4px 12px rgba(96, 165, 250, 0.8));
+    filter: brightness(1.8) contrast(1.15) drop-shadow(0 4px 12px rgba(96, 165, 250, 0.8));
 }
 
 .logo-container i:hover {
