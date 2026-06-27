@@ -57,7 +57,8 @@ const elements = {
     sheetUrlInput: document.getElementById('sheet-url'),
     openSheetBtn: document.getElementById('open-sheet-btn'),
     searchHistory: document.getElementById('search-history'),
-    historySummary: document.getElementById('history-summary')
+    historySummary: document.getElementById('history-summary'),
+    reloadAppBtn: document.getElementById('reload-app-btn')
 };
 
 const SHEET_URL_KEY = "lightman_sheet_url";
@@ -300,6 +301,26 @@ function setupEventListeners() {
         }
     });
 
+    // Reload and Clear Cache Button
+    if (elements.reloadAppBtn) {
+        elements.reloadAppBtn.addEventListener('click', async () => {
+            if (confirm("Voulez-vous vider le cache et recharger l'application pour appliquer les mises à jour ?")) {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                }
+                if (window.caches) {
+                    const keys = await caches.keys();
+                    for (let key of keys) {
+                        await caches.delete(key);
+                    }
+                }
+                window.location.reload(true);
+            }
+        });
+    }
 
 
     // Stepper Logic
@@ -930,8 +951,10 @@ function updateDashboard() {
 
     renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#3b82f6', '#10b981', '#ef4444', '#f59e0b'], {
         datasetLabel: 'Ampoules',
+        cutout: '45%', // Thicker slices to give labels more room
         plugins: {
             datalabels: {
+                display: 'auto', // Hides labels that overlap or don't fit
                 formatter: (value, context) => {
                     let sum = 0;
                     const dataArr = context.chart.data.datasets[0].data;
@@ -941,8 +964,9 @@ function updateDashboard() {
                     if (sum === 0) return '';
                     
                     const percentageValue = (value * 100 / sum);
-                    // Si representa menos del 6% del total, no dibujamos la etiqueta para evitar desbordamientos
-                    if (percentageValue < 6) return '';
+                    // Aumentamos el límite en móvil a 12% y en PC a 6% para evitar amontonamientos
+                    const threshold = window.innerWidth < 480 ? 12 : 6;
+                    if (percentageValue < threshold) return '';
                     
                     const percentage = percentageValue.toFixed(1) + "%";
                     return `${value}\n(${percentage})`;
