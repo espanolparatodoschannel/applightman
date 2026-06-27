@@ -169,20 +169,40 @@ function doGet(e) {
         const quantIdx = headers.indexOf("Quantité");
         const tacheIdx = headers.indexOf("Type de tâche");
         const numTacheIdx = headers.indexOf("# Type de tâche");
+        let numBonIdx = headers.indexOf("# Bon de trabajo");
+        if (numBonIdx === -1) {
+          numBonIdx = headers.indexOf("# Bon de travail");
+        }
+        const numSoumIdx = headers.indexOf("# Soumission");
         const idIdx = headers.indexOf("Id");
         const noteIdx = headers.indexOf("Note");
 
+        const recordsSheet = ss.getSheetByName(SHEET_NAME_RECORDS);
         for (let i = 1; i < recordsData.length; i++) {
           const row = recordsData[i];
+          let descVal = descIdx > -1 ? row[descIdx] : "";
+          let idVal = idIdx > -1 ? row[idIdx] : "";
+
+          // Auto-correction for known mismatch (F32T8/TL930... should be FC-23, not FC-15)
+          if (descVal === "F32T8/TL930/ALTO PHILIPS-479592 30/CASE" && idVal === "FC-15") {
+            if (idIdx > -1) {
+              idVal = "FC-23";
+              row[idIdx] = "FC-23";
+              recordsSheet.getRange(i + 1, idIdx + 1).setValue("FC-23");
+            }
+          }
+
           records.push({
             date: fechaIdx > -1 ? row[fechaIdx] : "",
             etage: etageIdx > -1 ? row[etageIdx] : "",
-            description: descIdx > -1 ? row[descIdx] : "",
+            description: descVal,
             categorie: catIdx > -1 ? row[catIdx] : "",
             quantite: quantIdx > -1 ? row[quantIdx] : 0,
             tache: tacheIdx > -1 ? row[tacheIdx] : "",
             num_tache: numTacheIdx > -1 ? row[numTacheIdx] : "",
-            id_item: idIdx > -1 ? row[idIdx] : "",
+            num_bon: numBonIdx > -1 ? row[numBonIdx] : "",
+            num_soumission: numSoumIdx > -1 ? row[numSoumIdx] : "",
+            id_item: idVal,
             note: noteIdx > -1 ? row[noteIdx] : ""
           });
         }

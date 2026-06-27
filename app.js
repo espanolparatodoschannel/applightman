@@ -53,8 +53,14 @@ const elements = {
     filterMonth: document.getElementById('filter-month'),
     filterEtage: document.getElementById('filter-etage'),
     filterTache: document.getElementById('filter-tache'),
-    clearFiltersBtn: document.getElementById('clear-filters-btn')
+    clearFiltersBtn: document.getElementById('clear-filters-btn'),
+    sheetUrlInput: document.getElementById('sheet-url'),
+    openSheetBtn: document.getElementById('open-sheet-btn'),
+    searchHistory: document.getElementById('search-history'),
+    historySummary: document.getElementById('history-summary')
 };
+
+const SHEET_URL_KEY = "lightman_sheet_url";
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -67,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDateDisplay();
     
     // Load config
+    const savedSheetUrl = localStorage.getItem(SHEET_URL_KEY);
+    if (savedSheetUrl && elements.sheetUrlInput) {
+        elements.sheetUrlInput.value = savedSheetUrl;
+    }
+
     if (apiUrl) {
         elements.configInput.value = apiUrl;
         elements.connStatus.textContent = "Connecté à Google Sheets";
@@ -229,6 +240,14 @@ function setupEventListeners() {
     // Save Config
     elements.saveConfigBtn.addEventListener('click', () => {
         const newUrl = elements.configInput.value.trim();
+        const sheetUrl = elements.sheetUrlInput.value.trim();
+        
+        if (sheetUrl) {
+            localStorage.setItem(SHEET_URL_KEY, sheetUrl);
+        } else {
+            localStorage.removeItem(SHEET_URL_KEY);
+        }
+
         if (newUrl) {
             localStorage.setItem(CONFIG_KEY, newUrl);
             apiUrl = newUrl;
@@ -242,6 +261,18 @@ function setupEventListeners() {
             elements.connStatus.className = "status-badge error";
         }
     });
+
+    // Open Sheet Button
+    if (elements.openSheetBtn) {
+        elements.openSheetBtn.addEventListener('click', () => {
+            const sheetUrl = elements.sheetUrlInput.value.trim();
+            if (sheetUrl) {
+                window.open(sheetUrl, '_blank');
+            } else {
+                alert("Veuillez entrer l'URL du fichier Google Sheets d'abord.");
+            }
+        });
+    }
 
     // Sync Button
     elements.syncBtn.addEventListener('click', () => {
@@ -274,6 +305,11 @@ function setupEventListeners() {
             let val = parseInt(quantiteInput.value) || 0;
             quantiteInput.value = val + 1;
         });
+    }
+
+    // Search History Listener
+    if (elements.searchHistory) {
+        elements.searchHistory.addEventListener('input', renderHistory);
     }
 }
 
@@ -483,23 +519,125 @@ function addToHistory(record) {
 function renderHistory() {
     if (!elements.historyContainer) return;
     
-    // Obtenemos los últimos 5 registros guardados en Google Sheets
-    const history = records.slice(-5).reverse();
+    // Obtenemos todos los registros guardados en Google Sheets
+    let history = [...records];
+    
+    // Invertir el orden para que los más recientes estén al principio
+    history.reverse();
+    
+    // Filtrar por la barra de búsqueda si tiene contenido
+    const searchVal = elements.searchHistory ? elements.searchHistory.value.trim().toLowerCase() : "";
+    if (searchVal !== "") {
+        history = history.filter(r => {
+            const desc = (r.description || "").toLowerCase();
+            const id = (r.id_item || "").toLowerCase();
+            const etage = String(r.etage || "").toLowerCase();
+            const tache = (r.tache || "").toLowerCase();
+            const note = (r.note || "").toLowerCase();
+            const numTache = String(r.num_tache || "").toLowerCase();
+            const numBon = String(r.num_bon || "").toLowerCase();
+            const numSoumission = String(r.num_soumission || "").toLowerCase();
+            const cat = (r.categorie || "").toLowerCase();
+            return desc.includes(searchVal) || 
+                   id.includes(searchVal) || 
+                   etage.includes(searchVal) || 
+                   tache.includes(searchVal) || 
+                   note.includes(searchVal) || 
+                   numTache.includes(searchVal) ||
+                   numBon.includes(searchVal) ||
+                   numSoumission.includes(searchVal) ||
+                   cat.includes(searchVal);
+        });
+    }
+    
+    // Actualizar el resumen/contador
+    if (elements.historySummary) {
+        elements.historySummary.textContent = `Total: ${history.length} remplacement${history.length !== 1 ? 's' : ''}`;
+    }
     
     if (history.length === 0) {
-        elements.historyContainer.innerHTML = '<p class="help-text">Aucun enregistrement récent.</p>';
+        elements.historyContainer.innerHTML = '<p class="help-text">Aucun enregistrement correspondant.</p>';
         return;
     }
     
-    elements.historyContainer.innerHTML = history.map(r => `
-        <div class="history-card">
-            <div class="history-info">
-                <span class="history-desc">${r.description || r.id_item || 'N/A'}</span>
-                <span class="history-date">Étage: ${r.etage || '-'} • Type: ${r.tache || '-'} • ${new Date(r.fecha || r.date).toLocaleDateString()}</span>
+    elements.historyContainer.innerHTML = history.map(r => {
+        // Formatear la fecha
+        let dateStr = "";
+        try {
+            const d = new Date(r.fecha || r.date);
+            if (!isNaN(d)) {
+                const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+                dateStr = `${d.getDate()}-${months[d.getMonth()]}-${d.getFullYear()}`;
+            } else {
+                dateStr = r.fecha || r.date || "-";
+            }
+        } catch(e) {
+            dateStr = r.fecha || r.date || "-";
+        }
+
+        // Obtener el número de tarea/bon/soumission
+        let detailsVal = "";
+        if (r.tache) {
+            const num = r.num_tache || r.num_bon || r.num_soumission;
+            detailsVal = num ? ` • #${num}` : "";
+        }
+
+        return `
+            <div class="pro-history-card">
+                <div class="pro-card-header">
+                    <div class="pro-desc-group">
+                        <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
+                        <h4 class="pro-desc">${r.description || 'N/A'}</h4>
+                    </div>
+                    <div class="pro-qty-badge">
+                        <span class="qty-val">${r.quantite}</span>
+                        <span class="qty-unit">x</span>
+                    </div>
+                </div>
+                
+                <div class="pro-card-body">
+                    <div class="pro-meta-grid">
+                        <div class="pro-meta-item">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <div>
+                                <span class="meta-label">Étage</span>
+                                <span class="meta-value">${r.etage !== undefined && r.etage !== null && r.etage !== "" ? r.etage : '-'}</span>
+                            </div>
+                        </div>
+                        <div class="pro-meta-item">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <div>
+                                <span class="meta-label">Tâche</span>
+                                <span class="meta-value">${r.tache || '-'}${detailsVal}</span>
+                            </div>
+                        </div>
+                        <div class="pro-meta-item">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <div>
+                                <span class="meta-label">Catégorie</span>
+                                <span class="meta-value">${r.categorie || '-'}</span>
+                            </div>
+                        </div>
+                        <div class="pro-meta-item">
+                            <i class="fa-regular fa-calendar"></i>
+                            <div>
+                                <span class="meta-label">Date</span>
+                                <span class="meta-value">${dateStr}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                ${r.note ? `
+                <div class="pro-card-footer">
+                    <div class="pro-note">
+                        <i class="fa-solid fa-quote-left"></i>
+                        <p>${r.note}</p>
+                    </div>
+                </div>` : ''}
             </div>
-            <span class="history-qty">${r.quantite}x</span>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function populateFilters() {
@@ -617,7 +755,9 @@ function updateDashboard() {
     const productDescMap = {};
     dashboardRecords.forEach(r => {
         const idKey = r.id_item || "Inconnu";
-        const desc = r.description || idKey;
+        // Buscamos la descripción en el catálogo de opciones oficial
+        const foundOpt = appOptions.opciones.find(opt => opt.id === idKey);
+        const desc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || idKey);
         if (idKey) {
             productData[idKey] = (productData[idKey] || 0) + Number(r.quantite || 0);
             if (r.categorie && !productCategoryMap[idKey]) {
@@ -761,23 +901,8 @@ function updateDashboard() {
     if (topProductsCard) topProductsCard.style.height = `${topProductsHeight + 80}px`;
 
     const etageChartHeight = Math.max(250, sortedEtages.length * 48);
-    const interCard = document.getElementById('etageInterventionsChart')?.closest('.chart-card');
-    if (interCard) interCard.style.height = `${etageChartHeight + 80}px`;
     const bulbsCard = document.getElementById('etageBulbsChart')?.closest('.chart-card');
     if (bulbsCard) bulbsCard.style.height = `${etageChartHeight + 80}px`;
-
-
-
-    renderChart('etageInterventionsChart', 'bar', sortedEtages, [], null, {
-        indexAxis: 'y',
-        datasets: [{
-            label: 'Interventions',
-            data: etageInterventionsValues,
-            backgroundColor: '#60a5fa',
-            borderColor: isDarkMode ? '#0f172a' : '#ffffff',
-            borderWidth: 2
-        }]
-    });
 
     renderChart('etageBulbsChart', 'bar', sortedEtages, [], null, {
         indexAxis: 'y',

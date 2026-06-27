@@ -20,7 +20,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
     <script>
-        (function() {
+        (function () {
             const savedTheme = localStorage.getItem('lightman_theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.documentElement.setAttribute('data-theme', savedTheme || (prefersDark ? 'dark' : 'light'));
@@ -109,9 +109,11 @@
                     <div class="form-group">
                         <label for="quantite"><i class="fa-solid fa-hashtag"></i> Quantité</label>
                         <div class="stepper-control">
-                            <button type="button" class="stepper-btn" id="stepper-minus"><i class="fa-solid fa-minus"></i></button>
+                            <button type="button" class="stepper-btn" id="stepper-minus"><i
+                                    class="fa-solid fa-minus"></i></button>
                             <input type="number" id="quantite" name="quantite" min="1" value="1" required>
-                            <button type="button" class="stepper-btn" id="stepper-plus"><i class="fa-solid fa-plus"></i></button>
+                            <button type="button" class="stepper-btn" id="stepper-plus"><i
+                                    class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
@@ -169,7 +171,8 @@
                         <option value="all">Toutes les tâches</option>
                     </select>
                 </div>
-                <button id="clear-filters-btn" class="btn-secondary" style="width: 100%;">Réinitialiser les filtres</button>
+                <button id="clear-filters-btn" class="btn-secondary" style="width: 100%;">Réinitialiser les
+                    filtres</button>
             </div>
 
             <div class="card chart-card">
@@ -194,13 +197,6 @@
             </div>
 
             <div class="card chart-card">
-                <h3>Nombre d'interventions par étage</h3>
-                <div class="chart-container">
-                    <canvas id="etageInterventionsChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card chart-card">
                 <h3>Total d'ampoules par étage et type</h3>
                 <div class="chart-container">
                     <canvas id="etageBulbsChart"></canvas>
@@ -218,7 +214,20 @@
         <!-- VIEW: HISTORIQUE -->
         <section id="view-historique" class="view">
             <div class="card">
-                <h2><i class="fa-solid fa-clock-rotate-left"></i> Historique Récent</h2>
+                <h2><i class="fa-solid fa-list-ul"></i> Historique des Remplacements</h2>
+                <p class="help-text">Visualisez et recherchez tous los remplacements enregistrés.</p>
+                
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <div class="search-input-container">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="search-history" placeholder="Rechercher par description, étage, tâche, note...">
+                    </div>
+                </div>
+
+                <div class="history-summary-text">
+                    <span id="history-summary">Total: 0 remplacements</span>
+                </div>
+                
                 <div id="history-container">
                     <p class="help-text">Aucun enregistrement récent.</p>
                 </div>
@@ -245,6 +254,18 @@
 
                 <h3>Statut de la connexion</h3>
                 <div id="connection-status" class="status-badge error">Non configuré</div>
+
+                <hr class="divider">
+
+                <h3>Visualiser la Base de Données</h3>
+                <p class="help-text">Pour ouvrir directement votre fichier Google Sheets, collez son URL ici.</p>
+                <div class="form-group">
+                    <label for="sheet-url">URL du fichier Google Sheets</label>
+                    <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+                </div>
+                <button id="open-sheet-btn" class="btn-secondary" style="width: 100%; margin-top: 10px;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir Google Sheets
+                </button>
             </div>
         </section>
 
