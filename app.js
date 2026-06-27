@@ -899,7 +899,23 @@ function updateDashboard() {
     });
 
     renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#3b82f6', '#10b981', '#ef4444', '#f59e0b'], {
-        datasetLabel: 'Ampoules'
+        datasetLabel: 'Ampoules',
+        plugins: {
+            datalabels: {
+                formatter: (value, context) => {
+                    let sum = 0;
+                    const dataArr = context.chart.data.datasets[0].data;
+                    dataArr.forEach(data => {
+                        sum += Number(data);
+                    });
+                    if (sum === 0) return '';
+                    const percentage = (value * 100 / sum).toFixed(1) + "%";
+                    return `${value}\n(${percentage})`;
+                },
+                color: '#ffffff',
+                font: { weight: 'bold', family: 'Inter', size: 11 }
+            }
+        }
     });
 
     // Ajustar alturas dinámicas de las tarjetas contenedoras de gráficos horizontales para unificar el espaciado y evitar solapamientos
