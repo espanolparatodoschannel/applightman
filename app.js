@@ -873,7 +873,14 @@ function updateDashboard() {
 
     // Renderizar todos los gráficos
     renderChart('monthlyBulbsChart', 'bar', monthlyLabels, monthlyValues, '#10b981', {
-        datasetLabel: 'Ampoules'
+        datasetLabel: 'Ampoules',
+        plugins: {
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                color: '#ffffff'
+            }
+        }
     });
 
     renderChart('topProductsChart', 'bar', sortedProducts, sortedProductQuantities, topProductsColors, {
@@ -985,6 +992,12 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
     }
     if (customOptions.plugins) {
         options.plugins = { ...defaultOptions.plugins, ...customOptions.plugins };
+        if (customOptions.plugins.datalabels) {
+            options.plugins.datalabels = { ...defaultOptions.plugins.datalabels, ...customOptions.plugins.datalabels };
+        }
+        if (customOptions.plugins.legend) {
+            options.plugins.legend = { ...defaultOptions.plugins.legend, ...customOptions.plugins.legend };
+        }
     }
 
     let finalDatasets = customOptions.datasets || [{
