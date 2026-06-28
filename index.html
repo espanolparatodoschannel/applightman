@@ -146,8 +146,20 @@
             <div class="card">
                 <div class="stats-grid">
                     <div class="stat-box">
-                        <span class="stat-label">Total Remplacements</span>
+                        <span class="stat-label">Total Ampoules</span>
                         <span id="stat-total" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Moyenne mensuelle</span>
+                        <span id="stat-avg" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Étage le plus actif</span>
+                        <span id="stat-top-etage" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Produit favori</span>
+                        <span id="stat-top-product" class="stat-value" style="font-size: 1.2rem; word-break: break-all;">-</span>
                     </div>
                 </div>
             </div>
@@ -176,6 +188,13 @@
                     filtres</button>
             </div>
 
+            <div id="stats-empty-state" class="card empty-state-card hidden" style="text-align: center; padding: 3rem 1rem;">
+                <i class="fa-solid fa-chart-pie empty-state-icon" style="font-size: 3rem; color: var(--border-color); margin-bottom: 1rem;"></i>
+                <h3 style="color: var(--text-secondary);">Aucune donnée pour cette sélection</h3>
+                <p class="help-text">Veuillez modifier vos filtres pour voir les statistiques.</p>
+            </div>
+
+            <div id="charts-container">
             <div class="card chart-card">
                 <h3>Ampoules changées par mois</h3>
                 <div class="chart-container">
@@ -198,7 +217,12 @@
             </div>
 
             <div class="card chart-card">
-                <h3>Total d'ampoules par étage et type</h3>
+                <div class="chart-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Total d'ampoules par étage et type</h3>
+                    <button id="toggle-etage-chart-btn" class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+                        <i class="fa-solid fa-layer-group"></i> Apilado
+                    </button>
+                </div>
                 <div class="chart-container">
                     <canvas id="etageBulbsChart"></canvas>
                 </div>
@@ -209,6 +233,7 @@
                 <div class="chart-container">
                     <canvas id="categoryChart"></canvas>
                 </div>
+            </div>
             </div>
         </section>
 

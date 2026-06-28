@@ -412,20 +412,21 @@ body {
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
 }
 
 .stat-box {
     background: linear-gradient(145deg, var(--input-bg), var(--bg-card));
-    padding: 1.25rem 1rem;
+    padding: 1rem 0.75rem;
     border-radius: var(--radius-md);
     text-align: center;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
-    max-width: 280px;
-    margin: 0 auto;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .stat-label {
@@ -440,7 +441,7 @@ body {
 
 .stat-value {
     display: block;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--primary);
     background: linear-gradient(to right, var(--primary), var(--primary-light));

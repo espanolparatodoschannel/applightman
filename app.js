@@ -23,6 +23,7 @@ let appOptions = {
 let records = [];
 let charts = {};
 let syncQueue = JSON.parse(localStorage.getItem('lightman_sync_queue')) || [];
+let isEtageStacked = true;
 
 // DOM Elements
 const elements = {
@@ -58,7 +59,15 @@ const elements = {
     openSheetBtn: document.getElementById('open-sheet-btn'),
     searchHistory: document.getElementById('search-history'),
     historySummary: document.getElementById('history-summary'),
-    reloadAppBtn: document.getElementById('reload-app-btn')
+    reloadAppBtn: document.getElementById('reload-app-btn'),
+    
+    // New Dashboard Elements
+    statAvg: document.getElementById('stat-avg'),
+    statTopEtage: document.getElementById('stat-top-etage'),
+    statTopProduct: document.getElementById('stat-top-product'),
+    statsEmptyState: document.getElementById('stats-empty-state'),
+    chartsContainer: document.getElementById('charts-container'),
+    toggleEtageBtn: document.getElementById('toggle-etage-chart-btn')
 };
 
 const SHEET_URL_KEY = "lightman_sheet_url";
@@ -319,6 +328,16 @@ function setupEventListeners() {
                 }
                 window.location.reload(true);
             }
+        });
+    }
+
+    if (elements.toggleEtageBtn) {
+        elements.toggleEtageBtn.addEventListener('click', () => {
+            isEtageStacked = !isEtageStacked;
+            elements.toggleEtageBtn.innerHTML = isEtageStacked 
+                ? '<i class="fa-solid fa-layer-group"></i> Apilado' 
+                : '<i class="fa-solid fa-bars"></i> Agrupado';
+            updateDashboard();
         });
     }
 
@@ -771,6 +790,21 @@ function getFilteredRecords() {
 function updateDashboard() {
     const dashboardRecords = getFilteredRecords();
 
+    if (dashboardRecords.length === 0) {
+        if (elements.chartsContainer) elements.chartsContainer.classList.add('hidden');
+        if (elements.statsEmptyState) elements.statsEmptyState.classList.remove('hidden');
+        
+        const totalElement = document.getElementById('stat-total');
+        if (totalElement) totalElement.textContent = "0";
+        if (elements.statAvg) elements.statAvg.textContent = "0";
+        if (elements.statTopEtage) elements.statTopEtage.textContent = "-";
+        if (elements.statTopProduct) elements.statTopProduct.textContent = "-";
+        return;
+    } else {
+        if (elements.chartsContainer) elements.chartsContainer.classList.remove('hidden');
+        if (elements.statsEmptyState) elements.statsEmptyState.classList.add('hidden');
+    }
+
     // Calcular totales de bombillas (ampoules)
     const totalBulbs = dashboardRecords.reduce((sum, r) => sum + Number(r.quantite || 0), 0);
     
@@ -778,8 +812,6 @@ function updateDashboard() {
     if (totalElement) {
         totalElement.textContent = totalBulbs;
     }
-
-
     // 1.5 Ampoules changées par mois
     const monthlyData = {};
     dashboardRecords.forEach(r => {
@@ -856,6 +888,18 @@ function updateDashboard() {
 
     const etageInterventionsValues = sortedEtages.map(et => etageInterventions[et] || 0);
 
+    // Actualizar KPIs
+    if (elements.statAvg) {
+        const avg = sortedMonths.length > 0 ? (totalBulbs / sortedMonths.length).toFixed(1) : 0;
+        elements.statAvg.textContent = avg;
+    }
+    if (elements.statTopEtage) {
+        elements.statTopEtage.textContent = sortedEtages.length > 0 ? sortedEtages[0] : "-";
+    }
+    if (elements.statTopProduct) {
+        elements.statTopProduct.textContent = sortedProducts.length > 0 ? sortedProducts[0] : "-";
+    }
+
     // 6. Categorías
     const catCounts = {};
     dashboardRecords.forEach(r => {
@@ -919,9 +963,31 @@ function updateDashboard() {
         return cat ? (catColorMap[cat] || '#cbd5e1') : '#cbd5e1';
     });
 
+    // Handler para Drill-down interactivo
+    const handleChartClick = (e, activeEls) => {
+        if (!activeEls.length) return;
+        const chart = activeEls[0].element.$context.chart;
+        const index = activeEls[0].index;
+        const label = chart.data.labels[index];
+        
+        // Cambiar a la pestaña Historique
+        elements.navItems.forEach(n => n.classList.remove('active'));
+        elements.views.forEach(v => v.classList.remove('active'));
+        const histNav = Array.from(elements.navItems).find(n => n.getAttribute('data-target') === 'historique');
+        if (histNav) histNav.classList.add('active');
+        document.getElementById('view-historique').classList.add('active');
+        
+        // Aplicar el filtro de búsqueda
+        if (elements.searchHistory) {
+            elements.searchHistory.value = label;
+            renderHistory();
+        }
+    };
+
     // Renderizar todos los gráficos
     renderChart('monthlyBulbsChart', 'bar', monthlyLabels, monthlyValues, '#10b981', {
         datasetLabel: 'Ampoules',
+        onClick: handleChartClick,
         plugins: {
             datalabels: {
                 anchor: 'center',
@@ -934,6 +1000,7 @@ function updateDashboard() {
     renderChart('topProductsChart', 'bar', sortedProducts, sortedProductQuantities, topProductsColors, {
         indexAxis: 'y',
         datasetLabel: 'Ampoules',
+        onClick: handleChartClick,
         fullDescriptions: topProductsFullDesc,
         plugins: {
             tooltip: {
@@ -948,6 +1015,7 @@ function updateDashboard() {
 
     renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#3b82f6', '#10b981', '#ef4444', '#f59e0b'], {
         datasetLabel: 'Ampoules',
+        onClick: handleChartClick,
         cutout: '45%', // Thicker slices to give labels more room
         plugins: {
             datalabels: {
@@ -990,14 +1058,16 @@ function updateDashboard() {
     renderChart('etageBulbsChart', 'bar', sortedEtages, [], null, {
         indexAxis: 'y',
         datasets: datasetsForEtage,
+        onClick: handleChartClick,
         scales: {
-            x: { stacked: true },
-            y: { stacked: true }
+            x: { stacked: isEtageStacked },
+            y: { stacked: isEtageStacked }
         }
     });
 
     renderChart('categoryChart', 'pie', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
-        datasetLabel: 'Ampoules'
+        datasetLabel: 'Ampoules',
+        onClick: handleChartClick
     });
 }
 
@@ -1053,7 +1123,12 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         },
         elements: {
             bar: { borderRadius: 6, borderSkipped: false },
-            line: { tension: 0.4, borderWidth: 3 } // Smooth premium curves
+            line: { tension: 0.4, borderWidth: 3 }
+        },
+        onClick: (e, activeEls) => {
+            if (activeEls.length > 0 && customOptions.onClick) {
+                customOptions.onClick(e, activeEls);
+            }
         }
     };
 
@@ -1084,6 +1159,26 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         borderWidth: type === 'line' ? 3 : 2,
         fill: type === 'line' ? false : undefined
     }];
+
+    // Apply gradients for bar charts to create a premium glassmorphism effect
+    if (type === 'bar') {
+        finalDatasets = finalDatasets.map(ds => {
+            if (Array.isArray(ds.backgroundColor)) {
+                ds.backgroundColor = ds.backgroundColor.map(color => {
+                    const gradient = ctx.createLinearGradient(0, 0, customOptions.indexAxis === 'y' ? 400 : 0, customOptions.indexAxis === 'y' ? 0 : 400);
+                    gradient.addColorStop(0, color);
+                    gradient.addColorStop(1, isDarkMode ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)');
+                    return gradient;
+                });
+            } else if (typeof ds.backgroundColor === 'string' && ds.backgroundColor !== 'transparent') {
+                const gradient = ctx.createLinearGradient(0, 0, customOptions.indexAxis === 'y' ? 400 : 0, customOptions.indexAxis === 'y' ? 0 : 400);
+                gradient.addColorStop(0, ds.backgroundColor);
+                gradient.addColorStop(1, isDarkMode ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)');
+                ds.backgroundColor = gradient;
+            }
+            return ds;
+        });
+    }
 
     // Si es una gráfica de barras horizontales, fijar un grosor de barra uniforme (barThickness) de forma global en las opciones
     if (type === 'bar' && customOptions.indexAxis === 'y') {
