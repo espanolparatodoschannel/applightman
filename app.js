@@ -23,7 +23,6 @@ let appOptions = {
 let records = [];
 let charts = {};
 let syncQueue = JSON.parse(localStorage.getItem('lightman_sync_queue')) || [];
-let isEtageStacked = true;
 
 // DOM Elements
 const elements = {
@@ -64,10 +63,7 @@ const elements = {
     // New Dashboard Elements
     statAvg: document.getElementById('stat-avg'),
     statTopEtage: document.getElementById('stat-top-etage'),
-    statTopProduct: document.getElementById('stat-top-product'),
-    statsEmptyState: document.getElementById('stats-empty-state'),
-    chartsContainer: document.getElementById('charts-container'),
-    toggleEtageBtn: document.getElementById('toggle-etage-chart-btn')
+    statTopProduct: document.getElementById('stat-top-product')
 };
 
 const SHEET_URL_KEY = "lightman_sheet_url";
@@ -330,17 +326,6 @@ function setupEventListeners() {
             }
         });
     }
-
-    if (elements.toggleEtageBtn) {
-        elements.toggleEtageBtn.addEventListener('click', () => {
-            isEtageStacked = !isEtageStacked;
-            elements.toggleEtageBtn.innerHTML = isEtageStacked 
-                ? '<i class="fa-solid fa-layer-group"></i> Apilado' 
-                : '<i class="fa-solid fa-bars"></i> Agrupado';
-            updateDashboard();
-        });
-    }
-
 
     // Stepper Logic
     const stepperMinus = document.getElementById('stepper-minus');
@@ -790,21 +775,6 @@ function getFilteredRecords() {
 function updateDashboard() {
     const dashboardRecords = getFilteredRecords();
 
-    if (dashboardRecords.length === 0) {
-        if (elements.chartsContainer) elements.chartsContainer.classList.add('hidden');
-        if (elements.statsEmptyState) elements.statsEmptyState.classList.remove('hidden');
-        
-        const totalElement = document.getElementById('stat-total');
-        if (totalElement) totalElement.textContent = "0";
-        if (elements.statAvg) elements.statAvg.textContent = "0";
-        if (elements.statTopEtage) elements.statTopEtage.textContent = "-";
-        if (elements.statTopProduct) elements.statTopProduct.textContent = "-";
-        return;
-    } else {
-        if (elements.chartsContainer) elements.chartsContainer.classList.remove('hidden');
-        if (elements.statsEmptyState) elements.statsEmptyState.classList.add('hidden');
-    }
-
     // Calcular totales de bombillas (ampoules)
     const totalBulbs = dashboardRecords.reduce((sum, r) => sum + Number(r.quantite || 0), 0);
     
@@ -1060,8 +1030,8 @@ function updateDashboard() {
         datasets: datasetsForEtage,
         onClick: handleChartClick,
         scales: {
-            x: { stacked: isEtageStacked },
-            y: { stacked: isEtageStacked }
+            x: { stacked: true },
+            y: { stacked: true }
         }
     });
 
@@ -1159,26 +1129,6 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         borderWidth: type === 'line' ? 3 : 2,
         fill: type === 'line' ? false : undefined
     }];
-
-    // Apply gradients for bar charts to create a premium glassmorphism effect
-    if (type === 'bar') {
-        finalDatasets = finalDatasets.map(ds => {
-            if (Array.isArray(ds.backgroundColor)) {
-                ds.backgroundColor = ds.backgroundColor.map(color => {
-                    const gradient = ctx.createLinearGradient(0, 0, customOptions.indexAxis === 'y' ? 400 : 0, customOptions.indexAxis === 'y' ? 0 : 400);
-                    gradient.addColorStop(0, color);
-                    gradient.addColorStop(1, isDarkMode ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)');
-                    return gradient;
-                });
-            } else if (typeof ds.backgroundColor === 'string' && ds.backgroundColor !== 'transparent') {
-                const gradient = ctx.createLinearGradient(0, 0, customOptions.indexAxis === 'y' ? 400 : 0, customOptions.indexAxis === 'y' ? 0 : 400);
-                gradient.addColorStop(0, ds.backgroundColor);
-                gradient.addColorStop(1, isDarkMode ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)');
-                ds.backgroundColor = gradient;
-            }
-            return ds;
-        });
-    }
 
     // Si es una gráfica de barras horizontales, fijar un grosor de barra uniforme (barThickness) de forma global en las opciones
     if (type === 'bar' && customOptions.indexAxis === 'y') {
