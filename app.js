@@ -630,7 +630,7 @@ function renderHistory() {
         let detailsVal = "";
         if (r.tache) {
             const num = r.num_tache || r.num_bon || r.num_soumission;
-            detailsVal = num ? ` • #${num}` : "";
+            detailsVal = num ? ` #${num}` : "";
         }
 
         return `
