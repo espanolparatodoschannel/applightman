@@ -846,16 +846,13 @@ function updateDashboard() {
         }
     });
 
-    let sortedEtages = [];
-    if (appOptions.etage && appOptions.etage.length > 0) {
-        const appEtages = appOptions.etage.map(et => String(et).trim()).filter(Boolean);
-        sortedEtages = appEtages.filter(et => etageInterventions[et] !== undefined || etageBulbsByCategory[et] !== undefined);
-        const otherEtages = Object.keys(etageInterventions).filter(et => !sortedEtages.includes(et));
-        sortedEtages = sortedEtages.concat(otherEtages);
-        sortedEtages = [...new Set(sortedEtages)];
-    } else {
-        sortedEtages = Object.keys(etageInterventions);
-    }
+    let sortedEtages = Object.keys(etageBulbsByCategory);
+    // Sort by total bulbs replaced (descending order) to match Top 5 products chart
+    sortedEtages.sort((a, b) => {
+        const totalA = Object.values(etageBulbsByCategory[a]).reduce((sum, v) => sum + v, 0);
+        const totalB = Object.values(etageBulbsByCategory[b]).reduce((sum, v) => sum + v, 0);
+        return totalB - totalA;
+    });
 
     const etageInterventionsValues = sortedEtages.map(et => etageInterventions[et] || 0);
 
