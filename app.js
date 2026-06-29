@@ -580,29 +580,33 @@ function renderHistory() {
     // Invertir el orden para que los más recientes estén al principio
     history.reverse();
     
-    // Filtrar por la barra de búsqueda si tiene contenido (Búsqueda Universal)
+    // Filtrar por la barra de búsqueda si tiene contenido
     const searchVal = elements.searchHistory ? elements.searchHistory.value.trim().toLowerCase() : "";
     if (searchVal !== "") {
         const searchTerms = searchVal.split(/\s+/); // Divide por espacios
         
         history = history.filter(r => {
-            // Combinar todos los campos en un solo bloque de texto
-            const allText = [
-                r.description,
-                r.id_item,
-                r.etage,
-                r.tache,
-                r.note,
-                r.num_tache,
-                r.num_bon,
-                r.num_soumission,
-                r.categorie,
-                r.fecha,
-                r.date
-            ].map(val => String(val || "").toLowerCase()).join(" ");
+            const desc = String(r.description || "").toLowerCase();
+            const id = String(r.id_item || "").toLowerCase();
+            const etage = String(r.etage || "").trim().toLowerCase();
+            const numTache = String(r.num_tache || "").toLowerCase();
+            const numBon = String(r.num_bon || "").toLowerCase();
+            const numSoumission = String(r.num_soumission || "").toLowerCase();
             
-            // Retorna true solo si TODOS los términos de búsqueda (separados por espacio) existen en el registro
-            return searchTerms.every(term => allText.includes(term));
+            // Retorna true solo si TODOS los términos de búsqueda existen en los campos seleccionados
+            return searchTerms.every(term => {
+                // Si el término es un número, hacemos comparación exacta para el piso (evita que "9" coincida con "19" o "29")
+                // Si no es un número (ej. "SS"), permitimos búsqueda parcial en el piso
+                const isNumeric = !isNaN(term) && term.trim() !== "";
+                const matchEtage = isNumeric ? (etage === term) : etage.includes(term);
+                
+                return desc.includes(term) || 
+                       id.includes(term) || 
+                       matchEtage || 
+                       numTache.includes(term) ||
+                       numBon.includes(term) ||
+                       numSoumission.includes(term);
+            });
         });
     }
     
