@@ -233,6 +233,33 @@
             <div class="card">
                 <h2><i class="fa-solid fa-list-ul"></i> Historique des Remplacements</h2>
                 <p class="help-text">Visualisez et recherchez tous los remplacements enregistrés.</p>
+
+                <!-- Filtres Historique -->
+                <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-history-month" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Mois / Année</label>
+                            <select id="filter-history-month" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Tous les mois</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-history-etage" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Étage</label>
+                            <select id="filter-history-etage" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Tous les étages</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-history-tache" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Type de tâche</label>
+                            <select id="filter-history-tache" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Toutes les tâches</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="clear-history-filters-btn" class="btn-secondary" style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                        <i class="fa-solid fa-rotate-left"></i> Réinitialiser les filtres
+                    </button>
+                </div>
                 
                 <div class="form-group" style="margin-bottom: 1.25rem;">
                     <div class="search-input-container">

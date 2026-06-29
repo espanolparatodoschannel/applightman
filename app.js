@@ -63,7 +63,13 @@ const elements = {
     // New Dashboard Elements
     statAvg: document.getElementById('stat-avg'),
     statTopEtage: document.getElementById('stat-top-etage'),
-    statTopProduct: document.getElementById('stat-top-product')
+    statTopProduct: document.getElementById('stat-top-product'),
+    
+    // History Filter Elements
+    filterHistoryMonth: document.getElementById('filter-history-month'),
+    filterHistoryEtage: document.getElementById('filter-history-etage'),
+    filterHistoryTache: document.getElementById('filter-history-tache'),
+    clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn')
 };
 
 const SHEET_URL_KEY = "lightman_sheet_url";
@@ -155,6 +161,19 @@ function setupEventListeners() {
             elements.filterEtage.value = 'all';
             elements.filterTache.value = 'all';
             updateDashboard();
+        });
+    }
+
+    if (elements.filterHistoryMonth) {
+        elements.filterHistoryMonth.addEventListener('change', renderHistory);
+        elements.filterHistoryEtage.addEventListener('change', renderHistory);
+        elements.filterHistoryTache.addEventListener('change', renderHistory);
+        elements.clearHistoryFiltersBtn.addEventListener('click', () => {
+            elements.filterHistoryMonth.value = 'all';
+            elements.filterHistoryEtage.value = 'all';
+            elements.filterHistoryTache.value = 'all';
+            if (elements.searchHistory) elements.searchHistory.value = '';
+            renderHistory();
         });
     }
 
@@ -580,6 +599,29 @@ function renderHistory() {
     // Invertir el orden para que los más recientes estén al principio
     history.reverse();
     
+    // Filtrar por los selectores de Filtro de Historial
+    if (elements.filterHistoryMonth) {
+        const hmVal = elements.filterHistoryMonth.value;
+        const heVal = elements.filterHistoryEtage.value;
+        const htVal = elements.filterHistoryTache.value;
+        
+        if (hmVal !== 'all') {
+            history = history.filter(r => {
+                const d = new Date(r.date || r.fecha);
+                if (isNaN(d)) return false;
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                return `${y}-${m}` === hmVal;
+            });
+        }
+        if (heVal !== 'all') {
+            history = history.filter(r => String(r.etage).trim() === heVal);
+        }
+        if (htVal !== 'all') {
+            history = history.filter(r => r.tache === htVal);
+        }
+    }
+    
     // Filtrar por la barra de búsqueda si tiene contenido
     const searchVal = elements.searchHistory ? elements.searchHistory.value.trim().toLowerCase() : "";
     if (searchVal !== "") {
@@ -716,11 +758,19 @@ function populateFilters() {
     });
     const sortedMonths = Array.from(months).sort().reverse();
     const monthNames = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
+    
+    // Populate Stats Month Filter
     elements.filterMonth.innerHTML = '<option value="all">Tous les mois</option>';
+    // Populate History Month Filter
+    if (elements.filterHistoryMonth) elements.filterHistoryMonth.innerHTML = '<option value="all">Tous les mois</option>';
+    
     sortedMonths.forEach(key => {
         const [y, m] = key.split('-');
         const label = `${monthNames[parseInt(m, 10) - 1]} ${y}`;
         elements.filterMonth.innerHTML += `<option value="${key}">${label}</option>`;
+        if (elements.filterHistoryMonth) {
+            elements.filterHistoryMonth.innerHTML += `<option value="${key}">${label}</option>`;
+        }
     });
 
     // Etage Filter
@@ -731,9 +781,15 @@ function populateFilters() {
         }
     });
     const sortedEtages = Array.from(etages).sort();
+    
     elements.filterEtage.innerHTML = '<option value="all">Tous les étages</option>';
+    if (elements.filterHistoryEtage) elements.filterHistoryEtage.innerHTML = '<option value="all">Tous les étages</option>';
+    
     sortedEtages.forEach(e => {
         elements.filterEtage.innerHTML += `<option value="${e}">${e}</option>`;
+        if (elements.filterHistoryEtage) {
+            elements.filterHistoryEtage.innerHTML += `<option value="${e}">${e}</option>`;
+        }
     });
 
     // Tache Filter
@@ -741,9 +797,15 @@ function populateFilters() {
     records.forEach(r => {
         if (r.tache) taches.add(r.tache);
     });
+    
     elements.filterTache.innerHTML = '<option value="all">Toutes les tâches</option>';
+    if (elements.filterHistoryTache) elements.filterHistoryTache.innerHTML = '<option value="all">Toutes les tâches</option>';
+    
     Array.from(taches).sort().forEach(t => {
         elements.filterTache.innerHTML += `<option value="${t}">${t}</option>`;
+        if (elements.filterHistoryTache) {
+            elements.filterHistoryTache.innerHTML += `<option value="${t}">${t}</option>`;
+        }
     });
 }
 
@@ -944,6 +1006,7 @@ function updateDashboard() {
         const chart = activeEls[0].element.$context.chart;
         const index = activeEls[0].index;
         const label = chart.data.labels[index];
+        const canvasId = chart.canvas.id;
         
         // Cambiar a la pestaña Historique
         elements.navItems.forEach(n => n.classList.remove('active'));
@@ -952,11 +1015,24 @@ function updateDashboard() {
         if (histNav) histNav.classList.add('active');
         document.getElementById('view-historique').classList.add('active');
         
-        // Aplicar el filtro de búsqueda
-        if (elements.searchHistory) {
+        // Reiniciar todos los filtros de historial primero
+        if (elements.filterHistoryMonth) elements.filterHistoryMonth.value = 'all';
+        if (elements.filterHistoryEtage) elements.filterHistoryEtage.value = 'all';
+        if (elements.filterHistoryTache) elements.filterHistoryTache.value = 'all';
+        if (elements.searchHistory) elements.searchHistory.value = '';
+
+        // Aplicar el filtro correspondiente al elemento clicado
+        if (canvasId === 'monthlyBulbsChart' && elements.filterHistoryMonth) {
+            elements.filterHistoryMonth.value = sortedMonths[index] || 'all';
+        } else if (canvasId === 'etageBulbsChart' && elements.filterHistoryEtage) {
+            elements.filterHistoryEtage.value = label || 'all';
+        } else if (canvasId === 'taskTypeChart' && elements.filterHistoryTache) {
+            elements.filterHistoryTache.value = label || 'all';
+        } else if (elements.searchHistory) {
             elements.searchHistory.value = label;
-            renderHistory();
         }
+        
+        renderHistory();
     };
 
     // Renderizar todos los gráficos
