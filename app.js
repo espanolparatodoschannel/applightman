@@ -580,28 +580,29 @@ function renderHistory() {
     // Invertir el orden para que los más recientes estén al principio
     history.reverse();
     
-    // Filtrar por la barra de búsqueda si tiene contenido
+    // Filtrar por la barra de búsqueda si tiene contenido (Búsqueda Universal)
     const searchVal = elements.searchHistory ? elements.searchHistory.value.trim().toLowerCase() : "";
     if (searchVal !== "") {
+        const searchTerms = searchVal.split(/\s+/); // Divide por espacios
+        
         history = history.filter(r => {
-            const desc = (r.description || "").toLowerCase();
-            const id = (r.id_item || "").toLowerCase();
-            const etage = String(r.etage || "").toLowerCase();
-            const tache = (r.tache || "").toLowerCase();
-            const note = (r.note || "").toLowerCase();
-            const numTache = String(r.num_tache || "").toLowerCase();
-            const numBon = String(r.num_bon || "").toLowerCase();
-            const numSoumission = String(r.num_soumission || "").toLowerCase();
-            const cat = (r.categorie || "").toLowerCase();
-            return desc.includes(searchVal) || 
-                   id.includes(searchVal) || 
-                   etage.includes(searchVal) || 
-                   tache.includes(searchVal) || 
-                   note.includes(searchVal) || 
-                   numTache.includes(searchVal) ||
-                   numBon.includes(searchVal) ||
-                   numSoumission.includes(searchVal) ||
-                   cat.includes(searchVal);
+            // Combinar todos los campos en un solo bloque de texto
+            const allText = [
+                r.description,
+                r.id_item,
+                r.etage,
+                r.tache,
+                r.note,
+                r.num_tache,
+                r.num_bon,
+                r.num_soumission,
+                r.categorie,
+                r.fecha,
+                r.date
+            ].map(val => String(val || "").toLowerCase()).join(" ");
+            
+            // Retorna true solo si TODOS los términos de búsqueda (separados por espacio) existen en el registro
+            return searchTerms.every(term => allText.includes(term));
         });
     }
     
