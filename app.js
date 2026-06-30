@@ -70,6 +70,42 @@ const elements = {
     clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn')
 };
 
+// Plugin de Chart.js para dibujar líneas señaladoras en gráficos circulares (pie)
+const pieLinesPlugin = {
+    id: 'pieLinesPlugin',
+    afterDraw: (chart) => {
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (chart.config.type !== 'pie') return;
+            
+            meta.data.forEach((element, index) => {
+                const { x, y, startAngle, endAngle, outerRadius } = element;
+                const midAngle = startAngle + (endAngle - startAngle) / 2;
+                
+                const startX = x + Math.cos(midAngle) * outerRadius;
+                const startY = y + Math.sin(midAngle) * outerRadius;
+                
+                const endX = x + Math.cos(midAngle) * (outerRadius + 14);
+                const endY = y + Math.sin(midAngle) * (outerRadius + 14);
+                
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                
+                const bgColors = dataset.backgroundColor;
+                const color = Array.isArray(bgColors) ? bgColors[index] : bgColors;
+                
+                ctx.strokeStyle = color || '#cbd5e1';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+            });
+        });
+    }
+};
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -1095,9 +1131,29 @@ function updateDashboard() {
 
     renderChart('categoryChart', 'pie', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
         datasetLabel: 'Ampoules',
-        onClick: handleChartClick
+        onClick: handleChartClick,
+        extraPlugins: [pieLinesPlugin],
+        plugins: {
+            datalabels: {
+                anchor: 'end',
+                align: 'end',
+                offset: 16,
+                color: (context) => {
+                    const dataset = context.chart.data.datasets[context.datasetIndex];
+                    const bgColors = dataset.backgroundColor;
+                    return (Array.isArray(bgColors) ? bgColors[context.dataIndex] : bgColors) || (isDarkMode ? '#94a3b8' : '#475569');
+                },
+                font: {
+                    weight: 'bold',
+                    family: 'Inter',
+                    size: 12
+                }
+            }
+        }
     });
 }
+
+
 
 function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
     const canvas = document.getElementById(canvasId);
@@ -1229,13 +1285,19 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         options.datasets.bar.barThickness = 26;
     }
 
+    const chartPlugins = [];
+    if (customOptions.extraPlugins) {
+        chartPlugins.push(...customOptions.extraPlugins);
+    }
+
     charts[canvasId] = new Chart(ctx, {
         type: type,
         data: {
             labels: labels,
             datasets: finalDatasets
         },
-        options: options
+        options: options,
+        plugins: chartPlugins
     });
 }
 
