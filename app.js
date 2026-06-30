@@ -628,7 +628,10 @@ function renderHistory() {
         const searchTerms = searchVal.split(/\s+/); // Divide por espacios
         
         history = history.filter(r => {
-            const desc = String(r.description || "").toLowerCase();
+            const foundOpt = appOptions.opciones.find(opt => opt.id === r.id_item);
+            const resolvedDesc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || "");
+            
+            const desc = resolvedDesc.toLowerCase();
             const id = String(r.id_item || "").toLowerCase();
             const etage = String(r.etage || "").trim().toLowerCase();
             const numTache = String(r.num_tache || "").toLowerCase();
@@ -684,12 +687,16 @@ function renderHistory() {
             detailsVal = num ? ` #${num}` : "";
         }
 
+        // Buscar descripción actualizada en el catálogo oficial usando el ID
+        const foundOpt = appOptions.opciones.find(opt => opt.id === r.id_item);
+        const displayDesc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || r.id_item || 'N/A');
+
         return `
             <div class="pro-history-card">
                 <div class="pro-card-header">
                     <div class="pro-desc-group">
                         <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
-                        <h4 class="pro-desc">${r.description || 'N/A'}</h4>
+                        <h4 class="pro-desc">${displayDesc}</h4>
                     </div>
                     <div class="pro-qty-badge">
                         <span class="qty-val">${r.quantite}</span>
