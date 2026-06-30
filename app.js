@@ -1146,6 +1146,11 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         responsive: true,
         maintainAspectRatio: false,
         color: textColor,
+        layout: {
+            padding: {
+                right: customOptions.indexAxis === 'y' ? 35 : 0
+            }
+        },
         plugins: {
             legend: {
                 display: (['pie', 'doughnut'].includes(type) || customOptions.datasets !== undefined),
