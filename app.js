@@ -1084,7 +1084,8 @@ function updateDashboard() {
                             strokeStyle: catColorMap[cat] || '#cbd5e1',
                             lineWidth: 0,
                             hidden: false,
-                            index: i
+                            index: i,
+                            fontColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#475569'
                         }));
                     }
                 }
@@ -1229,7 +1230,8 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
                                         strokeStyle: style.borderColor,
                                         lineWidth: style.borderWidth,
                                         hidden: isNaN(dataset.data[i]) || (meta.data[i] && meta.data[i].hidden),
-                                        index: i
+                                        index: i,
+                                        fontColor: textColor
                                     };
                                 });
                             }
