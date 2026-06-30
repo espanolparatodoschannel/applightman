@@ -1068,6 +1068,27 @@ function updateDashboard() {
         onClick: handleChartClick,
         fullDescriptions: topProductsFullDesc,
         plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                onClick: () => {}, // Disable hiding dataset on click
+                labels: {
+                    generateLabels: function(chart) {
+                        const uniqueCats = new Set();
+                        sortedProducts.forEach(p => {
+                            if (productCategoryMap[p]) uniqueCats.add(productCategoryMap[p]);
+                        });
+                        return Array.from(uniqueCats).map((cat, i) => ({
+                            text: cat,
+                            fillStyle: catColorMap[cat] || '#cbd5e1',
+                            strokeStyle: catColorMap[cat] || '#cbd5e1',
+                            lineWidth: 0,
+                            hidden: false,
+                            index: i
+                        }));
+                    }
+                }
+            },
             tooltip: {
                 callbacks: {
                     title: function(context) {
@@ -1078,7 +1099,7 @@ function updateDashboard() {
         }
     });
 
-    renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#3b82f6', '#10b981', '#ef4444', '#f59e0b'], {
+    renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
         cutout: '45%', // Thicker slices to give labels more room
@@ -1133,6 +1154,9 @@ function updateDashboard() {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
         extraPlugins: [pieLinesPlugin],
+        layout: {
+            padding: 40
+        },
         plugins: {
             datalabels: {
                 anchor: 'end',
