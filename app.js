@@ -1062,8 +1062,7 @@ function updateDashboard() {
                     const threshold = window.innerWidth < 480 ? 12 : 6;
                     if (percentageValue < threshold) return '';
                     
-                    const percentage = percentageValue.toFixed(1) + "%";
-                    return `${value}\n(${percentage})`;
+                    return `${value}`;
                 },
                 color: '#ffffff',
                 font: { 
@@ -1130,7 +1129,36 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
                     color: textColor, 
                     padding: 20, 
                     font: { family: 'Inter', size: 12 },
-                    filter: (item) => item.text !== 'Total'
+                    filter: (item) => item.text !== 'Total',
+                    generateLabels: (chart) => {
+                        if (['pie', 'doughnut'].includes(type)) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                const dataset = data.datasets[0];
+                                const total = dataset.data.reduce((sum, val) => sum + Number(val || 0), 0);
+                                return data.labels.map((label, i) => {
+                                    const value = Number(dataset.data[i] || 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) + '%' : '0%';
+                                    
+                                    const meta = chart.getDatasetMeta(0);
+                                    const style = meta.controller.getStyle(i);
+                                    
+                                    return {
+                                        text: `${label} (${percentage})`,
+                                        fillStyle: style.backgroundColor,
+                                        strokeStyle: style.borderColor,
+                                        lineWidth: style.borderWidth,
+                                        hidden: isNaN(dataset.data[i]) || (meta.data[i] && meta.data[i].hidden),
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        } else {
+                            // Fallback para gráficos de barra (como etageBulbsChart)
+                            return Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                        }
+                    }
                 }
             },
             datalabels: {
