@@ -54,8 +54,6 @@ const elements = {
     filterEtage: document.getElementById('filter-etage'),
     filterTache: document.getElementById('filter-tache'),
     clearFiltersBtn: document.getElementById('clear-filters-btn'),
-    sheetUrlInput: document.getElementById('sheet-url'),
-    openSheetBtn: document.getElementById('open-sheet-btn'),
     searchHistory: document.getElementById('search-history'),
     historySummary: document.getElementById('history-summary'),
     reloadAppBtn: document.getElementById('reload-app-btn'),
@@ -72,8 +70,6 @@ const elements = {
     clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn')
 };
 
-const SHEET_URL_KEY = "lightman_sheet_url";
-
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -83,12 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set default date to today
     elements.dateInput.valueAsDate = new Date();
     updateDateDisplay();
-    
-    // Load config
-    const savedSheetUrl = localStorage.getItem(SHEET_URL_KEY);
-    if (savedSheetUrl && elements.sheetUrlInput) {
-        elements.sheetUrlInput.value = savedSheetUrl;
-    }
 
     if (apiUrl) {
         elements.configInput.value = apiUrl;
@@ -278,13 +268,6 @@ function setupEventListeners() {
     // Save Config
     elements.saveConfigBtn.addEventListener('click', () => {
         const newUrl = elements.configInput.value.trim();
-        const sheetUrl = elements.sheetUrlInput.value.trim();
-        
-        if (sheetUrl) {
-            localStorage.setItem(SHEET_URL_KEY, sheetUrl);
-        } else {
-            localStorage.removeItem(SHEET_URL_KEY);
-        }
 
         if (newUrl) {
             localStorage.setItem(CONFIG_KEY, newUrl);
@@ -299,18 +282,6 @@ function setupEventListeners() {
             elements.connStatus.className = "status-badge error";
         }
     });
-
-    // Open Sheet Button
-    if (elements.openSheetBtn) {
-        elements.openSheetBtn.addEventListener('click', () => {
-            const sheetUrl = elements.sheetUrlInput.value.trim();
-            if (sheetUrl) {
-                window.open(sheetUrl, '_blank');
-            } else {
-                alert("Veuillez entrer l'URL du fichier Google Sheets d'abord.");
-            }
-        });
-    }
 
     // Sync Button
     elements.syncBtn.addEventListener('click', () => {
