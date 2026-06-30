@@ -1204,7 +1204,7 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         plugins: {
             legend: {
                 display: (['pie', 'doughnut'].includes(type) || customOptions.datasets !== undefined),
-                position: ['pie', 'doughnut'].includes(type) ? 'right' : 'bottom',
+                position: 'bottom',
                 labels: { 
                     color: textColor, 
                     padding: 20, 
