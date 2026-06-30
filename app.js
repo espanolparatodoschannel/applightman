@@ -1290,6 +1290,9 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
         }
         if (customOptions.plugins.legend) {
             options.plugins.legend = { ...defaultOptions.plugins.legend, ...customOptions.plugins.legend };
+            if (customOptions.plugins.legend.labels) {
+                options.plugins.legend.labels = { ...defaultOptions.plugins.legend.labels, ...customOptions.plugins.legend.labels };
+            }
         }
     }
 
