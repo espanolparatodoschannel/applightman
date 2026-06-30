@@ -1068,7 +1068,7 @@ function updateDashboard() {
                 font: { 
                     weight: 'bold', 
                     family: 'Inter', 
-                    size: window.innerWidth < 480 ? 9 : 10 
+                    size: window.innerWidth < 480 ? 12 : 14 
                 }
             }
         }
