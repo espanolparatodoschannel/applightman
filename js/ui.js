@@ -201,6 +201,19 @@ export function resetFormAndRefresh() {
     if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
     if (elements.numTacheInput) elements.numTacheInput.required = false;
     populateAllSelects();
+    
+    // Reset edit state
+    store.setEditingRecordUuid(null);
+    if (elements.form) {
+        const submitBtn = elements.form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Enregistrer';
+        }
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        if (cancelBtn) {
+            cancelBtn.style.display = 'none';
+        }
+    }
 }
 
 export function renderHistory() {
@@ -323,9 +336,15 @@ export function renderHistory() {
                         <div class="pro-qty-badge">
                             <span class="qty-val">${r.quantite}</span>
                         </div>
-                        ${r.uuid ? `<button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error);" title="Supprimer">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>` : ''}
+                        ${r.uuid && !r.isPending ? `
+                        <div style="display: flex; gap: 0.35rem;">
+                            <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary);" title="Modifier">
+                                <i class="fa-solid fa-pencil"></i>
+                            </button>
+                            <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error);" title="Supprimer">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>` : ''}
                     </div>
                 </div>
                 
@@ -381,6 +400,77 @@ export function renderHistory() {
             const confirmed = await showConfirm("Voulez-vous vraiment supprimer cet enregistrement ?");
             if (confirmed) {
                 await deleteRecord(uuid);
+            }
+        });
+    });
+
+    // Agregar eventos a botones de editar
+    const editBtns = elements.historyContainer.querySelectorAll('.edit-btn');
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const uuid = btn.getAttribute('data-uuid');
+            const pendingRecord = store.syncQueue.find(r => r.uuid === uuid);
+            const historyRecord = store.getHistory().find(r => r.uuid === uuid);
+            const record = pendingRecord || historyRecord;
+            
+            if (record) {
+                store.setEditingRecordUuid(uuid);
+                
+                // Switch view to saisie
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                const saisieBtn = document.querySelector('.nav-btn[data-view="view-saisie"]');
+                if (saisieBtn) saisieBtn.classList.add('active');
+                
+                document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+                const saisieView = document.getElementById('view-saisie');
+                if (saisieView) saisieView.classList.add('active');
+                
+                // Populate form
+                if (elements.dateInput && record.fecha) {
+                    elements.dateInput.value = record.fecha.substring(0, 10);
+                    updateDateDisplay();
+                }
+                if (elements.etageSelect) elements.etageSelect.value = record.etage;
+                if (elements.tacheSelect) {
+                    elements.tacheSelect.value = record.tache;
+                    elements.tacheSelect.dispatchEvent(new Event('change'));
+                }
+                if (elements.numTacheInput) elements.numTacheInput.value = record.num_tache || "";
+                if (elements.numBonInput) elements.numBonInput.value = record.num_bon || "";
+                if (elements.numSoumissionInput) elements.numSoumissionInput.value = record.num_soumission || "";
+                if (elements.idSelect) {
+                    elements.idSelect.value = record.id_item;
+                    elements.idSelect.dispatchEvent(new Event('change'));
+                }
+                if (elements.quantiteInput) elements.quantiteInput.value = record.quantite;
+                if (elements.noteInput) elements.noteInput.value = record.note || "";
+                
+                // Change submit button text
+                const submitBtn = elements.form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier';
+                }
+                
+                // Show cancel button
+                let cancelBtn = document.getElementById('cancel-edit-btn');
+                if (!cancelBtn) {
+                    cancelBtn = document.createElement('button');
+                    cancelBtn.id = 'cancel-edit-btn';
+                    cancelBtn.type = 'button';
+                    cancelBtn.className = 'btn-secondary';
+                    cancelBtn.style.marginTop = '10px';
+                    cancelBtn.style.width = '100%';
+                    cancelBtn.innerHTML = '<i class="fa-solid fa-times"></i> Annuler la modification';
+                    cancelBtn.addEventListener('click', () => {
+                        resetFormAndRefresh();
+                    });
+                    if (submitBtn && submitBtn.parentNode) {
+                        submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling);
+                    }
+                }
+                if (cancelBtn) cancelBtn.style.display = 'block';
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     });

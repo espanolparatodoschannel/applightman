@@ -113,6 +113,54 @@ function doPost(e) {
       }
       return createJsonResponse({ status: 'error', message: 'Record not found' });
     }
+
+    if (action === 'editRecord') {
+      const targetUuid = data.uuid;
+      const record = data.record;
+      if (!targetUuid) throw new Error("UUID no proporcionado");
+      if (!record) throw new Error("Record no proporcionado");
+      
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME_RECORDS);
+      const lastRow = sheet.getLastRow();
+      const lastCol = sheet.getLastColumn();
+      
+      if (lastRow > 1) {
+        const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+        const uuidIdx = headers.indexOf("UUID");
+        
+        if (uuidIdx > -1) {
+          const uuidValues = sheet.getRange(2, uuidIdx + 1, lastRow - 1, 1).getValues();
+          for (let i = 0; i < uuidValues.length; i++) {
+            if (uuidValues[i][0] === targetUuid) {
+              const rowIndex = i + 2;
+              
+              // Prepare updated row
+              const updatedRow = [];
+              for (let c = 0; c < headers.length; c++) {
+                const h = headers[c];
+                if (h === "Date" || h === "Fecha") updatedRow.push(record.fecha || "");
+                else if (h === "Étage") updatedRow.push(record.etage || "");
+                else if (h === "Catégorie") updatedRow.push(record.categorie || "");
+                else if (h === "Description") updatedRow.push(record.description || "");
+                else if (h === "Quantité") updatedRow.push(record.quantite || 0);
+                else if (h === "Id") updatedRow.push(record.id_item || "");
+                else if (h === "Note") updatedRow.push(record.note || "");
+                else if (h === "Type de tâche") updatedRow.push(record.tache || "");
+                else if (h === "# Type de tâche") updatedRow.push(record.num_tache || "");
+                else if (h === "# Bon de trabajo" || h === "# Bon de travail") updatedRow.push(record.num_bon || "");
+                else if (h === "# Soumission") updatedRow.push(record.num_soumission || "");
+                else if (h === "UUID") updatedRow.push(targetUuid);
+                else updatedRow.push("");
+              }
+              
+              sheet.getRange(rowIndex, 1, 1, headers.length).setValues([updatedRow]);
+              return createJsonResponse({ status: 'success', message: 'Record updated successfully' });
+            }
+          }
+        }
+      }
+      return createJsonResponse({ status: 'error', message: 'Record not found' });
+    }
   } catch (error) {
     return createJsonResponse({ status: 'error', message: error.toString() });
   }

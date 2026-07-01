@@ -201,7 +201,7 @@ function setupEventListeners() {
             };
 
             const historyData = store.getHistory();
-            if (historyData.length > 0) {
+            if (historyData.length > 0 && !store.editingRecordUuid) {
                 const lastRecord = historyData[0];
                 if (
                     lastRecord.id_item === record.id_item &&
@@ -224,7 +224,11 @@ function setupEventListeners() {
 
             try {
                 if (store.apiUrl) {
-                    await api.saveRecordToCloud(record);
+                    if (store.editingRecordUuid) {
+                        await api.editRecord(store.editingRecordUuid, record);
+                    } else {
+                        await api.saveRecordToCloud(record);
+                    }
                 } else {
                     store.addRecordLocally(record);
                     if (navigator.vibrate) navigator.vibrate([200]);

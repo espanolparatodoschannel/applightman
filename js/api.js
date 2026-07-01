@@ -157,3 +157,46 @@ export async function deleteRecord(uuid) {
         ui.hideLoader();
     }
 }
+
+export async function editRecord(uuid, updatedRecord) {
+    if (!navigator.onLine) {
+        ui.showToast("Vous devez être en ligne pour modifier un enregistrement.", "warning");
+        return;
+    }
+
+    ui.showLoader("Modification...");
+    try {
+        const response = await fetch(store.apiUrl, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'editRecord', uuid: uuid, record: updatedRecord })
+        });
+        
+        const data = await response.json();
+        if (data.status === 'success') {
+            if (navigator.vibrate) navigator.vibrate([200]);
+            ui.showToast("Modification réussie !", "success");
+            
+            // Actualizar localmente
+            const updatedLocalRecord = { ...updatedRecord, date: updatedRecord.fecha, uuid: uuid };
+            
+            let records = store.records.map(r => r.uuid === uuid ? updatedLocalRecord : r);
+            store.setRecords(records);
+            
+            let history = store.getHistory().map(r => r.uuid === uuid ? updatedLocalRecord : r);
+            store.setHistory(history);
+            
+            store.setEditingRecordUuid(null);
+            ui.resetFormAndRefresh();
+            charts.updateDashboard();
+            ui.renderHistory();
+        } else {
+            throw new Error("Error al modificar");
+        }
+    } catch (error) {
+        console.error("Edit Error:", error);
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        ui.showToast("Erreur lors de la modification.", "error");
+    } finally {
+        ui.hideLoader();
+    }
+}

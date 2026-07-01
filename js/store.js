@@ -22,6 +22,11 @@ export let appOptions = {
 
 export let records = [];
 export let syncQueue = JSON.parse(localStorage.getItem('lightman_sync_queue')) || [];
+export let editingRecordUuid = null;
+
+export function setEditingRecordUuid(uuid) {
+    editingRecordUuid = uuid;
+}
 
 export function setApiUrl(url) {
     apiUrl = url;
