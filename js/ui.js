@@ -18,6 +18,8 @@ export const elements = {
     catSelect: document.getElementById('categorie'),
     idInput: document.getElementById('id_item'),
     descSelect: document.getElementById('description'),
+    quantiteInput: document.getElementById('quantite'),
+    noteInput: document.getElementById('note'),
     tacheSelect: document.getElementById('tache'),
     groupBon: document.getElementById('group-bon'),
     groupSoumission: document.getElementById('group-soumission'),
@@ -438,11 +440,27 @@ export function renderHistory() {
                 if (elements.numTacheInput) elements.numTacheInput.value = record.num_tache || "";
                 if (elements.numBonInput) elements.numBonInput.value = record.num_bon || "";
                 if (elements.numSoumissionInput) elements.numSoumissionInput.value = record.num_soumission || "";
-                if (elements.idSelect) {
-                    elements.idSelect.value = record.id_item;
-                    elements.idSelect.dispatchEvent(new Event('change'));
+                
+                if (elements.catSelect) {
+                    elements.catSelect.value = record.categorie || "";
+                    elements.catSelect.dispatchEvent(new Event('change'));
                 }
-                if (elements.quantiteInput) elements.quantiteInput.value = record.quantite;
+                if (elements.descSelect) {
+                    // Esperar un poquito por si catSelect cambia las opciones de descSelect
+                    setTimeout(() => {
+                        elements.descSelect.value = record.description || "";
+                        elements.descSelect.dispatchEvent(new Event('change'));
+                        
+                        // Set ID explicitly after description triggers
+                        if (elements.idInput) {
+                            elements.idInput.value = record.id_item || "";
+                        }
+                    }, 50);
+                } else if (elements.idInput) {
+                    elements.idInput.value = record.id_item || "";
+                }
+
+                if (elements.quantiteInput) elements.quantiteInput.value = record.quantite || 1;
                 if (elements.noteInput) elements.noteInput.value = record.note || "";
                 
                 // Change submit button text
