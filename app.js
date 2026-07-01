@@ -707,7 +707,6 @@ function renderHistory() {
                     </div>
                     <div class="pro-qty-badge">
                         <span class="qty-val">${r.quantite}</span>
-                        <span class="qty-unit">x</span>
                     </div>
                 </div>
                 
