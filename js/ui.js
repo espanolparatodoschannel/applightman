@@ -415,19 +415,19 @@ export function renderHistory() {
             
             if (record) {
                 store.setEditingRecordUuid(uuid);
-                
-                // Switch view to saisie
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                const saisieBtn = document.querySelector('.nav-btn[data-view="view-saisie"]');
+                // Switch view to saisie (registro)
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                const saisieBtn = document.querySelector('.nav-item[data-target="view-registro"]');
                 if (saisieBtn) saisieBtn.classList.add('active');
                 
-                document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-                const saisieView = document.getElementById('view-saisie');
+                document.querySelectorAll('.view').forEach(sec => sec.classList.remove('active'));
+                const saisieView = document.getElementById('view-registro');
                 if (saisieView) saisieView.classList.add('active');
                 
                 // Populate form
-                if (elements.dateInput && record.fecha) {
-                    elements.dateInput.value = record.fecha.substring(0, 10);
+                const targetDate = record.fecha || record.date;
+                if (elements.dateInput && targetDate) {
+                    elements.dateInput.value = targetDate.substring(0, 10);
                     updateDateDisplay();
                 }
                 if (elements.etageSelect) elements.etageSelect.value = record.etage;
