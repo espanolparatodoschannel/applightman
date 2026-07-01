@@ -64,9 +64,22 @@ function doPost(e) {
       const noteIdx = headers.indexOf("Note");
       const uuidIdx = headers.indexOf("UUID");
 
+      const lastRow = sheet.getLastRow();
+      let existingUuids = new Set();
+      if (lastRow > 1 && uuidIdx > -1) {
+        const uuidsData = sheet.getRange(2, uuidIdx + 1, lastRow - 1, 1).getValues();
+        uuidsData.forEach(r => {
+            if (r[0]) existingUuids.add(r[0].toString());
+        });
+      }
+
       const rowsToAppend = [];
 
       for (const record of recordsToInsert) {
+        if (record.uuid && existingUuids.has(record.uuid.toString())) {
+            continue; // Omitir duplicados
+        }
+        
         const row = new Array(headers.length).fill("");
         if (idIdx > -1) row[idIdx] = record.id_item;
         if (fechaIdx > -1) row[fechaIdx] = record.fecha;
@@ -80,7 +93,11 @@ function doPost(e) {
         if (numSoumIdx > -1) row[numSoumIdx] = record.num_soumission;
         if (noteIdx > -1) row[noteIdx] = record.note;
         if (uuidIdx > -1) row[uuidIdx] = record.uuid;
+        
         rowsToAppend.push(row);
+        if (record.uuid) {
+            existingUuids.add(record.uuid.toString());
+        }
       }
 
       if (rowsToAppend.length > 0) {
