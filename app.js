@@ -1,5 +1,14 @@
 // app.js
 
+const catPalette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+function getCategoryColor(categoryName) {
+    if (!categoryName) return '#cbd5e1';
+    let hash = 0;
+    for (let i = 0; i < categoryName.length; i++) {
+        hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return catPalette[Math.abs(hash) % catPalette.length];
+}
 const CONFIG_KEY = "lightman_api_url";
 let apiUrl = localStorage.getItem(CONFIG_KEY) || "https://script.google.com/macros/s/AKfycbwI3o54GHtgvGu7pafOkRiDL8jWoLw2sHSw2TfAGD2k_KCRtZO6f-ma2RQYx_gZD5OHvQ/exec";
 
@@ -708,8 +717,10 @@ function renderHistory() {
             ? `<span class="pro-sync-badge pending" title="En attente de synchronisation"><i class="fa-solid fa-cloud-arrow-up"></i></span>`
             : `<span class="pro-sync-badge synced" title="Synchronisé"><i class="fa-solid fa-check"></i></span>`;
 
+        const catColor = getCategoryColor(r.categorie);
+
         return `
-            <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
+            <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor};">
                 <div class="pro-card-header">
                     <div class="pro-desc-group">
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
@@ -972,11 +983,6 @@ function updateDashboard() {
     });
 
     const catLabels = Object.keys(catCounts);
-    const catPalette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
-    const catColorMap = {};
-    catLabels.forEach((cat, index) => {
-        catColorMap[cat] = catPalette[index % catPalette.length];
-    });
 
     // Crear datasets apilados para etageBulbsChart
     const etageCategories = new Set();
@@ -989,7 +995,7 @@ function updateDashboard() {
         return {
             label: cat,
             data: catData,
-            backgroundColor: catColorMap[cat] || '#cbd5e1',
+            backgroundColor: getCategoryColor(cat),
             borderWidth: 0
         };
     });
@@ -1023,7 +1029,7 @@ function updateDashboard() {
 
     const topProductsColors = sortedProducts.map(p => {
         const cat = productCategoryMap[p];
-        return cat ? (catColorMap[cat] || '#cbd5e1') : '#cbd5e1';
+        return cat ? getCategoryColor(cat) : '#cbd5e1';
     });
 
     // Handler para Drill-down interactivo
@@ -1092,8 +1098,8 @@ function updateDashboard() {
                         });
                         return Array.from(uniqueCats).map((cat, i) => ({
                             text: cat,
-                            fillStyle: catColorMap[cat] || '#cbd5e1',
-                            strokeStyle: catColorMap[cat] || '#cbd5e1',
+                            fillStyle: getCategoryColor(cat),
+                            strokeStyle: getCategoryColor(cat),
                             lineWidth: 0,
                             hidden: false,
                             index: i,
@@ -1170,7 +1176,7 @@ function updateDashboard() {
         }
     });
 
-    renderChart('categoryChart', 'bar', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
+    renderChart('categoryChart', 'bar', catLabels, Object.values(catCounts), catLabels.map(cat => getCategoryColor(cat)), {
         datasetLabel: 'Ampoules',
         indexAxis: 'y',
         onClick: handleChartClick,
