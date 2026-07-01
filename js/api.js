@@ -137,11 +137,7 @@ export async function deleteRecord(uuid) {
         if (navigator.vibrate) navigator.vibrate([200]);
         ui.showToast("Suppression réussie !", "success");
         
-        let records = store.records.filter(r => r.uuid !== uuid);
-        store.setRecords(records);
-        
-        let history = store.getHistory().filter(r => r.uuid !== uuid);
-        store.setHistory(history);
+        store.deleteRecordLocally(uuid);
         
         charts.updateDashboard();
         ui.renderHistory();
@@ -172,14 +168,7 @@ export async function editRecord(uuid, updatedRecord) {
         if (navigator.vibrate) navigator.vibrate([200]);
         ui.showToast("Modification réussie !", "success");
         
-        // Actualizar localmente
-        const updatedLocalRecord = { ...updatedRecord, date: updatedRecord.fecha, uuid: uuid };
-        
-        let records = store.records.map(r => r.uuid === uuid ? updatedLocalRecord : r);
-        store.setRecords(records);
-        
-        let history = store.getHistory().map(r => r.uuid === uuid ? updatedLocalRecord : r);
-        store.setHistory(history);
+        store.editRecordLocally(uuid, updatedRecord);
         
         store.setEditingRecordUuid(null);
         ui.resetFormAndRefresh();

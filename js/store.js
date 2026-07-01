@@ -92,3 +92,17 @@ export function deleteRecordLocally(uuid) {
     history = history.filter(r => r.uuid !== uuid);
     setHistory(history);
 }
+
+export function editRecordLocally(uuid, updatedRecord) {
+    const updatedLocalRecord = { ...updatedRecord, date: updatedRecord.fecha, uuid: uuid };
+
+    records = records.map(r => r.uuid === uuid ? updatedLocalRecord : r);
+    localStorage.setItem('lightman_cloud_records', JSON.stringify(records));
+
+    syncQueue = syncQueue.map(r => r.uuid === uuid ? updatedLocalRecord : r);
+    localStorage.setItem('lightman_sync_queue', JSON.stringify(syncQueue));
+
+    let history = getHistory();
+    history = history.map(r => r.uuid === uuid ? updatedLocalRecord : r);
+    setHistory(history);
+}
