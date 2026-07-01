@@ -344,7 +344,8 @@ export function updateDashboard() {
         scales: { x: { stacked: true }, y: { stacked: true } }
     });
 
-    renderChart('categoryChart', 'bar', catLabels, Object.values(catCounts), catLabels.map(cat => getCategoryColor(cat)), {
+    const catValues = catLabels.map(cat => catCounts[cat]);
+    renderChart('categoryChart', 'bar', catLabels, catValues, catLabels.map(cat => getCategoryColor(cat)), {
         datasetLabel: 'Ampoules',
         indexAxis: 'y',
         onClick: handleChartClick,
