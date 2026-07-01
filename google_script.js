@@ -10,33 +10,48 @@ function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_OPTIONS, ["Id", "Description", "Catégorie"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
+  ensureUUIDColumn();
+}
+
+function ensureUUIDColumn() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME_RECORDS);
+  if (!sheet) return;
+  const lastCol = sheet.getLastColumn();
+  if (lastCol === 0) return;
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  if (headers.indexOf("UUID") === -1) {
+    sheet.insertColumnAfter(lastCol);
+    sheet.getRange(1, lastCol + 1).setValue("UUID");
+  }
 }
 
 function doPost(e) {
   try {
-    // Asegurarse de que las hojas existen
     setup();
 
     const data = JSON.parse(e.postData.contents);
     const action = data.action;
 
-    if (action === 'addRecord') {
-      const record = data.record;
+    if (action === 'addRecord' || action === 'addRecordsBatch') {
+      const recordsToInsert = action === 'addRecord' ? [data.record] : (data.records || []);
       const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME_RECORDS);
 
-      // Obtener cabeceras actuales para mapear correctamente las columnas por nombre
       const lastCol = sheet.getLastColumn();
       let headers = [];
       if (lastCol > 0) {
         headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
       }
 
+      if (headers.length === 0 || (headers.length === 1 && headers[0] === "")) {
+        headers = ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"];
+        sheet.appendRow(headers);
+      }
+
       const idIdx = headers.indexOf("Id");
       let fechaIdx = headers.indexOf("Date");
-      if (fechaIdx === -1) {
-        fechaIdx = headers.indexOf("Fecha");
-      }
+      if (fechaIdx === -1) fechaIdx = headers.indexOf("Fecha");
       const etageIdx = headers.indexOf("Étage");
       const descIdx = headers.indexOf("Description");
       const catIdx = headers.indexOf("Catégorie");
@@ -44,37 +59,15 @@ function doPost(e) {
       const tacheIdx = headers.indexOf("Type de tâche");
       const numTacheIdx = headers.indexOf("# Type de tâche");
       let numBonIdx = headers.indexOf("# Bon de trabajo");
-      if (numBonIdx === -1) {
-        numBonIdx = headers.indexOf("# Bon de travail");
-      }
+      if (numBonIdx === -1) numBonIdx = headers.indexOf("# Bon de travail");
       const numSoumIdx = headers.indexOf("# Soumission");
       const noteIdx = headers.indexOf("Note");
+      const uuidIdx = headers.indexOf("UUID");
 
-      // Si la hoja estaba totalmente vacía o sin cabeceras
-      if (headers.length === 0 || (headers.length === 1 && headers[0] === "")) {
-        const defaultHeaders = ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note"];
-        sheet.appendRow(defaultHeaders);
-        sheet.appendRow([
-          record.fecha,
-          record.tache,
-          record.num_tache,
-          record.num_bon,
-          record.num_soumission,
-          record.etage,
-          record.categorie,
-          record.description,
-          record.quantite,
-          record.id_item,
-          record.note
-        ]);
-      } else {
-        // Crear una fila vacía con el tamaño de las cabeceras
-        const row = new Array(headers.length);
-        for (let i = 0; i < row.length; i++) {
-          row[i] = "";
-        }
+      const rowsToAppend = [];
 
-        // Rellenar la fila según el índice de cada cabecera
+      for (const record of recordsToInsert) {
+        const row = new Array(headers.length).fill("");
         if (idIdx > -1) row[idIdx] = record.id_item;
         if (fechaIdx > -1) row[fechaIdx] = record.fecha;
         if (etageIdx > -1) row[etageIdx] = record.etage;
@@ -86,11 +79,39 @@ function doPost(e) {
         if (numBonIdx > -1) row[numBonIdx] = record.num_bon;
         if (numSoumIdx > -1) row[numSoumIdx] = record.num_soumission;
         if (noteIdx > -1) row[noteIdx] = record.note;
-
-        sheet.appendRow(row);
+        if (uuidIdx > -1) row[uuidIdx] = record.uuid;
+        rowsToAppend.push(row);
       }
 
-      return createJsonResponse({ status: 'success', message: 'Record added successfully' });
+      if (rowsToAppend.length > 0) {
+        sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAppend.length, headers.length).setValues(rowsToAppend);
+      }
+
+      return createJsonResponse({ status: 'success', message: 'Records added successfully' });
+    }
+
+    if (action === 'deleteRecord') {
+      const targetUuid = data.uuid;
+      if (!targetUuid) throw new Error("UUID no proporcionado");
+
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME_RECORDS);
+      const lastRow = sheet.getLastRow();
+      const lastCol = sheet.getLastColumn();
+
+      if (lastRow > 1) {
+        const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+        const uuidIdx = headers.indexOf("UUID");
+        if (uuidIdx > -1) {
+          const uuidValues = sheet.getRange(2, uuidIdx + 1, lastRow - 1, 1).getValues();
+          for (let i = 0; i < uuidValues.length; i++) {
+            if (uuidValues[i][0] === targetUuid) {
+              sheet.deleteRow(i + 2); // +2 porque el arreglo empieza en 0 y la primera fila es cabecera
+              return createJsonResponse({ status: 'success', message: 'Record deleted successfully' });
+            }
+          }
+        }
+      }
+      return createJsonResponse({ status: 'error', message: 'Record not found' });
     }
   } catch (error) {
     return createJsonResponse({ status: 'error', message: error.toString() });
@@ -99,7 +120,6 @@ function doPost(e) {
 
 function doGet(e) {
   try {
-    // Asegurarse de que las hojas existen
     setup();
 
     const action = e.parameter.action || 'getData';
@@ -107,7 +127,7 @@ function doGet(e) {
     if (action === 'getData') {
       const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-      // 1. Obtener Opciones (Id, Description, Catégorie)
+      // 1. Obtener Opciones
       const optionsData = ss.getSheetByName(SHEET_NAME_OPTIONS).getDataRange().getValues();
       const opcionesList = [];
       if (optionsData.length > 1) {
@@ -154,15 +174,16 @@ function doGet(e) {
         }
       }
 
-      // 4. Obtener Registros
-      const recordsData = ss.getSheetByName(SHEET_NAME_RECORDS).getDataRange().getValues();
+      // 4. Obtener Registros limitados a los últimos 500 para evitar timeout
+      const recordsSheet = ss.getSheetByName(SHEET_NAME_RECORDS);
+      const lastRow = recordsSheet.getLastRow();
+      const lastCol = recordsSheet.getLastColumn();
+
       const records = [];
-      if (recordsData.length > 1) {
-        const headers = recordsData[0];
+      if (lastRow > 1) {
+        const headers = recordsSheet.getRange(1, 1, 1, lastCol).getValues()[0];
         let fechaIdx = headers.indexOf("Date");
-        if (fechaIdx === -1) {
-          fechaIdx = headers.indexOf("Fecha");
-        }
+        if (fechaIdx === -1) fechaIdx = headers.indexOf("Fecha");
         const etageIdx = headers.indexOf("Étage");
         const descIdx = headers.indexOf("Description");
         const catIdx = headers.indexOf("Catégorie");
@@ -170,25 +191,29 @@ function doGet(e) {
         const tacheIdx = headers.indexOf("Type de tâche");
         const numTacheIdx = headers.indexOf("# Type de tâche");
         let numBonIdx = headers.indexOf("# Bon de trabajo");
-        if (numBonIdx === -1) {
-          numBonIdx = headers.indexOf("# Bon de travail");
-        }
+        if (numBonIdx === -1) numBonIdx = headers.indexOf("# Bon de travail");
         const numSoumIdx = headers.indexOf("# Soumission");
         const idIdx = headers.indexOf("Id");
         const noteIdx = headers.indexOf("Note");
+        const uuidIdx = headers.indexOf("UUID");
 
-        const recordsSheet = ss.getSheetByName(SHEET_NAME_RECORDS);
-        for (let i = 1; i < recordsData.length; i++) {
+        const LIMIT = 500; // Limite de carga
+        const startRow = Math.max(2, lastRow - LIMIT + 1);
+        const numRows = lastRow - startRow + 1;
+
+        const recordsData = recordsSheet.getRange(startRow, 1, numRows, lastCol).getValues();
+
+        for (let i = 0; i < recordsData.length; i++) {
           const row = recordsData[i];
           let descVal = descIdx > -1 ? row[descIdx] : "";
           let idVal = idIdx > -1 ? row[idIdx] : "";
 
-          // Auto-correction for known mismatch (F32T8/TL930... should be FC-23, not FC-15)
+          // Auto-correction
           if (descVal === "F32T8/TL930/ALTO PHILIPS-479592 30/CASE" && idVal === "FC-15") {
             if (idIdx > -1) {
               idVal = "FC-23";
               row[idIdx] = "FC-23";
-              recordsSheet.getRange(i + 1, idIdx + 1).setValue("FC-23");
+              recordsSheet.getRange(startRow + i, idIdx + 1).setValue("FC-23");
             }
           }
 
@@ -203,10 +228,14 @@ function doGet(e) {
             num_bon: numBonIdx > -1 ? row[numBonIdx] : "",
             num_soumission: numSoumIdx > -1 ? row[numSoumIdx] : "",
             id_item: idVal,
-            note: noteIdx > -1 ? row[noteIdx] : ""
+            note: noteIdx > -1 ? row[noteIdx] : "",
+            uuid: uuidIdx > -1 ? row[uuidIdx] : ""
           });
         }
       }
+
+      // Invertir para que los más recientes estén al principio (si la app asume eso)
+      records.reverse();
 
       const options = {
         opciones: opcionesList,
