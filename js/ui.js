@@ -326,27 +326,27 @@ export function renderHistory() {
 
         return `
             <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor}; position: relative;">
-                <div class="pro-card-header">
-                    <div class="pro-desc-group">
+                <div class="pro-card-header" style="display: flex; align-items: center; gap: 0.75rem;">
+                    ${r.uuid && !r.isPending ? `
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
+                        <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary);" title="Modifier">
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
+                        <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error);" title="Supprimer">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>` : ''}
+                    <div class="pro-desc-group" style="flex: 1;">
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
                             <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
                             ${syncBadgeHtml}
                         </div>
                         <h4 class="pro-desc">${displayDesc}</h4>
                     </div>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; justify-content: center;">
                         <div class="pro-qty-badge">
                             <span class="qty-val">${r.quantite}</span>
                         </div>
-                        ${r.uuid && !r.isPending ? `
-                        <div style="display: flex; gap: 0.35rem;">
-                            <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary);" title="Modifier">
-                                <i class="fa-solid fa-pencil"></i>
-                            </button>
-                            <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error);" title="Supprimer">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>` : ''}
                     </div>
                 </div>
                 

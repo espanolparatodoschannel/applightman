@@ -171,7 +171,7 @@ export function updateDashboard() {
             catCounts[r.categorie] = (catCounts[r.categorie] || 0) + Number(r.quantite || 0);
         }
     });
-    const catLabels = Object.keys(catCounts);
+    const catLabels = Object.keys(catCounts).sort((a, b) => catCounts[b] - catCounts[a]);
 
     const etageCategories = new Set();
     Object.values(etageBulbsByCategory).forEach(etageData => {
@@ -297,11 +297,15 @@ export function updateDashboard() {
         }
     });
 
-    renderChart('taskTypeChart', 'doughnut', Object.keys(taskTypeData), Object.values(taskTypeData), ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
+    // Ordenar los datos del gráfico de tipo de tarea de mayor a menor para que los colores se asignen según el tamaño
+    const taskTypeKeys = Object.keys(taskTypeData).sort((a, b) => taskTypeData[b] - taskTypeData[a]);
+    const taskTypeVals = taskTypeKeys.map(k => taskTypeData[k]);
+
+    renderChart('taskTypeChart', 'doughnut', taskTypeKeys, taskTypeVals, ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
         cutout: '45%', 
-        layout: { padding: { top: 20, bottom: 60, left: 40, right: 40 } },
+        layout: { padding: { top: 20, bottom: 20, left: 40, right: 40 } },
         plugins: {
             datalabels: {
                 display: 'auto', 
