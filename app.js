@@ -9,6 +9,34 @@ function getCategoryColor(categoryName) {
     }
     return catPalette[Math.abs(hash) % catPalette.length];
 }
+
+function showToast(message, type = 'success') {
+    const existing = document.getElementById('custom-toast');
+    if (existing) existing.remove();
+
+    const iconMap = {
+        'success': 'fa-circle-check',
+        'error': 'fa-circle-xmark',
+        'warning': 'fa-triangle-exclamation',
+        'info': 'fa-circle-info'
+    };
+
+    const toast = document.createElement('div');
+    toast.id = 'custom-toast';
+    toast.className = 'toast-container';
+    toast.innerHTML = `
+        <i class="fa-solid ${iconMap[type] || iconMap.info} toast-icon ${type}"></i>
+        <span style="font-weight: 500; font-size: 0.95rem;">${message}</span>
+    `;
+    
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 3500);
+}
 const CONFIG_KEY = "lightman_api_url";
 let apiUrl = localStorage.getItem(CONFIG_KEY) || "https://script.google.com/macros/s/AKfycbwI3o54GHtgvGu7pafOkRiDL8jWoLw2sHSw2TfAGD2k_KCRtZO6f-ma2RQYx_gZD5OHvQ/exec";
 
@@ -304,7 +332,7 @@ function setupEventListeners() {
             const localRecord = { ...record, date: record.fecha };
             records.push(localRecord);
             localStorage.setItem('lightman_local_records', JSON.stringify(records));
-            alert("Enregistré localement (Mode test). Configurez Google Sheets pour enregistrer dans le cloud.");
+            showToast("Enregistré localement (Mode test). Configurez Google Sheets pour enregistrer dans le cloud.", "info");
             addToHistory(record);
             resetFormAndRefresh();
         }
@@ -337,7 +365,7 @@ function setupEventListeners() {
                 fetchDataFromCloud();
             }
         } else {
-            alert("Vous devez d'abord configurer l'URL de Google Sheets.");
+            showToast("Vous devez d'abord configurer l'URL de Google Sheets.", "warning");
         }
     });
 
@@ -452,7 +480,7 @@ async function fetchDataFromCloud(showBlockingLoader = true) {
     } catch (error) {
         console.error("Fetch Error:", error);
         if (showBlockingLoader) {
-            alert("Erreur de connexion à Google Sheets. Utilisation de données locales temporaires.");
+            showToast("Erreur de connexion à Google Sheets. Utilisation de données locales temporaires.", "error");
             appOptions = mockOptions;
             populateAllSelects();
         }
@@ -481,7 +509,7 @@ async function saveRecordToCloud(record) {
         
         const data = await response.json();
         if (data.status === 'success') {
-            alert("Enregistrement réussi !");
+            showToast("Enregistrement réussi !", "success");
             addToHistory(record);
             resetFormAndRefresh();
         } else {
@@ -502,7 +530,7 @@ function addToOfflineQueue(record) {
     updateSyncBadge();
     addToHistory(record);
     resetFormAndRefresh(false);
-    alert("Hors ligne : Enregistrement sauvegardé localement. Il sera synchronisé dès que la connexion sera rétablie.");
+    showToast("Hors ligne : Enregistrement sauvegardé localement. Il sera synchronisé dès que la connexion sera rétablie.", "warning");
 }
 
 async function syncOfflineQueue() {
@@ -539,9 +567,9 @@ async function syncOfflineQueue() {
     
     if (syncSuccessCount > 0) {
         fetchDataFromCloud();
-        alert(`${syncSuccessCount} enregistrements synchronisés avec succès !`);
+        showToast(`${syncSuccessCount} enregistrements synchronisés avec succès !`, "success");
     } else if (syncQueue.length > 0) {
-        alert("Certains enregistrements n'ont pas pu être synchronisés. Ils restent dans la file d'attente.");
+        showToast("Certains enregistrements n'ont pas pu être synchronisés. Ils restent dans la file d'attente.", "error");
     }
 }
 
