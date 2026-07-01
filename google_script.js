@@ -202,19 +202,28 @@ function doGet(e) {
         const numRows = lastRow - startRow + 1;
 
         const recordsData = recordsSheet.getRange(startRow, 1, numRows, lastCol).getValues();
+        let sheetUpdated = false;
 
         for (let i = 0; i < recordsData.length; i++) {
           const row = recordsData[i];
           let descVal = descIdx > -1 ? row[descIdx] : "";
           let idVal = idIdx > -1 ? row[idIdx] : "";
+          let uuidVal = uuidIdx > -1 ? row[uuidIdx] : "";
 
           // Auto-correction
           if (descVal === "F32T8/TL930/ALTO PHILIPS-479592 30/CASE" && idVal === "FC-15") {
             if (idIdx > -1) {
               idVal = "FC-23";
               row[idIdx] = "FC-23";
-              recordsSheet.getRange(startRow + i, idIdx + 1).setValue("FC-23");
+              sheetUpdated = true;
             }
+          }
+
+          // Auto-populate UUID if missing
+          if (uuidIdx > -1 && !uuidVal) {
+            uuidVal = Utilities.getUuid();
+            row[uuidIdx] = uuidVal;
+            sheetUpdated = true;
           }
 
           records.push({
@@ -229,8 +238,12 @@ function doGet(e) {
             num_soumission: numSoumIdx > -1 ? row[numSoumIdx] : "",
             id_item: idVal,
             note: noteIdx > -1 ? row[noteIdx] : "",
-            uuid: uuidIdx > -1 ? row[uuidIdx] : ""
+            uuid: uuidVal
           });
+        }
+
+        if (sheetUpdated) {
+          recordsSheet.getRange(startRow, 1, numRows, lastCol).setValues(recordsData);
         }
       }
 
