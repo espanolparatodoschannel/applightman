@@ -441,14 +441,24 @@ export function renderHistory() {
                 if (elements.numBonInput) elements.numBonInput.value = record.num_bon || "";
                 if (elements.numSoumissionInput) elements.numSoumissionInput.value = record.num_soumission || "";
                 
+                let recordCat = record.categorie || "";
+                let recordDesc = record.description || "";
+                
+                if (record.id_item) {
+                    const foundOpt = store.appOptions.opciones.find(opt => opt.id === record.id_item);
+                    if (foundOpt) {
+                        recordCat = foundOpt.categorie || recordCat;
+                        recordDesc = foundOpt.description || recordDesc;
+                    }
+                }
+
                 if (elements.catSelect) {
-                    elements.catSelect.value = record.categorie || "";
+                    elements.catSelect.value = recordCat;
                     elements.catSelect.dispatchEvent(new Event('change'));
                 }
                 if (elements.descSelect) {
-                    // Esperar un poquito por si catSelect cambia las opciones de descSelect
                     setTimeout(() => {
-                        elements.descSelect.value = record.description || "";
+                        elements.descSelect.value = recordDesc;
                         elements.descSelect.dispatchEvent(new Event('change'));
                         
                         // Set ID explicitly after description triggers
@@ -481,6 +491,14 @@ export function renderHistory() {
                     cancelBtn.innerHTML = '<i class="fa-solid fa-times"></i> Annuler la modification';
                     cancelBtn.addEventListener('click', () => {
                         resetFormAndRefresh();
+                        // Volver a historique
+                        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                        const historyNavBtn = document.querySelector('.nav-item[data-target="view-historique"]');
+                        if (historyNavBtn) historyNavBtn.classList.add('active');
+                        
+                        document.querySelectorAll('.view').forEach(sec => sec.classList.remove('active'));
+                        const historyView = document.getElementById('view-historique');
+                        if (historyView) historyView.classList.add('active');
                     });
                     if (submitBtn && submitBtn.parentNode) {
                         submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling);
