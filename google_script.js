@@ -119,21 +119,21 @@ function doPost(e) {
       const record = data.record;
       if (!targetUuid) throw new Error("UUID no proporcionado");
       if (!record) throw new Error("Record no proporcionado");
-      
+
       const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME_RECORDS);
       const lastRow = sheet.getLastRow();
       const lastCol = sheet.getLastColumn();
-      
+
       if (lastRow > 1) {
         const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
         const uuidIdx = headers.indexOf("UUID");
-        
+
         if (uuidIdx > -1) {
           const uuidValues = sheet.getRange(2, uuidIdx + 1, lastRow - 1, 1).getValues();
           for (let i = 0; i < uuidValues.length; i++) {
             if (uuidValues[i][0] === targetUuid) {
               const rowIndex = i + 2;
-              
+
               // Prepare updated row
               const updatedRow = [];
               for (let c = 0; c < headers.length; c++) {
@@ -152,7 +152,7 @@ function doPost(e) {
                 else if (h === "UUID") updatedRow.push(targetUuid);
                 else updatedRow.push("");
               }
-              
+
               sheet.getRange(rowIndex, 1, 1, headers.length).setValues([updatedRow]);
               return createJsonResponse({ status: 'success', message: 'Record updated successfully' });
             }

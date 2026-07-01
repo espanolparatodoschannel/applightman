@@ -410,8 +410,8 @@ export function renderHistory() {
         btn.addEventListener('click', () => {
             const uuid = btn.getAttribute('data-uuid');
             const pendingRecord = store.syncQueue.find(r => r.uuid === uuid);
-            const historyRecord = store.getHistory().find(r => r.uuid === uuid);
-            const record = pendingRecord || historyRecord;
+            const cloudRecord = store.records.find(r => r.uuid === uuid);
+            const record = pendingRecord || cloudRecord;
             
             if (record) {
                 store.setEditingRecordUuid(uuid);
