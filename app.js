@@ -1104,6 +1104,9 @@ function updateDashboard() {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
         cutout: '45%', // Thicker slices to give labels more room
+        layout: {
+            padding: { top: 20, bottom: 60, left: 40, right: 40 }
+        },
         plugins: {
             datalabels: {
                 display: 'auto', // Hides labels that overlap or don't fit
@@ -1156,7 +1159,7 @@ function updateDashboard() {
         onClick: handleChartClick,
         extraPlugins: [pieLinesPlugin],
         layout: {
-            padding: 40
+            padding: { top: 20, bottom: 60, left: 40, right: 40 }
         },
         plugins: {
             datalabels: {
