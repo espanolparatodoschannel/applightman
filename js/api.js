@@ -55,23 +55,21 @@ export async function saveRecordToCloud(record) {
 
     ui.showLoader("Enregistrement...");
     try {
-        const response = await fetch(store.apiUrl, {
+        await fetch(store.apiUrl, {
             method: 'POST',
+            mode: 'no-cors',
             body: JSON.stringify({ action: 'addRecordsBatch', records: [record] })
         });
         
-        const data = await response.json();
-        if (data.status === 'success') {
-            if (navigator.vibrate) navigator.vibrate([200]);
-            ui.showToast("Enregistrement réussi !", "success");
-            store.addToHistory(record);
-            store.setRecords([record, ...store.records]);
-            ui.resetFormAndRefresh();
-            charts.updateDashboard();
-            ui.renderHistory();
-        } else {
-            throw new Error("Error al guardar");
-        }
+        // As mode is no-cors, the response is opaque. We assume success.
+        if (navigator.vibrate) navigator.vibrate([200]);
+        ui.showToast("Enregistrement réussi !", "success");
+        store.addToHistory(record);
+        store.setRecords([record, ...store.records]);
+        ui.resetFormAndRefresh();
+        charts.updateDashboard();
+        ui.renderHistory();
+        
     } catch (error) {
         console.error("Save Error:", error);
         addToOfflineQueue(record);
@@ -98,28 +96,25 @@ export async function syncOfflineQueue() {
     
     ui.showLoader(`Synchronisation de ${store.syncQueue.length} éléments...`);
     
-    const queueToProcess = [...store.syncQueue];
-    
     try {
-        const response = await fetch(store.apiUrl, {
+        await fetch(store.apiUrl, {
             method: 'POST',
-            body: JSON.stringify({ action: 'addRecordsBatch', records: queueToProcess })
+            mode: 'no-cors',
+            body: JSON.stringify({ action: 'addRecordsBatch', records: store.syncQueue })
         });
-        const data = await response.json();
         
-        if (data.status === 'success') {
-            store.updateSyncQueue([]);
-            ui.updateSyncBadge();
-            if (navigator.vibrate) navigator.vibrate([200]);
-            ui.showToast(`${queueToProcess.length} enregistrements synchronisés avec succès !`, "success");
-            await fetchDataFromCloud(false);
-        } else {
-            throw new Error("Batch error");
-        }
-    } catch (e) {
-        console.error("Sync batch error:", e);
+        // Assume success
+        store.updateSyncQueue([]);
+        ui.updateSyncBadge();
+        if (navigator.vibrate) navigator.vibrate([200]);
+        ui.showToast("Synchronisation réussie !", "success");
+        
+        setTimeout(() => fetchDataFromCloud(false), 1000);
+        
+    } catch (error) {
+        console.error("Sync Error:", error);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        ui.showToast("Erreur lors de la synchronisation par lots. Les enregistrements restent dans la file d'attente.", "error");
+        ui.showToast("Erreur lors de la synchronisation. Veuillez réessayer plus tard.", "error");
     } finally {
         ui.hideLoader();
     }
@@ -127,28 +122,30 @@ export async function syncOfflineQueue() {
 
 export async function deleteRecord(uuid) {
     if (!navigator.onLine) {
-        ui.showToast("Vous devez être en ligne pour supprimer un enregistrement de la base de données.", "warning");
+        ui.showToast("Vous devez être en ligne pour supprimer un enregistrement.", "warning");
         return;
     }
 
     ui.showLoader("Suppression...");
     try {
-        const response = await fetch(store.apiUrl, {
+        await fetch(store.apiUrl, {
             method: 'POST',
+            mode: 'no-cors',
             body: JSON.stringify({ action: 'deleteRecord', uuid: uuid })
         });
         
-        const data = await response.json();
-        if (data.status === 'success') {
-            if (navigator.vibrate) navigator.vibrate([200]);
-            ui.showToast("Enregistrement supprimé !", "success");
-            store.deleteRecordLocally(uuid);
-            charts.populateFilters();
-            charts.updateDashboard();
-            ui.renderHistory();
-        } else {
-            throw new Error("Error al eliminar");
-        }
+        if (navigator.vibrate) navigator.vibrate([200]);
+        ui.showToast("Suppression réussie !", "success");
+        
+        let records = store.records.filter(r => r.uuid !== uuid);
+        store.setRecords(records);
+        
+        let history = store.getHistory().filter(r => r.uuid !== uuid);
+        store.setHistory(history);
+        
+        charts.updateDashboard();
+        ui.renderHistory();
+        
     } catch (error) {
         console.error("Delete Error:", error);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -166,32 +163,29 @@ export async function editRecord(uuid, updatedRecord) {
 
     ui.showLoader("Modification...");
     try {
-        const response = await fetch(store.apiUrl, {
+        await fetch(store.apiUrl, {
             method: 'POST',
+            mode: 'no-cors',
             body: JSON.stringify({ action: 'editRecord', uuid: uuid, record: updatedRecord })
         });
         
-        const data = await response.json();
-        if (data.status === 'success') {
-            if (navigator.vibrate) navigator.vibrate([200]);
-            ui.showToast("Modification réussie !", "success");
-            
-            // Actualizar localmente
-            const updatedLocalRecord = { ...updatedRecord, date: updatedRecord.fecha, uuid: uuid };
-            
-            let records = store.records.map(r => r.uuid === uuid ? updatedLocalRecord : r);
-            store.setRecords(records);
-            
-            let history = store.getHistory().map(r => r.uuid === uuid ? updatedLocalRecord : r);
-            store.setHistory(history);
-            
-            store.setEditingRecordUuid(null);
-            ui.resetFormAndRefresh();
-            charts.updateDashboard();
-            ui.renderHistory();
-        } else {
-            throw new Error("Error al modificar");
-        }
+        if (navigator.vibrate) navigator.vibrate([200]);
+        ui.showToast("Modification réussie !", "success");
+        
+        // Actualizar localmente
+        const updatedLocalRecord = { ...updatedRecord, date: updatedRecord.fecha, uuid: uuid };
+        
+        let records = store.records.map(r => r.uuid === uuid ? updatedLocalRecord : r);
+        store.setRecords(records);
+        
+        let history = store.getHistory().map(r => r.uuid === uuid ? updatedLocalRecord : r);
+        store.setHistory(history);
+        
+        store.setEditingRecordUuid(null);
+        ui.resetFormAndRefresh();
+        charts.updateDashboard();
+        ui.renderHistory();
+        
     } catch (error) {
         console.error("Edit Error:", error);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
