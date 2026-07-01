@@ -307,9 +307,11 @@ function setupEventListeners() {
         }
     });
 
-    // Form Submit
+    let isSubmitting = false;
     elements.form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        if (isSubmitting) return; // Prevent double clicks
         
         const formData = new FormData(elements.form);
         const record = {
@@ -326,15 +328,41 @@ function setupEventListeners() {
             note: formData.get('note') || ""
         };
 
-        if (apiUrl) {
-            await saveRecordToCloud(record);
-        } else {
-            const localRecord = { ...record, date: record.fecha };
-            records.push(localRecord);
-            localStorage.setItem('lightman_local_records', JSON.stringify(records));
-            showToast("Enregistré localement (Mode test). Configurez Google Sheets pour enregistrer dans le cloud.", "info");
-            addToHistory(record);
-            resetFormAndRefresh();
+        // Verificación de duplicados recientes
+        const historyData = JSON.parse(localStorage.getItem('lightman_history')) || [];
+        if (historyData.length > 0) {
+            const lastRecord = historyData[0];
+            if (
+                lastRecord.id_item === record.id_item &&
+                lastRecord.etage === record.etage &&
+                lastRecord.tache === record.tache &&
+                lastRecord.quantite === record.quantite &&
+                lastRecord.num_bon === record.num_bon &&
+                lastRecord.num_tache === record.num_tache
+            ) {
+                const isConfirmed = confirm("⚠️ Attention : Ce registre semble être identique au précédent. Voulez-vous vraiment l'enregistrer à nouveau ?");
+                if (!isConfirmed) return;
+            }
+        }
+        
+        isSubmitting = true;
+        const submitBtn = elements.form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+            if (apiUrl) {
+                await saveRecordToCloud(record);
+            } else {
+                const localRecord = { ...record, date: record.fecha };
+                records.push(localRecord);
+                localStorage.setItem('lightman_local_records', JSON.stringify(records));
+                showToast("Enregistré localement (Mode test). Configurez Google Sheets pour enregistrer dans le cloud.", "info");
+                addToHistory(record);
+                resetFormAndRefresh();
+            }
+        } finally {
+            isSubmitting = false;
+            if (submitBtn) submitBtn.disabled = false;
         }
     });
 
