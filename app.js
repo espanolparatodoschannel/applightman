@@ -600,8 +600,9 @@ function addToHistory(record) {
 function renderHistory() {
     if (!elements.historyContainer) return;
     
-    // Obtenemos todos los registros guardados en Google Sheets
-    let history = [...records];
+    // Marcar registros pendientes (locales) y combinarlos con los registros guardados
+    const pending = syncQueue.map(r => ({...r, isPending: true}));
+    let history = [...pending, ...records];
     
     // Invertir el orden para que los más recientes estén al principio
     history.reverse();
@@ -668,11 +669,16 @@ function renderHistory() {
     }
     
     if (history.length === 0) {
-        elements.historyContainer.innerHTML = '<p class="help-text">Aucun enregistrement correspondant.</p>';
+        elements.historyContainer.innerHTML = `
+            <div class="empty-state-container">
+                <i class="fa-solid fa-magnifying-glass empty-icon"></i>
+                <p class="empty-text">Aucun enregistrement correspondant.</p>
+            </div>
+        `;
         return;
     }
     
-    elements.historyContainer.innerHTML = history.map(r => {
+    elements.historyContainer.innerHTML = history.map((r, index) => {
         // Formatear la fecha
         let dateStr = "";
         try {
@@ -698,11 +704,18 @@ function renderHistory() {
         const foundOpt = appOptions.opciones.find(opt => opt.id === r.id_item);
         const displayDesc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || r.id_item || 'N/A');
 
+        const syncBadgeHtml = r.isPending 
+            ? `<span class="pro-sync-badge pending" title="En attente de synchronisation"><i class="fa-solid fa-cloud-arrow-up"></i></span>`
+            : `<span class="pro-sync-badge synced" title="Synchronisé"><i class="fa-solid fa-check"></i></span>`;
+
         return `
-            <div class="pro-history-card">
+            <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
                 <div class="pro-card-header">
                     <div class="pro-desc-group">
-                        <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                            <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
+                            ${syncBadgeHtml}
+                        </div>
                         <h4 class="pro-desc">${displayDesc}</h4>
                     </div>
                     <div class="pro-qty-badge">
