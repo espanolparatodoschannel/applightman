@@ -1144,6 +1144,10 @@ function updateDashboard() {
     const bulbsCard = document.getElementById('etageBulbsChart')?.closest('.chart-card');
     if (bulbsCard) bulbsCard.style.height = `${etageChartHeight + 80}px`;
 
+    const catChartHeight = Math.max(250, catLabels.length * 48);
+    const catCard = document.getElementById('categoryChart')?.closest('.chart-card');
+    if (catCard) catCard.style.height = `${catChartHeight + 80}px`;
+
     renderChart('etageBulbsChart', 'bar', sortedEtages, [], null, {
         indexAxis: 'y',
         datasets: datasetsForEtage,
@@ -1154,28 +1158,13 @@ function updateDashboard() {
         }
     });
 
-    renderChart('categoryChart', 'pie', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
+    renderChart('categoryChart', 'bar', catLabels, Object.values(catCounts), catLabels.map(cat => catColorMap[cat]), {
         datasetLabel: 'Ampoules',
+        indexAxis: 'y',
         onClick: handleChartClick,
-        extraPlugins: [pieLinesPlugin],
-        layout: {
-            padding: { top: 20, bottom: 60, left: 40, right: 40 }
-        },
         plugins: {
-            datalabels: {
-                anchor: 'end',
-                align: 'end',
-                offset: 16,
-                color: (context) => {
-                    const dataset = context.chart.data.datasets[context.datasetIndex];
-                    const bgColors = dataset.backgroundColor;
-                    return (Array.isArray(bgColors) ? bgColors[context.dataIndex] : bgColors) || (isDarkMode ? '#94a3b8' : '#475569');
-                },
-                font: {
-                    weight: 'bold',
-                    family: 'Inter',
-                    size: 12
-                }
+            legend: {
+                display: false
             }
         }
     });
