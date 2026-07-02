@@ -280,6 +280,29 @@
                 </div>
             </div>
         </section>
+        <!-- VIEW: NOTES -->
+        <section id="view-notes" class="view">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+                <h2><i class="fa-solid fa-note-sticky"></i> Nouvelles Notes</h2>
+                
+                <div class="form-group">
+                    <label for="note-text"><i class="fa-solid fa-pencil"></i> Rédiger une note</label>
+                    <textarea id="note-text" rows="4" placeholder="Tapez votre rappel ou note ici..." style="width: 100%; border: 2px solid transparent; border-radius: var(--radius-sm); font-size: 1.05rem; padding: 0.875rem 1rem; background-color: var(--input-bg); color: var(--text-primary); font-family: inherit; resize: vertical; transition: all var(--transition-snappy);"></textarea>
+                </div>
+                
+                <button id="save-note-btn" class="btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fa-solid fa-list-check"></i> Mes Notes (Locales)</h2>
+                <div id="notes-list-container">
+                    <!-- Notes will be rendered here -->
+                    <p class="help-text">Aucune note pour le moment.</p>
+                </div>
+            </div>
+        </section>
 
         <!-- VIEW: CONFIGURACION -->
         <section id="view-config" class="view">
@@ -329,6 +352,10 @@
         <a href="#" class="nav-item" data-target="view-stats">
             <i class="fa-solid fa-chart-pie"></i>
             <span>Stats</span>
+        </a>
+        <a href="#" class="nav-item" data-target="view-notes">
+            <i class="fa-solid fa-note-sticky"></i>
+            <span>Notes</span>
         </a>
         <a href="#" class="nav-item" data-target="view-config">
             <i class="fa-solid fa-gear"></i>

@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ui.updateSyncBadge();
     ui.renderHistory();
+    ui.renderNotes();
     window.addEventListener('online', api.syncOfflineQueue);
 
     setupEventListeners();
@@ -315,6 +316,20 @@ function setupEventListeners() {
 
     if (ui.elements.searchHistory) {
         ui.elements.searchHistory.addEventListener('input', ui.renderHistory);
+    }
+
+    if (ui.elements.saveNoteBtn && ui.elements.noteTextInput) {
+        ui.elements.saveNoteBtn.addEventListener('click', () => {
+            const text = ui.elements.noteTextInput.value.trim();
+            if (text) {
+                store.addNote(text);
+                ui.elements.noteTextInput.value = '';
+                ui.renderNotes();
+                ui.showToast('Note enregistrée !', 'success');
+            } else {
+                ui.showToast('La note ne peut pas être vide.', 'error');
+            }
+        });
     }
 }
 

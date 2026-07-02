@@ -106,3 +106,25 @@ export function editRecordLocally(uuid, updatedRecord) {
     history = history.map(r => r.uuid === uuid ? updatedLocalRecord : r);
     setHistory(history);
 }
+
+export function getNotes() {
+    return JSON.parse(localStorage.getItem('lightman_notes')) || [];
+}
+
+export function addNote(noteText) {
+    const notes = getNotes();
+    const newNote = {
+        id: crypto.randomUUID ? crypto.randomUUID() : 'note-' + Date.now(),
+        text: noteText,
+        timestamp: new Date().toISOString()
+    };
+    notes.unshift(newNote);
+    localStorage.setItem('lightman_notes', JSON.stringify(notes));
+    return newNote;
+}
+
+export function deleteNote(id) {
+    let notes = getNotes();
+    notes = notes.filter(n => n.id !== id);
+    localStorage.setItem('lightman_notes', JSON.stringify(notes));
+}

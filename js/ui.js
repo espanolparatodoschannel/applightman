@@ -47,7 +47,11 @@ export const elements = {
     filterHistoryEtage: document.getElementById('filter-history-etage'),
     filterHistoryTache: document.getElementById('filter-history-tache'),
     filterHistoryCategorie: document.getElementById('filter-history-categorie'),
-    clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn')
+    clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn'),
+    
+    noteTextInput: document.getElementById('note-text'),
+    saveNoteBtn: document.getElementById('save-note-btn'),
+    notesListContainer: document.getElementById('notes-list-container')
 };
 
 export function showToast(message, type = 'success') {
@@ -508,6 +512,48 @@ export function renderHistory() {
                 if (cancelBtn) cancelBtn.style.display = 'block';
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    });
+}
+
+export function renderNotes() {
+    if (!elements.notesListContainer) return;
+    
+    const notes = store.getNotes();
+    
+    if (notes.length === 0) {
+        elements.notesListContainer.innerHTML = '<p class="help-text">Aucune note pour le moment.</p>';
+        return;
+    }
+    
+    elements.notesListContainer.innerHTML = notes.map(note => {
+        const dateObj = new Date(note.timestamp);
+        const dateStr = dateObj.toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        
+        return `
+            <div class="card" style="margin-bottom: 0.75rem; padding: 1rem; border-left: 4px solid var(--primary);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+                    <button class="icon-btn delete-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Supprimer">
+                        <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
+                    </button>
+                </div>
+                <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; color: var(--text-primary); white-space: pre-wrap;">${note.text}</p>
+            </div>
+        `;
+    }).join('');
+    
+    // Add delete event listeners
+    const deleteBtns = elements.notesListContainer.querySelectorAll('.delete-note-btn');
+    deleteBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const confirmed = await showConfirm("Voulez-vous vraiment supprimer cette note ?");
+            if (confirmed) {
+                store.deleteNote(id);
+                renderNotes();
+                showToast("Note supprimée", "success");
             }
         });
     });

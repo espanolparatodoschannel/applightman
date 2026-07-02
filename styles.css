@@ -518,7 +518,7 @@ body {
     font-weight: 500;
     gap: 0.3rem;
     transition: all var(--transition-snappy);
-    width: 25%;
+    width: 20%;
     position: relative;
 }
 
