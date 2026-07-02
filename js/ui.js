@@ -321,33 +321,31 @@ export function renderHistory() {
 
         return `
             <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor}; position: relative;">
-                <div class="pro-card-header" style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                    <div class="pro-desc-group" style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-                            <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
-                            <h4 class="pro-desc" style="margin: 0;">${displayDesc}</h4>
-                        </div>
-                        
-                        <div style="margin-bottom: 0.65rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
-                            <i class="fa-solid fa-briefcase" style="margin-right: 0.25rem;"></i> ${r.tache || 'N/A'}
-                        </div>
-                        
+                <div class="pro-card-header" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <span class="pro-id-badge" style="white-space: nowrap;"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
+                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3;">${displayDesc}</h4>
+                    </div>
+                    
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
+                        <i class="fa-solid fa-briefcase" style="margin-right: 0.25rem;"></i> ${r.tache || 'N/A'}
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
+                            <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
                                 <i class="${r.isPending ? 'fa-solid fa-cloud-arrow-up' : 'fa-solid fa-check'}"></i>
                             </div>
                             ${r.uuid && !r.isPending ? `
-                            <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
+                            <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
                                 <i class="fa-solid fa-pencil"></i>
                             </button>
-                            <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center;" title="Supprimer">
+                            <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center;" title="Supprimer">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                             ` : ''}
                         </div>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; justify-content: center; align-self: stretch;">
+                        
                         <div class="pro-qty-badge">
                             <span class="qty-val">${r.quantite}</span>
                         </div>
