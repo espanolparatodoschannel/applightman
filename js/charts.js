@@ -548,4 +548,16 @@ export function populateFilters() {
             ui.elements.filterHistoryTache.innerHTML += `<option value="${t}">${t}</option>`;
         }
     });
+
+    const categories = new Set();
+    store.records.forEach(r => {
+        if (r.categorie) categories.add(r.categorie);
+    });
+
+    if (ui.elements.filterHistoryCategorie) {
+        ui.elements.filterHistoryCategorie.innerHTML = '<option value="all">Toutes les catégories</option>';
+        Array.from(categories).sort().forEach(c => {
+            ui.elements.filterHistoryCategorie.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+    }
 }

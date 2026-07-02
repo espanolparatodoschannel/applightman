@@ -100,10 +100,12 @@ function setupEventListeners() {
         ui.elements.filterHistoryMonth.addEventListener('change', ui.renderHistory);
         ui.elements.filterHistoryEtage.addEventListener('change', ui.renderHistory);
         ui.elements.filterHistoryTache.addEventListener('change', ui.renderHistory);
+        if (ui.elements.filterHistoryCategorie) ui.elements.filterHistoryCategorie.addEventListener('change', ui.renderHistory);
         ui.elements.clearHistoryFiltersBtn.addEventListener('click', () => {
             ui.elements.filterHistoryMonth.value = 'all';
             ui.elements.filterHistoryEtage.value = 'all';
             ui.elements.filterHistoryTache.value = 'all';
+            if (ui.elements.filterHistoryCategorie) ui.elements.filterHistoryCategorie.value = 'all';
             if (ui.elements.searchHistory) ui.elements.searchHistory.value = '';
             ui.renderHistory();
         });

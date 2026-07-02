@@ -46,6 +46,7 @@ export const elements = {
     filterHistoryMonth: document.getElementById('filter-history-month'),
     filterHistoryEtage: document.getElementById('filter-history-etage'),
     filterHistoryTache: document.getElementById('filter-history-tache'),
+    filterHistoryCategorie: document.getElementById('filter-history-categorie'),
     clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn')
 };
 
@@ -310,40 +311,43 @@ export function renderHistory() {
         }
 
         let detailsVal = "";
-        if (r.tache) {
-            const num = r.num_tache || r.num_bon || r.num_soumission;
-            detailsVal = num ? ` #${num}` : "";
-        }
+        const num = r.num_tache || r.num_bon || r.num_soumission;
+        detailsVal = num ? `#${num}` : "-";
 
         const foundOpt = store.appOptions.opciones.find(opt => opt.id === r.id_item);
         const displayDesc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || r.id_item || 'N/A');
-
-        const syncBadgeHtml = r.isPending 
-            ? `<span class="pro-sync-badge pending" title="En attente de synchronisation"><i class="fa-solid fa-cloud-arrow-up"></i></span>`
-            : `<span class="pro-sync-badge synced" title="Synchronisé"><i class="fa-solid fa-check"></i></span>`;
 
         const catColor = getCategoryColor(r.categorie);
 
         return `
             <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor}; position: relative;">
-                <div class="pro-card-header" style="display: flex; align-items: center; gap: 0.75rem;">
-                    ${r.uuid && !r.isPending ? `
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
-                        <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary);" title="Modifier">
-                            <i class="fa-solid fa-pencil"></i>
-                        </button>
-                        <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error);" title="Supprimer">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>` : ''}
+                <div class="pro-card-header" style="display: flex; gap: 0.75rem; align-items: flex-start;">
                     <div class="pro-desc-group" style="flex: 1;">
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
                             <span class="pro-id-badge"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
-                            ${syncBadgeHtml}
+                            <h4 class="pro-desc" style="margin: 0;">${displayDesc}</h4>
                         </div>
-                        <h4 class="pro-desc">${displayDesc}</h4>
+                        
+                        <div style="margin-bottom: 0.65rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
+                            <i class="fa-solid fa-briefcase" style="margin-right: 0.25rem;"></i> ${r.tache || 'N/A'}
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
+                                <i class="${r.isPending ? 'fa-solid fa-cloud-arrow-up' : 'fa-solid fa-check'}"></i>
+                            </div>
+                            ${r.uuid && !r.isPending ? `
+                            <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
+                                <i class="fa-solid fa-pencil"></i>
+                            </button>
+                            <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center;" title="Supprimer">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                            ` : ''}
+                        </div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: center;">
+                    
+                    <div style="display: flex; align-items: center; justify-content: center; align-self: stretch;">
                         <div class="pro-qty-badge">
                             <span class="qty-val">${r.quantite}</span>
                         </div>
@@ -360,10 +364,10 @@ export function renderHistory() {
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <i class="fa-solid fa-clipboard-list"></i>
+                            <i class="fa-solid fa-hashtag"></i>
                             <div>
-                                <span class="meta-label">Tâche</span>
-                                <span class="meta-value">${r.tache || '-'}${detailsVal}</span>
+                                <span class="meta-label">Num. Tâche</span>
+                                <span class="meta-value">${detailsVal}</span>
                             </div>
                         </div>
                         <div class="pro-meta-item">
