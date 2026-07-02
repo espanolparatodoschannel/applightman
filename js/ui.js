@@ -323,7 +323,7 @@ export function renderHistory() {
             <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor}; position: relative;">
                 <div class="pro-card-header" style="display: flex; flex-direction: column; gap: 0.5rem;">
                     <div style="display: flex; align-items: flex-start;">
-                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3;"><i class="fa-solid fa-lightbulb" style="color: var(--primary); margin-right: 0.35rem; font-size: 0.95rem;"></i>${displayDesc}</h4>
+                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3;"><i class="fa-solid fa-lightbulb" style="color: var(--text-secondary); margin-right: 0.35rem; font-size: 0.95rem;"></i>${displayDesc}</h4>
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
