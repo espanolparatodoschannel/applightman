@@ -577,13 +577,18 @@ export function renderNotes() {
     // Add edit event listeners
     const editBtns = elements.notesListContainer.querySelectorAll('.edit-note-btn');
     editBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const id = btn.getAttribute('data-id');
-            const note = notes.find(n => n.id === id);
-            if (note && elements.noteTextInput && elements.saveNoteBtn) {
+            const note = store.getNotes().find(n => String(n.id) === String(id));
+            
+            const noteInput = document.getElementById('note-text');
+            const saveBtn = document.getElementById('save-note-btn');
+            
+            if (note && noteInput && saveBtn) {
                 store.setEditingNoteId(id);
-                elements.noteTextInput.value = note.text;
-                elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier la Note';
+                noteInput.value = note.text;
+                saveBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier la Note';
                 
                 let cancelBtn = document.getElementById('cancel-edit-note-btn');
                 if (!cancelBtn) {
@@ -596,15 +601,22 @@ export function renderNotes() {
                     cancelBtn.innerHTML = '<i class="fa-solid fa-times"></i> Annuler la modification';
                     cancelBtn.addEventListener('click', () => {
                         store.setEditingNoteId(null);
-                        elements.noteTextInput.value = '';
-                        elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                        noteInput.value = '';
+                        saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
                         cancelBtn.style.display = 'none';
                     });
-                    elements.saveNoteBtn.parentNode.insertBefore(cancelBtn, elements.saveNoteBtn.nextSibling);
+                    saveBtn.parentNode.insertBefore(cancelBtn, saveBtn.nextSibling);
                 }
                 cancelBtn.style.display = 'block';
                 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch(err) {
+                    window.scrollTo(0, 0);
+                }
+                
+                // Focus the textarea
+                noteInput.focus();
             }
         });
     });
