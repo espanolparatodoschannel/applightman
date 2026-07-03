@@ -239,6 +239,7 @@ export function renderHistory() {
         const hmVal = elements.filterHistoryMonth.value;
         const heVal = elements.filterHistoryEtage.value;
         const htVal = elements.filterHistoryTache.value;
+        const hcVal = elements.filterHistoryCategorie ? elements.filterHistoryCategorie.value : 'all';
         
         if (hmVal !== 'all') {
             history = history.filter(r => {
@@ -254,6 +255,16 @@ export function renderHistory() {
         }
         if (htVal !== 'all') {
             history = history.filter(r => r.tache === htVal);
+        }
+        if (hcVal !== 'all') {
+            history = history.filter(r => {
+                let recCat = r.categorie;
+                if (!recCat && r.id_item) {
+                    const foundOpt = store.appOptions.opciones.find(opt => opt.id === r.id_item);
+                    if (foundOpt) recCat = foundOpt.categorie;
+                }
+                return recCat === hcVal;
+            });
         }
     }
     
@@ -535,9 +546,14 @@ export function renderNotes() {
             <div class="card" style="margin-bottom: 0.75rem; padding: 1rem; border-left: 4px solid var(--primary);">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                     <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock"></i> ${dateStr}</span>
-                    <button class="icon-btn delete-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Supprimer">
-                        <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
-                    </button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="icon-btn edit-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Modifier">
+                            <i class="fa-solid fa-pencil" style="font-size: 0.8rem;"></i>
+                        </button>
+                        <button class="icon-btn delete-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Supprimer">
+                            <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
+                        </button>
+                    </div>
                 </div>
                 <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; color: var(--text-primary); white-space: pre-wrap;">${note.text}</p>
             </div>
@@ -554,6 +570,41 @@ export function renderNotes() {
                 store.deleteNote(id);
                 renderNotes();
                 showToast("Note supprimée", "success");
+            }
+        });
+    });
+
+    // Add edit event listeners
+    const editBtns = elements.notesListContainer.querySelectorAll('.edit-note-btn');
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const note = notes.find(n => n.id === id);
+            if (note && elements.noteTextInput && elements.saveNoteBtn) {
+                store.setEditingNoteId(id);
+                elements.noteTextInput.value = note.text;
+                elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier la Note';
+                
+                let cancelBtn = document.getElementById('cancel-edit-note-btn');
+                if (!cancelBtn) {
+                    cancelBtn = document.createElement('button');
+                    cancelBtn.id = 'cancel-edit-note-btn';
+                    cancelBtn.type = 'button';
+                    cancelBtn.className = 'btn-secondary';
+                    cancelBtn.style.marginTop = '10px';
+                    cancelBtn.style.width = '100%';
+                    cancelBtn.innerHTML = '<i class="fa-solid fa-times"></i> Annuler la modification';
+                    cancelBtn.addEventListener('click', () => {
+                        store.setEditingNoteId(null);
+                        elements.noteTextInput.value = '';
+                        elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                        cancelBtn.style.display = 'none';
+                    });
+                    elements.saveNoteBtn.parentNode.insertBefore(cancelBtn, elements.saveNoteBtn.nextSibling);
+                }
+                cancelBtn.style.display = 'block';
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     });

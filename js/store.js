@@ -123,8 +123,20 @@ export function addNote(noteText) {
     return newNote;
 }
 
+export let editingNoteId = null;
+
+export function setEditingNoteId(id) {
+    editingNoteId = id;
+}
+
 export function deleteNote(id) {
     let notes = getNotes();
     notes = notes.filter(n => n.id !== id);
+    localStorage.setItem('lightman_notes', JSON.stringify(notes));
+}
+
+export function editNote(id, newText) {
+    let notes = getNotes();
+    notes = notes.map(n => n.id === id ? { ...n, text: newText } : n);
     localStorage.setItem('lightman_notes', JSON.stringify(notes));
 }

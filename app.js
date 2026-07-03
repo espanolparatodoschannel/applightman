@@ -322,10 +322,19 @@ function setupEventListeners() {
         ui.elements.saveNoteBtn.addEventListener('click', () => {
             const text = ui.elements.noteTextInput.value.trim();
             if (text) {
-                store.addNote(text);
+                if (store.editingNoteId) {
+                    store.editNote(store.editingNoteId, text);
+                    store.setEditingNoteId(null);
+                    ui.elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                    const cancelBtn = document.getElementById('cancel-edit-note-btn');
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+                    ui.showToast('Note modifiée !', 'success');
+                } else {
+                    store.addNote(text);
+                    ui.showToast('Note enregistrée !', 'success');
+                }
                 ui.elements.noteTextInput.value = '';
                 ui.renderNotes();
-                ui.showToast('Note enregistrée !', 'success');
             } else {
                 ui.showToast('La note ne peut pas être vide.', 'error');
             }
