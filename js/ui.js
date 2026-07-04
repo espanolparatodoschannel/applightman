@@ -178,6 +178,7 @@ export function populateAllSelects() {
 export function updateInventoryDescriptionFilter() {
     if (!elements.filterInvCategorie || !elements.filterInvDescription) return;
     
+    const currentDesc = elements.filterInvDescription.value;
     const cat = elements.filterInvCategorie.value;
     let items = store.appOptions.inventory || [];
     if (cat !== 'all') {
@@ -186,6 +187,12 @@ export function updateInventoryDescriptionFilter() {
     
     const invDescriptions = [...new Set(items.map(item => item.description).filter(Boolean))];
     populateSelect('filter-inv-description', invDescriptions.sort());
+    
+    if (invDescriptions.includes(currentDesc)) {
+        elements.filterInvDescription.value = currentDesc;
+    } else {
+        elements.filterInvDescription.value = 'all';
+    }
 }
 
 export function updateDateDisplay() {
@@ -678,8 +685,15 @@ export function renderInventory() {
         const stockClass = solde <= 5 ? 'low-stock' : 'good-stock';
         const displaySolde = solde;
         
+        const formattedPrix = parseFloat(item.prix || 0).toFixed(2);
+        
         const card = document.createElement('div');
         card.className = 'inv-card';
+        const percentage = initialStock > 0 ? Math.max(0, Math.min(100, (displaySolde / initialStock) * 100)) : 0;
+        let progressColor = 'var(--success)';
+        if (displaySolde <= 5) progressColor = 'var(--error)';
+        else if (percentage <= 30) progressColor = '#f59e0b'; // Amber for warning
+
         card.innerHTML = `
             <div class="inv-header" style="align-items: flex-start;">
                 <div style="display: flex; flex-direction: column; gap: 0.25rem; width: 100%;">
@@ -690,7 +704,7 @@ export function renderInventory() {
                     <div style="display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; gap: 0.4rem; padding-left: 1.3rem; margin-top: 0.25rem; max-width: 100%; padding-bottom: 2px;">
                         <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-tag" style="margin-right: 0.25rem;"></i> ${item.id}</span>
                         <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><i class="fa-regular fa-folder-open" style="margin-right: 0.25rem;"></i> ${item.categorie || 'Sans Catégorie'}</span>
-                        <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${item.prix || '0.00'}</span>
+                        <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${formattedPrix}</span>
                     </div>
                 </div>
             </div>
@@ -708,6 +722,10 @@ export function renderInventory() {
                     <span class="inv-stat-label">Solde</span>
                     <span class="inv-stat-val ${stockClass}">${displaySolde}</span>
                 </div>
+            </div>
+            
+            <div style="width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; margin-top: 1.25rem; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+                <div style="height: 100%; width: ${percentage}%; background: ${progressColor}; transition: width 0.5s ease-out; border-radius: 3px;"></div>
             </div>
         `;
         

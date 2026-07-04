@@ -1196,18 +1196,18 @@ body {
 }
 
 .inv-card {
-    background: var(--card-bg);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 1.25rem;
     position: relative;
-    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    box-shadow: var(--shadow-md);
     transition: transform var(--transition-snappy), box-shadow var(--transition-snappy);
 }
 
 .inv-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px var(--shadow-color);
+    box-shadow: var(--shadow-lg);
 }
 
 .inv-header {

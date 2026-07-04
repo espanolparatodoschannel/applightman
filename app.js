@@ -121,7 +121,17 @@ function setupEventListeners() {
         });
     }
     if (ui.elements.filterInvDescription) {
-        ui.elements.filterInvDescription.addEventListener('change', ui.renderInventory);
+        ui.elements.filterInvDescription.addEventListener('change', (e) => {
+            const selectedDesc = e.target.value;
+            if (selectedDesc !== 'all') {
+                const foundItem = store.appOptions.inventory.find(item => item.description === selectedDesc);
+                if (foundItem && foundItem.categorie && ui.elements.filterInvCategorie.value !== foundItem.categorie) {
+                    ui.elements.filterInvCategorie.value = foundItem.categorie;
+                    ui.updateInventoryDescriptionFilter();
+                }
+            }
+            ui.renderInventory();
+        });
     }
     if (ui.elements.clearInvFiltersBtn) {
         ui.elements.clearInvFiltersBtn.addEventListener('click', () => {
