@@ -242,9 +242,9 @@ export function updateDashboard() {
         if (ui.elements.filterHistoryTache) ui.elements.filterHistoryTache.value = 'all';
         if (ui.elements.searchHistory) ui.elements.searchHistory.value = '';
 
-        if (canvasId === 'monthlyBulbsChart' && ui.elements.filterHistoryMonth) {
+        if ((canvasId === 'monthlyBulbsChart' || canvasId === 'cumulativeTrendChart') && ui.elements.filterHistoryMonth) {
             ui.elements.filterHistoryMonth.value = sortedMonths[index] || 'all';
-        } else if (canvasId === 'etageBulbsChart' && ui.elements.filterHistoryEtage) {
+        } else if ((canvasId === 'etageBulbsChart' || canvasId === 'topEtagesChart') && ui.elements.filterHistoryEtage) {
             ui.elements.filterHistoryEtage.value = label || 'all';
         } else if (canvasId === 'taskTypeChart' && ui.elements.filterHistoryTache) {
             ui.elements.filterHistoryTache.value = label || 'all';
@@ -354,6 +354,35 @@ export function updateDashboard() {
         indexAxis: 'y',
         onClick: handleChartClick,
         plugins: { legend: { display: false } }
+    });
+
+    const top5Etages = sortedEtages.slice(0, 5);
+    const top5EtagesValues = top5Etages.map(et => {
+        return Object.values(etageBulbsByCategory[et]).reduce((sum, v) => sum + v, 0);
+    });
+    const topEtagesColors = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981'];
+    
+    renderChart('topEtagesChart', 'bar', top5Etages, top5EtagesValues, topEtagesColors, {
+        indexAxis: 'y',
+        datasetLabel: 'Ampoules',
+        onClick: handleChartClick,
+        plugins: {
+            datalabels: { anchor: 'end', align: 'left', color: '#ffffff' }
+        }
+    });
+
+    let cumulativeSum = 0;
+    const cumulativeValues = monthlyValues.map(val => {
+        cumulativeSum += val;
+        return cumulativeSum;
+    });
+
+    renderChart('cumulativeTrendChart', 'line', monthlyLabels, cumulativeValues, '#8b5cf6', {
+        datasetLabel: 'Total Cumulé',
+        fill: true,
+        plugins: {
+            datalabels: { anchor: 'end', align: 'top', color: textColor, font: { weight: 'bold' } }
+        }
     });
 }
 
