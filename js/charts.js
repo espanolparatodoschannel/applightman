@@ -244,7 +244,7 @@ export function updateDashboard() {
 
         if ((canvasId === 'monthlyBulbsChart' || canvasId === 'cumulativeTrendChart') && ui.elements.filterHistoryMonth) {
             ui.elements.filterHistoryMonth.value = sortedMonths[index] || 'all';
-        } else if ((canvasId === 'etageBulbsChart' || canvasId === 'topEtagesChart') && ui.elements.filterHistoryEtage) {
+        } else if (canvasId === 'topEtagesChart' && ui.elements.filterHistoryEtage) {
             ui.elements.filterHistoryEtage.value = label || 'all';
         } else if (canvasId === 'taskTypeChart' && ui.elements.filterHistoryTache) {
             ui.elements.filterHistoryTache.value = label || 'all';
@@ -333,20 +333,9 @@ export function updateDashboard() {
     const topProductsCard = document.getElementById('topProductsChart')?.closest('.chart-card');
     if (topProductsCard) topProductsCard.style.height = `${topProductsHeight + 80}px`;
 
-    const etageChartHeight = Math.max(250, sortedEtages.length * 48);
-    const bulbsCard = document.getElementById('etageBulbsChart')?.closest('.chart-card');
-    if (bulbsCard) bulbsCard.style.height = `${etageChartHeight + 80}px`;
-
     const catChartHeight = Math.max(250, catLabels.length * 48);
     const catCard = document.getElementById('categoryChart')?.closest('.chart-card');
     if (catCard) catCard.style.height = `${catChartHeight + 80}px`;
-
-    renderChart('etageBulbsChart', 'bar', sortedEtages, [], null, {
-        indexAxis: 'y',
-        datasets: datasetsForEtage,
-        onClick: handleChartClick,
-        scales: { x: { stacked: true }, y: { stacked: true } }
-    });
 
     const catValues = catLabels.map(cat => catCounts[cat]);
     renderChart('categoryChart', 'bar', catLabels, catValues, catLabels.map(cat => getCategoryColor(cat)), {
