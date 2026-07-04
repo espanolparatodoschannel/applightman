@@ -54,7 +54,10 @@ export const elements = {
     notesListContainer: document.getElementById('notes-list-container'),
     
     inventoryContainer: document.getElementById('inventory-container'),
-    searchInventory: document.getElementById('search-inventory')
+    searchInventory: document.getElementById('search-inventory'),
+    filterInvCategorie: document.getElementById('filter-inv-categorie'),
+    filterInvDescription: document.getElementById('filter-inv-description'),
+    clearInvFiltersBtn: document.getElementById('clear-inv-filters-btn')
 };
 
 export function showToast(message, type = 'success') {
@@ -163,7 +166,16 @@ export function populateAllSelects() {
     populateSelect('categorie', allCategories);
     populateSelect('etage', store.appOptions.etage || []);
     populateSelect('tache', store.appOptions.tache || []);
+    
     if (elements.idInput) elements.idInput.value = "";
+
+    // Inventory Filters
+    if (store.appOptions.inventory && store.appOptions.inventory.length > 0) {
+        const invCategories = [...new Set(store.appOptions.inventory.map(item => item.categorie).filter(Boolean))];
+        const invDescriptions = [...new Set(store.appOptions.inventory.map(item => item.description).filter(Boolean))];
+        populateSelect('filter-inv-categorie', invCategories.sort());
+        populateSelect('filter-inv-description', invDescriptions.sort());
+    }
 }
 
 export function updateDateDisplay() {
@@ -629,6 +641,8 @@ export function renderInventory() {
     
     let inventory = store.appOptions.inventory || [];
     const searchTerm = (elements.searchInventory ? elements.searchInventory.value.toLowerCase().trim() : "");
+    const filterCat = (elements.filterInvCategorie ? elements.filterInvCategorie.value : "all");
+    const filterDesc = (elements.filterInvDescription ? elements.filterInvDescription.value : "all");
     
     // Calculate Depense
     const records = store.records || [];
@@ -643,6 +657,9 @@ export function renderInventory() {
     
     let count = 0;
     inventory.forEach(item => {
+        if (filterCat !== 'all' && item.categorie !== filterCat) return;
+        if (filterDesc !== 'all' && item.description !== filterDesc) return;
+        
         const idStr = String(item.id).toLowerCase();
         const descStr = String(item.description).toLowerCase();
         const nameStr = String(item.name).toLowerCase();
@@ -665,12 +682,12 @@ export function renderInventory() {
         card.innerHTML = `
             <div class="inv-header">
                 <div>
-                    <div class="inv-title">${item.name || item.description}</div>
+                    <div class="inv-title">${item.description || item.name}</div>
                     <span class="inv-cat">${item.categorie || 'Sans Catégorie'}</span>
                 </div>
                 <span class="inv-id">${item.id}</span>
             </div>
-            ${item.name && item.description && item.name !== item.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom: 0.75rem;">${item.description}</div>` : ''}
+            ${item.name && item.description && item.name !== item.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom: 0.75rem;">Nom: ${item.name}</div>` : ''}
             <div class="inv-stats">
                 <div class="inv-stat-box">
                     <span class="inv-stat-label">Stock Initial</span>

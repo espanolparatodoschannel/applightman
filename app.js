@@ -116,6 +116,21 @@ function setupEventListeners() {
     if (ui.elements.searchInventory) {
         ui.elements.searchInventory.addEventListener('input', ui.renderInventory);
     }
+    
+    if (ui.elements.filterInvCategorie) {
+        ui.elements.filterInvCategorie.addEventListener('change', ui.renderInventory);
+    }
+    if (ui.elements.filterInvDescription) {
+        ui.elements.filterInvDescription.addEventListener('change', ui.renderInventory);
+    }
+    if (ui.elements.clearInvFiltersBtn) {
+        ui.elements.clearInvFiltersBtn.addEventListener('click', () => {
+            if (ui.elements.filterInvCategorie) ui.elements.filterInvCategorie.value = 'all';
+            if (ui.elements.filterInvDescription) ui.elements.filterInvDescription.value = 'all';
+            if (ui.elements.searchInventory) ui.elements.searchInventory.value = '';
+            ui.renderInventory();
+        });
+    }
     if (ui.elements.tacheSelect) {
         ui.elements.tacheSelect.addEventListener('change', (e) => {
             const val = e.target.value.trim().toLowerCase();
