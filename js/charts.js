@@ -242,7 +242,7 @@ export function updateDashboard() {
         if (ui.elements.filterHistoryTache) ui.elements.filterHistoryTache.value = 'all';
         if (ui.elements.searchHistory) ui.elements.searchHistory.value = '';
 
-        if ((canvasId === 'monthlyBulbsChart' || canvasId === 'cumulativeTrendChart') && ui.elements.filterHistoryMonth) {
+        if ((canvasId === 'monthlyBulbsChart' || canvasId === 'cumulativeTrendChart' || canvasId === 'taskTypeEvolutionChart') && ui.elements.filterHistoryMonth) {
             ui.elements.filterHistoryMonth.value = sortedMonths[index] || 'all';
         } else if (canvasId === 'topEtagesChart' && ui.elements.filterHistoryEtage) {
             ui.elements.filterHistoryEtage.value = label || 'all';
@@ -305,28 +305,45 @@ export function updateDashboard() {
     const taskTypeKeys = Object.keys(taskTypeData).sort((a, b) => taskTypeData[b] - taskTypeData[a]);
     const taskTypeVals = taskTypeKeys.map(k => taskTypeData[k]);
 
-    renderChart('taskTypeChart', 'doughnut', taskTypeKeys, taskTypeVals, ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
+    renderChart('taskTypeChart', 'bar', taskTypeKeys, taskTypeVals, ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
+        indexAxis: 'y',
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
-        cutout: '45%', 
-        layout: { padding: { top: 20, bottom: 20, left: 40, right: 40 } },
         plugins: {
-            datalabels: {
-                display: 'auto', 
-                formatter: (value, context) => {
-                    let sum = 0;
-                    const dataArr = context.chart.data.datasets[0].data;
-                    dataArr.forEach(data => sum += Number(data));
-                    if (sum === 0) return '';
-                    const percentageValue = (value * 100 / sum);
-                    const threshold = window.innerWidth < 480 ? 12 : 6;
-                    if (percentageValue < threshold) return '';
-                    return `${value}`;
-                },
-                color: '#ffffff',
-                font: { weight: 'bold', family: 'Inter', size: window.innerWidth < 480 ? 12 : 14 }
+            legend: { display: false },
+            datalabels: { anchor: 'end', align: 'left', color: '#ffffff' }
+        }
+    });
+
+    const monthlyTaskTypeData = {};
+    sortedMonths.forEach(m => monthlyTaskTypeData[m] = {});
+
+    dashboardRecords.forEach(r => {
+        if (!r.date && !r.fecha) return;
+        const d = new Date(r.date || r.fecha);
+        if (!isNaN(d) && r.tache) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const key = `${y}-${m}`;
+            if (monthlyTaskTypeData[key]) {
+                monthlyTaskTypeData[key][r.tache] = (monthlyTaskTypeData[key][r.tache] || 0) + Number(r.quantite || 0);
             }
         }
+    });
+
+    const taskTypeColorsArr = ['#0ea5e9', '#f43f5e', '#d946ef', '#84cc16', '#64748b'];
+    const taskTypeEvolutionDatasets = taskTypeKeys.map((tache, index) => {
+        return {
+            label: tache,
+            data: sortedMonths.map(month => monthlyTaskTypeData[month][tache] || 0),
+            backgroundColor: taskTypeColorsArr[index % taskTypeColorsArr.length]
+        };
+    });
+
+    renderChart('taskTypeEvolutionChart', 'bar', monthlyLabels, [], null, {
+        datasets: taskTypeEvolutionDatasets,
+        onClick: handleChartClick,
+        scales: { x: { stacked: true }, y: { stacked: true } }
     });
 
     const topProductsHeight = Math.max(250, sortedProducts.length * 48);
