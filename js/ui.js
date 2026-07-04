@@ -709,27 +709,20 @@ export function renderInventory() {
             </div>
             
             <div class="pro-card-body" style="padding: 1.25rem 0 0 0;">
-                <div class="pro-meta-grid">
-                    <div class="pro-meta-item">
-                        <i class="fa-solid fa-cubes"></i>
-                        <div>
-                            <span class="meta-label">Stock</span>
-                            <span class="meta-value">${initialStock}</span>
-                        </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="text-align: center; flex: 1;">
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Stock</span>
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${initialStock}</span>
                     </div>
-                    <div class="pro-meta-item">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <div>
-                            <span class="meta-label">Dépense</span>
-                            <span class="meta-value">${depense}</span>
-                        </div>
+                    <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
+                    <div style="text-align: center; flex: 1;">
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Dépense</span>
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${depense}</span>
                     </div>
-                    <div class="pro-meta-item">
-                        <i class="fa-solid fa-clipboard-check"></i>
-                        <div>
-                            <span class="meta-label">Solde</span>
-                            <span class="meta-value ${stockClass}">${displaySolde}</span>
-                        </div>
+                    <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
+                    <div style="text-align: center; flex: 1;">
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Solde</span>
+                        <span style="font-size: 1.15rem; font-weight: 700;" class="${stockClass}">${displaySolde}</span>
                     </div>
                 </div>
             </div>
