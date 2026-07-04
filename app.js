@@ -118,7 +118,10 @@ function setupEventListeners() {
     }
     
     if (ui.elements.filterInvCategorie) {
-        ui.elements.filterInvCategorie.addEventListener('change', ui.renderInventory);
+        ui.elements.filterInvCategorie.addEventListener('change', () => {
+            ui.updateInventoryDescriptionFilter();
+            ui.renderInventory();
+        });
     }
     if (ui.elements.filterInvDescription) {
         ui.elements.filterInvDescription.addEventListener('change', ui.renderInventory);
@@ -126,6 +129,7 @@ function setupEventListeners() {
     if (ui.elements.clearInvFiltersBtn) {
         ui.elements.clearInvFiltersBtn.addEventListener('click', () => {
             if (ui.elements.filterInvCategorie) ui.elements.filterInvCategorie.value = 'all';
+            ui.updateInventoryDescriptionFilter(); // Repopulate all
             if (ui.elements.filterInvDescription) ui.elements.filterInvDescription.value = 'all';
             if (ui.elements.searchInventory) ui.elements.searchInventory.value = '';
             ui.renderInventory();

@@ -168,14 +168,25 @@ export function populateAllSelects() {
     populateSelect('tache', store.appOptions.tache || []);
     
     if (elements.idInput) elements.idInput.value = "";
-
     // Inventory Filters
     if (store.appOptions.inventory && store.appOptions.inventory.length > 0) {
         const invCategories = [...new Set(store.appOptions.inventory.map(item => item.categorie).filter(Boolean))];
-        const invDescriptions = [...new Set(store.appOptions.inventory.map(item => item.description).filter(Boolean))];
         populateSelect('filter-inv-categorie', invCategories.sort());
-        populateSelect('filter-inv-description', invDescriptions.sort());
+        updateInventoryDescriptionFilter();
     }
+}
+
+export function updateInventoryDescriptionFilter() {
+    if (!elements.filterInvCategorie || !elements.filterInvDescription) return;
+    
+    const cat = elements.filterInvCategorie.value;
+    let items = store.appOptions.inventory || [];
+    if (cat !== 'all') {
+        items = items.filter(item => item.categorie === cat);
+    }
+    
+    const invDescriptions = [...new Set(items.map(item => item.description).filter(Boolean))];
+    populateSelect('filter-inv-description', invDescriptions.sort());
 }
 
 export function updateDateDisplay() {
@@ -398,7 +409,7 @@ export function renderHistory() {
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <i class="fa-solid fa-cubes"></i>
+                            <span style="font-size: 1.1rem; margin-right: 0.2rem;">📂</span>
                             <div>
                                 <span class="meta-label">Catégorie</span>
                                 <span class="meta-value">${r.categorie || '-'}</span>
@@ -685,12 +696,12 @@ export function renderInventory() {
                     <div class="inv-title">${item.description || item.name}</div>
                     <span class="inv-cat">${item.categorie || 'Sans Catégorie'}</span>
                 </div>
-                <span class="inv-id">${item.id}</span>
+                <span class="pro-id-badge" style="height: 32px; padding: 0 0.75rem; border-radius: 16px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 600; font-size: 0.85rem;"><i class="fa-solid fa-tag" style="margin-right: 0.3rem;"></i> ${item.id}</span>
             </div>
-            ${item.name && item.description && item.name !== item.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom: 0.75rem;">Nom: ${item.name}</div>` : ''}
+            
             <div class="inv-stats">
                 <div class="inv-stat-box">
-                    <span class="inv-stat-label">Stock Initial</span>
+                    <span class="inv-stat-label">Stock</span>
                     <span class="inv-stat-val">${initialStock}</span>
                 </div>
                 <div class="inv-stat-box">
