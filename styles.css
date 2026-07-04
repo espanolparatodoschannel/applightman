@@ -926,8 +926,6 @@ body {
 }
 
 .pro-note {
-    display: flex;
-    gap: 0.6rem;
     background: rgba(245, 158, 11, 0.1); /* Amber tint */
     border-left: 3px solid #f59e0b;
     padding: 0.75rem 1rem;
@@ -945,16 +943,9 @@ body {
     background: rgba(245, 158, 11, 0.15);
 }
 
-.pro-note i {
-    color: #f59e0b;
-    font-size: 0.95rem;
-    margin-top: 0.15rem;
-}
-
 .pro-note p {
     margin: 0;
     line-height: 1.4;
-    font-style: italic;
 }
 
 /* --- Search Input Styles --- */

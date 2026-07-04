@@ -402,7 +402,6 @@ export function renderHistory() {
                 ${r.note ? `
                 <div class="pro-card-footer">
                     <div class="pro-note">
-                        <i class="fa-solid fa-quote-left"></i>
                         <p>${r.note}</p>
                     </div>
                 </div>` : ''}
