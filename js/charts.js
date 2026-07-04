@@ -99,6 +99,10 @@ export function updateDashboard() {
         return `${monthNames[parseInt(m, 10) - 1]} ${y}`;
     });
     const monthlyValues = sortedMonths.map(key => monthlyData[key]);
+    const monthlyColors = sortedMonths.map(key => {
+        const [y, m] = key.split('-');
+        return parseInt(m, 10) === 7 ? '#3b82f6' : '#10b981'; // Blue for July, Green for others
+    });
 
     // 2. Top 5 Productos
     const productData = {};
@@ -251,7 +255,7 @@ export function updateDashboard() {
         ui.renderHistory();
     };
 
-    renderChart('monthlyBulbsChart', 'bar', monthlyLabels, monthlyValues, '#10b981', {
+    renderChart('monthlyBulbsChart', 'bar', monthlyLabels, monthlyValues, monthlyColors, {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
         plugins: {
