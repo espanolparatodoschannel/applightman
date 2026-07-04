@@ -181,7 +181,7 @@ export function updateInventoryDescriptionFilter() {
     const cat = elements.filterInvCategorie.value;
     let items = store.appOptions.inventory || [];
     if (cat !== 'all') {
-        items = items.filter(item => item.categorie === cat);
+        items = items.filter(item => item.categorie && String(item.categorie).trim() === String(cat).trim());
     }
     
     const invDescriptions = [...new Set(items.map(item => item.description).filter(Boolean))];
@@ -666,8 +666,8 @@ export function renderInventory() {
     
     let count = 0;
     inventory.forEach(item => {
-        if (filterCat !== 'all' && item.categorie !== filterCat) return;
-        if (filterDesc !== 'all' && item.description !== filterDesc) return;
+        if (filterCat !== 'all' && (!item.categorie || String(item.categorie).trim() !== String(filterCat).trim())) return;
+        if (filterDesc !== 'all' && (!item.description || String(item.description).trim() !== String(filterDesc).trim())) return;
         
         count++;
         
@@ -685,12 +685,12 @@ export function renderInventory() {
                 <div style="display: flex; flex-direction: column; gap: 0.25rem; width: 100%;">
                     <div class="inv-title" style="display: flex; align-items: flex-start;">
                         <i class="fa-solid fa-lightbulb" style="color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;"></i>
-                        <span>${item.description || item.name}</span>
+                        <span>${item.description || 'Sans description'}</span>
                     </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding-left: 1.3rem; margin-top: 0.25rem;">
-                        <span class="pro-id-badge" style="height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><i class="fa-regular fa-folder-open" style="margin-right: 0.25rem;"></i> ${item.categorie || 'Sans Catégorie'}</span>
-                        <span class="pro-id-badge" style="height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-tag" style="margin-right: 0.25rem;"></i> ${item.id}</span>
-                        <span class="pro-id-badge" style="height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${item.prix || '0.00'}</span>
+                    <div style="display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; gap: 0.4rem; padding-left: 1.3rem; margin-top: 0.25rem; max-width: 100%; padding-bottom: 2px;">
+                        <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-tag" style="margin-right: 0.25rem;"></i> ${item.id}</span>
+                        <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><i class="fa-regular fa-folder-open" style="margin-right: 0.25rem;"></i> ${item.categorie || 'Sans Catégorie'}</span>
+                        <span class="pro-id-badge" style="flex-shrink: 0; height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${item.prix || '0.00'}</span>
                     </div>
                 </div>
             </div>
