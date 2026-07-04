@@ -305,13 +305,27 @@ export function updateDashboard() {
     const taskTypeKeys = Object.keys(taskTypeData).sort((a, b) => taskTypeData[b] - taskTypeData[a]);
     const taskTypeVals = taskTypeKeys.map(k => taskTypeData[k]);
 
-    renderChart('taskTypeChart', 'bar', taskTypeKeys, taskTypeVals, ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
-        indexAxis: 'y',
+    renderChart('taskTypeChart', 'doughnut', taskTypeKeys, taskTypeVals, ['#64748b', '#0ea5e9', '#d946ef', '#f43f5e'], {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
+        cutout: '45%', 
+        layout: { padding: { top: 20, bottom: 20, left: 40, right: 40 } },
         plugins: {
-            legend: { display: false },
-            datalabels: { anchor: 'end', align: 'left', color: '#ffffff' }
+            datalabels: {
+                display: 'auto', 
+                formatter: (value, context) => {
+                    let sum = 0;
+                    const dataArr = context.chart.data.datasets[0].data;
+                    dataArr.forEach(data => sum += Number(data));
+                    if (sum === 0) return '';
+                    const percentageValue = (value * 100 / sum);
+                    const threshold = window.innerWidth < 480 ? 12 : 6;
+                    if (percentageValue < threshold) return '';
+                    return `${value}`;
+                },
+                color: '#ffffff',
+                font: { weight: 'bold', family: 'Inter', size: window.innerWidth < 480 ? 12 : 14 }
+            }
         }
     });
 
@@ -333,17 +347,24 @@ export function updateDashboard() {
 
     const taskTypeColorsArr = ['#0ea5e9', '#f43f5e', '#d946ef', '#84cc16', '#64748b'];
     const taskTypeEvolutionDatasets = taskTypeKeys.map((tache, index) => {
+        const color = taskTypeColorsArr[index % taskTypeColorsArr.length];
         return {
             label: tache,
             data: sortedMonths.map(month => monthlyTaskTypeData[month][tache] || 0),
-            backgroundColor: taskTypeColorsArr[index % taskTypeColorsArr.length]
+            borderColor: color,
+            backgroundColor: color + '33', // 33 for some transparency in area fill
+            fill: true,
+            tension: 0.4 // Smooth lines
         };
     });
 
-    renderChart('taskTypeEvolutionChart', 'bar', monthlyLabels, [], null, {
+    renderChart('taskTypeEvolutionChart', 'line', monthlyLabels, [], null, {
         datasets: taskTypeEvolutionDatasets,
         onClick: handleChartClick,
-        scales: { x: { stacked: true }, y: { stacked: true } }
+        plugins: {
+            legend: { display: true },
+            datalabels: { display: false } // Avoid cluttering the line chart with too many labels
+        }
     });
 
     const topProductsHeight = Math.max(250, sortedProducts.length * 48);
