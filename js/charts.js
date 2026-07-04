@@ -361,6 +361,12 @@ export function updateDashboard() {
     renderChart('taskTypeEvolutionChart', 'line', monthlyLabels, [], null, {
         datasets: taskTypeEvolutionDatasets,
         onClick: handleChartClick,
+        scales: {
+            y: { grace: '15%' }
+        },
+        layout: {
+            padding: { top: 20 }
+        },
         plugins: {
             legend: { display: true },
             datalabels: {
@@ -512,6 +518,10 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
     };
 
     const options = { ...defaultOptions, ...customOptions };
+    if (customOptions.layout) {
+        options.layout = { ...defaultOptions.layout, ...customOptions.layout };
+        if (customOptions.layout.padding) options.layout.padding = { ...defaultOptions.layout.padding, ...customOptions.layout.padding };
+    }
     if (customOptions.fullDescriptions) options.fullDescriptions = customOptions.fullDescriptions;
     if (customOptions.scales) {
         options.scales = { ...defaultOptions.scales, ...customOptions.scales };
