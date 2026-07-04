@@ -363,7 +363,14 @@ export function updateDashboard() {
         onClick: handleChartClick,
         plugins: {
             legend: { display: true },
-            datalabels: { display: false } // Avoid cluttering the line chart with too many labels
+            datalabels: {
+                display: 'auto',
+                align: 'top',
+                anchor: 'center',
+                color: textColor,
+                font: { weight: 'bold', family: 'Inter', size: 11 },
+                formatter: (value) => value > 0 ? value : ''
+            }
         }
     });
 
