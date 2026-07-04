@@ -696,9 +696,9 @@ export function renderInventory() {
 
         card.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div class="inv-title" style="display: flex; align-items: flex-start; margin: 0;">
-                    <i class="fa-solid fa-lightbulb" style="color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;"></i>
-                    <span style="line-height: 1.3;">${item.description || 'Sans description'}</span>
+                <div class="inv-title" style="display: flex; align-items: flex-start; margin: 0; max-width: 100%;">
+                    <i class="fa-solid fa-lightbulb" style="flex-shrink: 0; color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;"></i>
+                    <span style="line-height: 1.3; flex: 1; min-width: 0; word-break: break-word; overflow-wrap: break-word;">${item.description || 'Sans description'}</span>
                 </div>
                 
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 100%;">
