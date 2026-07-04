@@ -113,10 +113,7 @@ function setupEventListeners() {
         });
     }
 
-    if (ui.elements.searchInventory) {
-        ui.elements.searchInventory.addEventListener('input', ui.renderInventory);
-    }
-    
+
     if (ui.elements.filterInvCategorie) {
         ui.elements.filterInvCategorie.addEventListener('change', () => {
             ui.updateInventoryDescriptionFilter();
@@ -131,7 +128,7 @@ function setupEventListeners() {
             if (ui.elements.filterInvCategorie) ui.elements.filterInvCategorie.value = 'all';
             ui.updateInventoryDescriptionFilter(); // Repopulate all
             if (ui.elements.filterInvDescription) ui.elements.filterInvDescription.value = 'all';
-            if (ui.elements.searchInventory) ui.elements.searchInventory.value = '';
+
             ui.renderInventory();
         });
     }

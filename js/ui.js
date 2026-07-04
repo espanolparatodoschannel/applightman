@@ -54,7 +54,6 @@ export const elements = {
     notesListContainer: document.getElementById('notes-list-container'),
     
     inventoryContainer: document.getElementById('inventory-container'),
-    searchInventory: document.getElementById('search-inventory'),
     filterInvCategorie: document.getElementById('filter-inv-categorie'),
     filterInvDescription: document.getElementById('filter-inv-description'),
     clearInvFiltersBtn: document.getElementById('clear-inv-filters-btn')
@@ -651,7 +650,6 @@ export function renderInventory() {
     if (!elements.inventoryContainer) return;
     
     let inventory = store.appOptions.inventory || [];
-    const searchTerm = (elements.searchInventory ? elements.searchInventory.value.toLowerCase().trim() : "");
     const filterCat = (elements.filterInvCategorie ? elements.filterInvCategorie.value : "all");
     const filterDesc = (elements.filterInvDescription ? elements.filterInvDescription.value : "all");
     
@@ -671,14 +669,6 @@ export function renderInventory() {
         if (filterCat !== 'all' && item.categorie !== filterCat) return;
         if (filterDesc !== 'all' && item.description !== filterDesc) return;
         
-        const idStr = String(item.id).toLowerCase();
-        const descStr = String(item.description).toLowerCase();
-        const nameStr = String(item.name).toLowerCase();
-        
-        if (searchTerm && !idStr.includes(searchTerm) && !descStr.includes(searchTerm) && !nameStr.includes(searchTerm)) {
-            return;
-        }
-        
         count++;
         
         const depense = depenseMap[item.id] || 0;
@@ -697,7 +687,11 @@ export function renderInventory() {
                         <i class="fa-solid fa-lightbulb" style="color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;"></i>
                         <span>${item.description || item.name}</span>
                     </div>
-                    <span class="inv-cat" style="padding-left: 1.3rem;">Id: ${item.id}</span>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding-left: 1.3rem; margin-top: 0.25rem;">
+                        <span class="pro-id-badge" style="height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><i class="fa-regular fa-folder-open" style="margin-right: 0.25rem;"></i> ${item.categorie || 'Sans Catégorie'}</span>
+                        <span class="pro-id-badge" style="height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-tag" style="margin-right: 0.25rem;"></i> ${item.id}</span>
+                        <span class="pro-id-badge" style="height: 22px; padding: 0 0.6rem; border-radius: 11px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${item.prix || '0.00'}</span>
+                    </div>
                 </div>
             </div>
             
