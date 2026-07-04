@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.updateSyncBadge();
     ui.renderHistory();
     ui.renderNotes();
+    ui.renderInventory();
     window.addEventListener('online', api.syncOfflineQueue);
 
     setupEventListeners();
@@ -112,6 +113,9 @@ function setupEventListeners() {
         });
     }
 
+    if (ui.elements.searchInventory) {
+        ui.elements.searchInventory.addEventListener('input', ui.renderInventory);
+    }
     if (ui.elements.tacheSelect) {
         ui.elements.tacheSelect.addEventListener('change', (e) => {
             const val = e.target.value.trim().toLowerCase();

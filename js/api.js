@@ -25,6 +25,7 @@ export async function fetchDataFromCloud(showBlockingLoader = true) {
             charts.populateFilters();
             charts.updateDashboard();
             ui.renderHistory();
+        ui.renderInventory();
         } else {
             throw new Error(data.message || "Error desconocido");
         }
@@ -69,6 +70,7 @@ export async function saveRecordToCloud(record) {
         ui.resetFormAndRefresh();
         charts.updateDashboard();
         ui.renderHistory();
+        ui.renderInventory();
         
     } catch (error) {
         console.error("Save Error:", error);
@@ -85,6 +87,7 @@ function addToOfflineQueue(record) {
     store.addRecordLocally(record);
     ui.resetFormAndRefresh();
     ui.renderHistory();
+    ui.renderInventory();
     charts.updateDashboard();
     
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -141,6 +144,7 @@ export async function deleteRecord(uuid) {
         
         charts.updateDashboard();
         ui.renderHistory();
+        ui.renderInventory();
         
     } catch (error) {
         console.error("Delete Error:", error);
@@ -174,6 +178,7 @@ export async function editRecord(uuid, updatedRecord) {
         ui.resetFormAndRefresh();
         charts.updateDashboard();
         ui.renderHistory();
+        ui.renderInventory();
         
     } catch (error) {
         console.error("Edit Error:", error);

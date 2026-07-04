@@ -51,7 +51,10 @@ export const elements = {
     
     noteTextInput: document.getElementById('note-text'),
     saveNoteBtn: document.getElementById('save-note-btn'),
-    notesListContainer: document.getElementById('notes-list-container')
+    notesListContainer: document.getElementById('notes-list-container'),
+    
+    inventoryContainer: document.getElementById('inventory-container'),
+    searchInventory: document.getElementById('search-inventory')
 };
 
 export function showToast(message, type = 'success') {
@@ -619,4 +622,80 @@ export function renderNotes() {
             }
         });
     });
+}
+
+export function renderInventory() {
+    if (!elements.inventoryContainer) return;
+    
+    let inventory = store.appOptions.inventory || [];
+    const searchTerm = (elements.searchInventory ? elements.searchInventory.value.toLowerCase().trim() : "");
+    
+    // Calculate Depense
+    const records = store.records || [];
+    const depenseMap = {};
+    records.forEach(rec => {
+        if (rec.id_item && rec.quantite) {
+            depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) + parseInt(rec.quantite, 10);
+        }
+    });
+    
+    elements.inventoryContainer.innerHTML = '';
+    
+    let count = 0;
+    inventory.forEach(item => {
+        const idStr = String(item.id).toLowerCase();
+        const descStr = String(item.description).toLowerCase();
+        const nameStr = String(item.name).toLowerCase();
+        
+        if (searchTerm && !idStr.includes(searchTerm) && !descStr.includes(searchTerm) && !nameStr.includes(searchTerm)) {
+            return;
+        }
+        
+        count++;
+        
+        const depense = depenseMap[item.id] || 0;
+        const initialStock = parseInt(item.stock) || 0;
+        const solde = initialStock - depense;
+        
+        const stockClass = solde <= 5 ? 'low-stock' : 'good-stock';
+        const displaySolde = solde;
+        
+        const card = document.createElement('div');
+        card.className = 'inv-card';
+        card.innerHTML = `
+            <div class="inv-header">
+                <div>
+                    <div class="inv-title">${item.name || item.description}</div>
+                    <span class="inv-cat">${item.categorie || 'Sans Catégorie'}</span>
+                </div>
+                <span class="inv-id">${item.id}</span>
+            </div>
+            ${item.name && item.description && item.name !== item.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom: 0.75rem;">${item.description}</div>` : ''}
+            <div class="inv-stats">
+                <div class="inv-stat-box">
+                    <span class="inv-stat-label">Stock Initial</span>
+                    <span class="inv-stat-val">${initialStock}</span>
+                </div>
+                <div class="inv-stat-box">
+                    <span class="inv-stat-label">Dépense</span>
+                    <span class="inv-stat-val">${depense}</span>
+                </div>
+                <div class="inv-stat-box">
+                    <span class="inv-stat-label">Solde</span>
+                    <span class="inv-stat-val ${stockClass}">${displaySolde}</span>
+                </div>
+            </div>
+        `;
+        
+        elements.inventoryContainer.appendChild(card);
+    });
+    
+    if (count === 0) {
+        elements.inventoryContainer.innerHTML = `
+            <div style="text-align:center; padding: 2rem; color: var(--text-secondary); background: var(--bg-color); border-radius: var(--radius-lg);">
+                <i class="fa-solid fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Aucun article trouvé dans l'inventaire.</p>
+            </div>
+        `;
+    }
 }

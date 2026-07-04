@@ -5,11 +5,13 @@ const SHEET_NAME_OPTIONS = "Opciones";
 const SHEET_NAME_ETAGES = "Étages";
 const SHEET_NAME_TACHES = "Tâches";
 const SHEET_NAME_RECORDS = "Registros";
+const SHEET_NAME_INVENTAIRE = "Inventaire";
 
 function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_OPTIONS, ["Id", "Description", "Catégorie"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_INVENTAIRE, ["Id", "Description", "Catégorie", "Name", "Prix", "Stock", "Dépense", "Solde"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
   ensureUUIDColumn();
 }
@@ -239,6 +241,36 @@ function doGet(e) {
         }
       }
 
+      // 4. Obtener Inventaire
+      let inventoryList = [];
+      const invSheet = ss.getSheetByName(SHEET_NAME_INVENTAIRE);
+      if (invSheet) {
+          const invData = invSheet.getDataRange().getValues();
+          if (invData.length > 1) {
+              const headers = invData[0];
+              const idIdx = headers.indexOf("Id");
+              const descIdx = headers.indexOf("Description");
+              const catIdx = headers.indexOf("Catégorie");
+              const nameIdx = headers.indexOf("Name");
+              const prixIdx = headers.indexOf("Prix");
+              const stockIdx = headers.indexOf("Stock");
+
+              for (let i = 1; i < invData.length; i++) {
+                  const row = invData[i];
+                  if (idIdx > -1 && row[idIdx]) {
+                      inventoryList.push({
+                          id: row[idIdx],
+                          description: descIdx > -1 ? row[descIdx] : "",
+                          categorie: catIdx > -1 ? row[catIdx] : "",
+                          name: nameIdx > -1 ? row[nameIdx] : "",
+                          prix: prixIdx > -1 ? row[prixIdx] : "",
+                          stock: stockIdx > -1 ? row[stockIdx] : 0
+                      });
+                  }
+              }
+          }
+      }
+
       // 4. Obtener Registros limitados a los últimos 500 para evitar timeout
       const recordsSheet = ss.getSheetByName(SHEET_NAME_RECORDS);
       const lastRow = recordsSheet.getLastRow();
@@ -318,7 +350,8 @@ function doGet(e) {
       const options = {
         opciones: opcionesList,
         etage: etagesList,
-        tache: tachesList
+        tache: tachesList,
+        inventory: inventoryList
       };
 
       return createJsonResponse({ status: 'success', options: options, records: records });

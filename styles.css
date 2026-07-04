@@ -1180,3 +1180,106 @@ body {
 .btn-confirm:hover {
     opacity: 0.9;
 }
+
+/* Inventory Styles */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .inventory-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+.inv-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    position: relative;
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    transition: transform var(--transition-snappy), box-shadow var(--transition-snappy);
+}
+
+.inv-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px var(--shadow-color);
+}
+
+.inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.inv-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.inv-cat {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    background: rgba(14, 165, 233, 0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.inv-id {
+    font-size: 0.85rem;
+    font-family: monospace;
+    background: var(--bg-color);
+    padding: 3px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.inv-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.inv-stat-box {
+    background: var(--bg-color);
+    padding: 0.75rem 0.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.inv-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.inv-stat-val {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.inv-stat-val.low-stock {
+    color: var(--error);
+}
+
+.inv-stat-val.good-stock {
+    color: var(--success);
+}

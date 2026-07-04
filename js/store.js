@@ -17,7 +17,8 @@ export const mockOptions = {
 export let appOptions = {
     opciones: [],
     etage: [],
-    tache: []
+    tache: [],
+    inventory: []
 };
 
 export let records = [];
