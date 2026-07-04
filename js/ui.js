@@ -409,7 +409,7 @@ export function renderHistory() {
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <span style="font-size: 1.1rem; margin-right: 0.2rem;">📂</span>
+                            <i class="fa-regular fa-folder-open" style="font-size: 1.1rem;"></i>
                             <div>
                                 <span class="meta-label">Catégorie</span>
                                 <span class="meta-value">${r.categorie || '-'}</span>
@@ -691,12 +691,14 @@ export function renderInventory() {
         const card = document.createElement('div');
         card.className = 'inv-card';
         card.innerHTML = `
-            <div class="inv-header">
-                <div>
-                    <div class="inv-title">${item.description || item.name}</div>
-                    <span class="inv-cat">${item.categorie || 'Sans Catégorie'}</span>
+            <div class="inv-header" style="align-items: flex-start;">
+                <div style="display: flex; flex-direction: column; gap: 0.25rem; width: 100%;">
+                    <div class="inv-title" style="display: flex; align-items: flex-start;">
+                        <i class="fa-solid fa-lightbulb" style="color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;"></i>
+                        <span>${item.description || item.name}</span>
+                    </div>
+                    <span class="inv-cat" style="padding-left: 1.3rem;">Id: ${item.id}</span>
                 </div>
-                <span class="pro-id-badge" style="height: 32px; padding: 0 0.75rem; border-radius: 16px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 600; font-size: 0.85rem;"><i class="fa-solid fa-tag" style="margin-right: 0.3rem;"></i> ${item.id}</span>
             </div>
             
             <div class="inv-stats">
