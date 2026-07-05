@@ -686,8 +686,6 @@ export function renderInventory() {
         if (filterCat !== 'all' && (!item.categorie || String(item.categorie).trim() !== String(filterCat).trim())) return;
         if (filterDesc !== 'all' && (!item.description || String(item.description).trim() !== String(filterDesc).trim())) return;
         
-        count++;
-        
         const depense = depenseMap[item.id] || 0;
         const initialStock = parseInt(item.stock) || 0;
         const solde = initialStock - depense;
@@ -702,6 +700,8 @@ export function renderInventory() {
         
         // Si el filtro de stock crítico está activo, saltar los que están bien
         if (isCriticalFilterActive && !isCritical) return;
+
+        count++;
 
         const stockClass = isCritical ? 'low-stock' : 'good-stock';
         const displaySolde = solde;

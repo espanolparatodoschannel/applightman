@@ -146,8 +146,8 @@ function setupEventListeners() {
         });
     }
     if (ui.elements.filterCriticalStockBtn) {
-        ui.elements.filterCriticalStockBtn.addEventListener('click', (e) => {
-            e.target.classList.toggle('btn-critical-active');
+        ui.elements.filterCriticalStockBtn.addEventListener('click', () => {
+            ui.elements.filterCriticalStockBtn.classList.toggle('btn-critical-active');
             ui.renderInventory();
         });
     }
