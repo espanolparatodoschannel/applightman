@@ -162,12 +162,7 @@ export function populateSelect(id, values) {
 export function populateAllSelects() {
     if (!store.appOptions) return;
     
-    let tacheOptions = store.appOptions.tache || [];
-    if (!tacheOptions.includes("Réception de matériel")) {
-        tacheOptions = [...tacheOptions, "Réception de matériel"];
-    }
-
-    populateSelect('tache', tacheOptions);
+    populateSelect('tache', store.appOptions.tache || []);
     populateSelect('etage', store.appOptions.etage || []);
     
     const allDescriptions = store.appOptions.opciones.map(opt => opt.description).filter(Boolean);
@@ -246,14 +241,9 @@ export function resetFormAndRefresh() {
     if (elements.groupBon) elements.groupBon.classList.add('hidden-field');
     if (elements.groupSoumission) elements.groupSoumission.classList.add('hidden-field');
     if (elements.groupTacheNum) elements.groupTacheNum.classList.add('hidden-field');
-    if (elements.groupEtage) elements.groupEtage.classList.remove('hidden-field');
     if (elements.numBonInput) elements.numBonInput.required = false;
     if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
     if (elements.numTacheInput) elements.numTacheInput.required = false;
-    if (elements.etageSelect) {
-        elements.etageSelect.required = true;
-        elements.etageSelect.setAttribute('required', 'true');
-    }
     populateAllSelects();
     
     // Reset edit state
@@ -680,11 +670,7 @@ export function renderInventory() {
     const depenseMap = {};
     records.forEach(rec => {
         if (rec.id_item && rec.quantite) {
-            if (rec.tache === "Réception de matériel") {
-                depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) - parseInt(rec.quantite, 10);
-            } else {
-                depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) + parseInt(rec.quantite, 10);
-            }
+            depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) + parseInt(rec.quantite, 10);
         }
     });
     

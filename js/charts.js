@@ -65,9 +65,6 @@ export function getFilteredRecords() {
 
     if (tVal !== 'all') {
         filtered = filtered.filter(r => r.tache === tVal);
-    } else {
-        // Excluir "Réception de matériel" de las estadísticas generales
-        filtered = filtered.filter(r => r.tache !== 'Réception de matériel' && r.tache !== 'reception de materiel');
     }
 
     return filtered;
