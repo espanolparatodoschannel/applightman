@@ -39,6 +39,8 @@ export const elements = {
     searchHistory: document.getElementById('search-history'),
     historySummary: document.getElementById('history-summary'),
     reloadAppBtn: document.getElementById('reload-app-btn'),
+    filterCriticalStockBtn: document.getElementById('filter-critical-stock-btn'),
+    navBadgeInventaire: document.getElementById('nav-badge-inventaire'),
     
     statAvg: document.getElementById('stat-avg'),
     statTopEtage: document.getElementById('stat-top-etage'),
@@ -677,6 +679,9 @@ export function renderInventory() {
     elements.inventoryContainer.innerHTML = '';
     
     let count = 0;
+    let criticalStockCount = 0;
+    const isCriticalFilterActive = elements.filterCriticalStockBtn && elements.filterCriticalStockBtn.classList.contains('btn-critical-active');
+    
     inventory.forEach(item => {
         if (filterCat !== 'all' && (!item.categorie || String(item.categorie).trim() !== String(filterCat).trim())) return;
         if (filterDesc !== 'all' && (!item.description || String(item.description).trim() !== String(filterDesc).trim())) return;
@@ -687,7 +692,18 @@ export function renderInventory() {
         const initialStock = parseInt(item.stock) || 0;
         const solde = initialStock - depense;
         
-        const stockClass = solde <= 5 ? 'low-stock' : 'good-stock';
+        // Determinar el límite/umbral
+        const seuil = parseInt(item.limite || item.Limite) || 5;
+        const isCritical = solde <= seuil;
+        
+        if (isCritical) {
+            criticalStockCount++;
+        }
+        
+        // Si el filtro de stock crítico está activo, saltar los que están bien
+        if (isCriticalFilterActive && !isCritical) return;
+
+        const stockClass = isCritical ? 'low-stock' : 'good-stock';
         const displaySolde = solde;
         
         const formattedPrix = parseFloat(item.prix || 0).toFixed(2);
@@ -696,8 +712,8 @@ export function renderInventory() {
         card.className = 'inv-card';
         const percentage = initialStock > 0 ? Math.max(0, Math.min(100, (displaySolde / initialStock) * 100)) : 0;
         let progressColor = 'var(--success)';
-        if (displaySolde <= 5) progressColor = 'var(--error)';
-        else if (percentage <= 30) progressColor = '#f59e0b'; // Amber for warning
+        if (isCritical) progressColor = 'var(--error)';
+        else if (percentage <= 30 || solde <= seuil * 2) progressColor = '#f59e0b'; // Amber for warning
 
         card.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -747,5 +763,15 @@ export function renderInventory() {
                 <p>Aucun article trouvé dans l'inventaire.</p>
             </div>
         `;
+    }
+
+    // Update badge
+    if (elements.navBadgeInventaire) {
+        if (criticalStockCount > 0) {
+            elements.navBadgeInventaire.textContent = criticalStockCount;
+            elements.navBadgeInventaire.classList.remove('hidden');
+        } else {
+            elements.navBadgeInventaire.classList.add('hidden');
+        }
     }
 }

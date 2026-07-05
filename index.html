@@ -258,6 +258,9 @@
                         </select>
                     </div>
 
+                    <button id="filter-critical-stock-btn" class="btn-secondary" style="width: 100%; margin-top: 0.5rem; border-color: var(--error); color: var(--error);">
+                        <i class="fa-solid fa-triangle-exclamation"></i> ⚠️ Voir Stock Critique
+                    </button>
                     <button id="clear-inv-filters-btn" class="btn-secondary" style="width: 100%; margin-top: 0.5rem;">Réinitialiser les filtres</button>
                 </div>
                 <div id="inventory-container" class="inventory-grid">
@@ -394,9 +397,10 @@
             <i class="fa-solid fa-chart-pie"></i>
             <span>Stats</span>
         </a>
-        <a href="#" class="nav-item" data-target="view-inventaire">
+        <a href="#" class="nav-item" data-target="view-inventaire" style="position: relative;">
             <i class="fa-solid fa-box-open"></i>
             <span>Inventaire</span>
+            <span id="nav-badge-inventaire" class="nav-badge hidden">0</span>
         </a>
         <a href="#" class="nav-item" data-target="view-notes">
             <i class="fa-solid fa-note-sticky"></i>

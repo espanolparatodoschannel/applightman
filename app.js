@@ -139,6 +139,15 @@ function setupEventListeners() {
             ui.updateInventoryDescriptionFilter(); // Repopulate all
             if (ui.elements.filterInvDescription) ui.elements.filterInvDescription.value = 'all';
 
+            if (ui.elements.filterCriticalStockBtn) {
+                ui.elements.filterCriticalStockBtn.classList.remove('btn-critical-active');
+            }
+            ui.renderInventory();
+        });
+    }
+    if (ui.elements.filterCriticalStockBtn) {
+        ui.elements.filterCriticalStockBtn.addEventListener('click', (e) => {
+            e.target.classList.toggle('btn-critical-active');
             ui.renderInventory();
         });
     }
