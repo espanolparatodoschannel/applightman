@@ -246,9 +246,14 @@ export function resetFormAndRefresh() {
     if (elements.groupBon) elements.groupBon.classList.add('hidden-field');
     if (elements.groupSoumission) elements.groupSoumission.classList.add('hidden-field');
     if (elements.groupTacheNum) elements.groupTacheNum.classList.add('hidden-field');
+    if (elements.groupEtage) elements.groupEtage.classList.remove('hidden-field');
     if (elements.numBonInput) elements.numBonInput.required = false;
     if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
     if (elements.numTacheInput) elements.numTacheInput.required = false;
+    if (elements.etageSelect) {
+        elements.etageSelect.required = true;
+        elements.etageSelect.setAttribute('required', 'true');
+    }
     populateAllSelects();
     
     // Reset edit state
