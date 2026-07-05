@@ -155,6 +155,18 @@ function setupEventListeners() {
             ui.elements.numBonInput.value = "";
             ui.elements.numSoumissionInput.value = "";
             ui.elements.numTacheInput.value = "";
+            
+            // Handle Etage visibility for Réception de matériel
+            if (val === 'réception de matériel' || val === 'reception de materiel') {
+                if (ui.elements.groupEtage) ui.elements.groupEtage.classList.add('hidden-field');
+                if (ui.elements.etageSelect) {
+                    ui.elements.etageSelect.required = false;
+                    ui.elements.etageSelect.value = "";
+                }
+            } else {
+                if (ui.elements.groupEtage) ui.elements.groupEtage.classList.remove('hidden-field');
+                if (ui.elements.etageSelect) ui.elements.etageSelect.required = true;
+            }
 
             if (val === 'bon de travail') {
                 ui.elements.groupBon.classList.remove('hidden-field');

@@ -24,6 +24,8 @@ export const elements = {
     groupBon: document.getElementById('group-bon'),
     groupSoumission: document.getElementById('group-soumission'),
     groupTacheNum: document.getElementById('group-tache-num'),
+    groupEtage: document.getElementById('group-etage'),
+    etageSelect: document.getElementById('etage'),
     numBonInput: document.getElementById('num_bon'),
     numSoumissionInput: document.getElementById('num_soumission'),
     numTacheInput: document.getElementById('num_tache'),
@@ -158,13 +160,21 @@ export function populateSelect(id, values) {
 }
 
 export function populateAllSelects() {
+    if (!store.appOptions) return;
+    
+    let tacheOptions = store.appOptions.tache || [];
+    if (!tacheOptions.includes("Réception de matériel")) {
+        tacheOptions = [...tacheOptions, "Réception de matériel"];
+    }
+
+    populateSelect('tache', tacheOptions);
+    populateSelect('etage', store.appOptions.etage || []);
+    
     const allDescriptions = store.appOptions.opciones.map(opt => opt.description).filter(Boolean);
     const allCategories = [...new Set(store.appOptions.opciones.map(opt => opt.categorie).filter(Boolean))];
     
     populateSelect('description', allDescriptions);
     populateSelect('categorie', allCategories);
-    populateSelect('etage', store.appOptions.etage || []);
-    populateSelect('tache', store.appOptions.tache || []);
     
     if (elements.idInput) elements.idInput.value = "";
     // Inventory Filters
@@ -665,7 +675,11 @@ export function renderInventory() {
     const depenseMap = {};
     records.forEach(rec => {
         if (rec.id_item && rec.quantite) {
-            depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) + parseInt(rec.quantite, 10);
+            if (rec.tache === "Réception de matériel") {
+                depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) - parseInt(rec.quantite, 10);
+            } else {
+                depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) + parseInt(rec.quantite, 10);
+            }
         }
     });
     
