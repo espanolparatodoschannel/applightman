@@ -24,6 +24,11 @@ export let appOptions = {
 export let records = [];
 export let syncQueue = JSON.parse(localStorage.getItem('lightman_sync_queue')) || [];
 export let editingRecordUuid = null;
+export let keepData = false;
+
+export function setKeepData(val) {
+    keepData = val;
+}
 
 export function setEditingRecordUuid(uuid) {
     editingRecordUuid = uuid;
@@ -112,12 +117,14 @@ export function getNotes() {
     return JSON.parse(localStorage.getItem('lightman_notes')) || [];
 }
 
-export function addNote(noteText) {
+export function addNote(noteText, color = 'note-blue') {
     const notes = getNotes();
     const newNote = {
         id: crypto.randomUUID ? crypto.randomUUID() : 'note-' + Date.now(),
         text: noteText,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        color: color,
+        completed: false
     };
     notes.unshift(newNote);
     localStorage.setItem('lightman_notes', JSON.stringify(notes));
@@ -136,8 +143,20 @@ export function deleteNote(id) {
     localStorage.setItem('lightman_notes', JSON.stringify(notes));
 }
 
-export function editNote(id, newText) {
+export function editNote(id, newText, newColor) {
     let notes = getNotes();
-    notes = notes.map(n => n.id === id ? { ...n, text: newText } : n);
+    notes = notes.map(n => n.id === id ? { ...n, text: newText, color: newColor || n.color } : n);
+    localStorage.setItem('lightman_notes', JSON.stringify(notes));
+}
+
+export function toggleNoteCompletion(id) {
+    let notes = getNotes();
+    notes = notes.map(n => n.id === id ? { ...n, completed: !n.completed } : n);
+    localStorage.setItem('lightman_notes', JSON.stringify(notes));
+}
+
+export function clearCompletedNotes() {
+    let notes = getNotes();
+    notes = notes.filter(n => !n.completed);
     localStorage.setItem('lightman_notes', JSON.stringify(notes));
 }

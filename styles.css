@@ -1311,3 +1311,84 @@ body {
     color: white !important;
     border-color: var(--error) !important;
 }
+
+/* Micro-Animaciones Globales */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.view:not(.hidden) {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Notes UI */
+.color-radio input[type="radio"] {
+    display: none;
+}
+.color-swatch {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.color-radio input[type="radio"]:checked + .color-swatch {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--text-primary);
+}
+
+.note-item.note-blue { border-left-color: var(--primary); }
+.note-item.note-yellow { border-left-color: #f59e0b; }
+.note-item.note-red { border-left-color: var(--error); }
+.note-item.note-green { border-left-color: var(--success); }
+
+.note-completed {
+    opacity: 0.6;
+}
+.note-completed .note-content {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+/* Floating Labels para Saisie */
+.form-floating {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+.form-floating input {
+    width: 100%;
+    padding: 1.25rem 1rem 0.5rem 1rem; /* Padding extra arriba para que entre la etiqueta */
+    font-size: 1rem;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+.form-floating label {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    margin-bottom: 0;
+}
+/* Cuando el input tiene foco o NO muestra su placeholder (es decir, tiene texto) */
+.form-floating input:focus + label,
+.form-floating input:not(:placeholder-shown) + label {
+    top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--primary);
+    transform: translateY(0);
+}
+.form-floating input:focus {
+    background-color: var(--bg-color);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}

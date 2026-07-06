@@ -224,6 +224,18 @@ function setupEventListeners() {
 
     let isSubmitting = false;
     if (ui.elements.form) {
+        const saveContinueBtn = document.getElementById('save-continue-btn');
+        if (saveContinueBtn) {
+            saveContinueBtn.addEventListener('click', () => {
+                if (ui.elements.form.checkValidity()) {
+                    store.setKeepData(true);
+                    ui.elements.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                } else {
+                    ui.elements.form.reportValidity();
+                }
+            });
+        }
+
         ui.elements.form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isSubmitting) return;
@@ -363,17 +375,11 @@ function setupEventListeners() {
         ui.elements.saveNoteBtn.addEventListener('click', () => {
             const text = ui.elements.noteTextInput.value.trim();
             if (text) {
-                if (store.editingNoteId) {
-                    store.editNote(store.editingNoteId, text);
-                    store.setEditingNoteId(null);
-                    ui.elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
-                    const cancelBtn = document.getElementById('cancel-edit-note-btn');
-                    if (cancelBtn) cancelBtn.style.display = 'none';
-                    ui.showToast('Note modifiée !', 'success');
-                } else {
-                    store.addNote(text);
-                    ui.showToast('Note enregistrée !', 'success');
-                }
+                const colorRadio = document.querySelector('input[name="note_color"]:checked');
+                const color = colorRadio ? colorRadio.value : 'note-blue';
+                
+                store.addNote(text, color);
+                ui.showToast('Note enregistrée !', 'success');
                 ui.elements.noteTextInput.value = '';
                 ui.renderNotes();
             } else {
@@ -381,6 +387,37 @@ function setupEventListeners() {
             }
         });
     }
+
+    if (ui.elements.notesListContainer) {
+        ui.elements.notesListContainer.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-note-btn');
+            if (deleteBtn) {
+                const id = deleteBtn.getAttribute('data-id');
+                if (confirm('Voulez-vous vraiment supprimer cette note ?')) {
+                    store.deleteNote(id);
+                    ui.renderNotes();
+                    ui.showToast('Note supprimée.', 'success');
+                }
+            }
+            
+            const checkbox = e.target.closest('.note-checkbox');
+            if (checkbox) {
+                const id = checkbox.getAttribute('data-id');
+                store.toggleNoteCompletion(id);
+                ui.renderNotes();
+            }
+        });
+    }
+
+    const clearCompletedBtn = document.getElementById('clear-completed-notes-btn');
+    if (clearCompletedBtn) {
+        clearCompletedBtn.addEventListener('click', () => {
+            store.clearCompletedNotes();
+            ui.renderNotes();
+            ui.showToast('Notes nettoyées', 'success');
+        });
+    }
+
 }
 
 const ThemeManager = {

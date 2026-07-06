@@ -233,17 +233,34 @@ export function updateSyncBadge() {
 }
 
 export function resetFormAndRefresh() {
-    if (elements.form) elements.form.reset();
-    if (elements.dateInput) {
-        elements.dateInput.valueAsDate = new Date();
-        updateDateDisplay();
+    if (store.keepData) {
+        if (elements.idInput) elements.idInput.value = '';
+        if (elements.quantiteInput) elements.quantiteInput.value = '1';
+        if (elements.noteInput) elements.noteInput.value = '';
+        if (elements.categorieSelect) elements.categorieSelect.value = '';
+        if (elements.descSelect) {
+            elements.descSelect.innerHTML = '<option value="" disabled selected>Sélectionnez une description</option>';
+        }
+    } else {
+        if (elements.form) elements.form.reset();
+        if (elements.dateInput) {
+            elements.dateInput.valueAsDate = new Date();
+            updateDateDisplay();
+        }
+        if (elements.groupBon) elements.groupBon.classList.add('hidden-field');
+        if (elements.groupSoumission) elements.groupSoumission.classList.add('hidden-field');
+        if (elements.groupTacheNum) elements.groupTacheNum.classList.add('hidden-field');
+        if (elements.numBonInput) elements.numBonInput.required = false;
+        if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
+        if (elements.numTacheInput) elements.numTacheInput.required = false;
+        if (elements.descSelect) {
+            elements.descSelect.innerHTML = '<option value="" disabled selected>Sélectionnez une description</option>';
+        }
     }
-    if (elements.groupBon) elements.groupBon.classList.add('hidden-field');
-    if (elements.groupSoumission) elements.groupSoumission.classList.add('hidden-field');
-    if (elements.groupTacheNum) elements.groupTacheNum.classList.add('hidden-field');
-    if (elements.numBonInput) elements.numBonInput.required = false;
-    if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
-    if (elements.numTacheInput) elements.numTacheInput.required = false;
+    
+    // Resetear el flag para la siguiente vez
+    store.setKeepData(false);
+    
     populateAllSelects();
     
     // Reset edit state
@@ -578,20 +595,24 @@ export function renderNotes() {
         const dateObj = new Date(note.timestamp);
         const dateStr = dateObj.toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
         
+        const noteColorClass = note.color || 'note-blue';
+        const completedClass = note.completed ? 'note-completed' : '';
+        const checkedAttr = note.completed ? 'checked' : '';
+        
         return `
-            <div class="card" style="margin-bottom: 0.75rem; padding: 1rem; border-left: 4px solid var(--primary);">
+            <div class="card note-item ${noteColorClass} ${completedClass}" style="margin-bottom: 0.75rem; padding: 1rem; border-left: 4px solid;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                    <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" class="note-checkbox" data-id="${note.id}" ${checkedAttr} style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+                    </div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="icon-btn edit-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Modifier">
-                            <i class="fa-solid fa-pencil" style="font-size: 0.8rem;"></i>
-                        </button>
                         <button class="icon-btn delete-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Supprimer">
                             <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
                         </button>
                     </div>
                 </div>
-                <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; color: var(--text-primary); white-space: pre-wrap;">${note.text}</p>
+                <p class="note-content" style="margin: 0; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;">${note.text}</p>
             </div>
         `;
     }).join('');

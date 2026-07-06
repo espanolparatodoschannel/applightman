@@ -68,19 +68,19 @@
                         </select>
                     </div>
 
-                    <div class="form-group hidden-field" id="group-bon">
+                    <div class="form-floating hidden-field" id="group-bon">
+                        <input type="text" id="num_bon" name="num_bon" placeholder=" ">
                         <label for="num_bon"><i class="fa-solid fa-hashtag"></i> # Bon de travail</label>
-                        <input type="text" id="num_bon" name="num_bon" placeholder="Entrez le numéro">
                     </div>
 
-                    <div class="form-group hidden-field" id="group-soumission">
+                    <div class="form-floating hidden-field" id="group-soumission">
+                        <input type="text" id="num_soumission" name="num_soumission" placeholder=" ">
                         <label for="num_soumission"><i class="fa-solid fa-hashtag"></i> # Soumission</label>
-                        <input type="text" id="num_soumission" name="num_soumission" placeholder="Entrez le numéro">
                     </div>
 
-                    <div class="form-group hidden-field" id="group-tache-num">
+                    <div class="form-floating hidden-field" id="group-tache-num">
+                        <input type="text" id="num_tache" name="num_tache" placeholder=" ">
                         <label for="num_tache"><i class="fa-solid fa-hashtag"></i> # Tournée</label>
-                        <input type="text" id="num_tache" name="num_tache" placeholder="Entrez le numéro">
                     </div>
 
                     <div class="form-group">
@@ -124,14 +124,17 @@
                             placeholder="Sera rempli automatiquement en sélectionnant la description">
                     </div>
 
-                    <div class="form-group">
-                        <label for="note"><i class="fa-regular fa-comment"></i> Note</label>
-                        <input type="text" id="note" name="note" placeholder="Ajoutez des notes (optionnel)">
+                    <div class="form-floating">
+                        <input type="text" id="note" name="note" placeholder=" ">
+                        <label for="note"><i class="fa-regular fa-comment"></i> Note (optionnel)</label>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">
+                    <div class="form-actions" style="display: flex; gap: 0.5rem;">
+                        <button type="submit" class="btn-primary" style="flex: 1;">
                             <i class="fa-solid fa-check"></i> Enregistrer
+                        </button>
+                        <button type="button" id="save-continue-btn" class="btn-secondary" style="flex: 1;" title="Enregistrer et garder les informations">
+                            <i class="fa-solid fa-check-double"></i> Enregistrer & Continuer
                         </button>
                     </div>
                 </form>
@@ -334,13 +337,39 @@
                     <textarea id="note-text" rows="4" placeholder="Tapez votre rappel ou note ici..." style="width: 100%; border: 2px solid transparent; border-radius: var(--radius-sm); font-size: 1.05rem; padding: 0.875rem 1rem; background-color: var(--input-bg); color: var(--text-primary); font-family: inherit; resize: vertical; transition: all var(--transition-snappy);"></textarea>
                 </div>
                 
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label style="margin-bottom: 0.5rem;"><i class="fa-solid fa-palette"></i> Couleur de la note</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <label class="color-radio">
+                            <input type="radio" name="note_color" value="note-blue" checked>
+                            <span class="color-swatch" style="background-color: var(--primary);"></span>
+                        </label>
+                        <label class="color-radio">
+                            <input type="radio" name="note_color" value="note-yellow">
+                            <span class="color-swatch" style="background-color: #f59e0b;"></span>
+                        </label>
+                        <label class="color-radio">
+                            <input type="radio" name="note_color" value="note-red">
+                            <span class="color-swatch" style="background-color: var(--error);"></span>
+                        </label>
+                        <label class="color-radio">
+                            <input type="radio" name="note_color" value="note-green">
+                            <span class="color-swatch" style="background-color: var(--success);"></span>
+                        </label>
+                    </div>
+                </div>
                 <button id="save-note-btn" class="btn-primary">
                     <i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note
                 </button>
             </div>
             
             <div class="card">
-                <h2><i class="fa-solid fa-list-check"></i> Mes Notes (Locales)</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;"><i class="fa-solid fa-list-check"></i> Mes Notes</h2>
+                    <button id="clear-completed-notes-btn" class="btn-secondary" style="width: auto; padding: 0.25rem 0.75rem; min-height: 0; font-size: 0.85rem; margin: 0; border-color: var(--text-secondary); color: var(--text-secondary);">
+                        <i class="fa-solid fa-broom"></i> Nettoyer
+                    </button>
+                </div>
                 <div id="notes-list-container">
                     <!-- Notes will be rendered here -->
                     <p class="help-text">Aucune note pour le moment.</p>
