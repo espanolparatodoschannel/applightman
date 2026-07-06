@@ -1324,7 +1324,10 @@ body {
 
 /* Notes UI */
 .color-radio input[type="radio"] {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 .color-swatch {
     display: inline-block;
