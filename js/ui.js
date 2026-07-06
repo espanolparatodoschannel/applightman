@@ -594,6 +594,9 @@ export function renderNotes() {
                         <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock"></i> ${dateStr}</span>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
+                        <button class="icon-btn edit-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Modifier">
+                            <i class="fa-solid fa-pencil" style="font-size: 0.8rem;"></i>
+                        </button>
                         <button class="icon-btn delete-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Supprimer">
                             <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
                         </button>
@@ -634,6 +637,10 @@ export function renderNotes() {
                 noteInput.value = note.text;
                 saveBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier la Note';
                 
+                const noteColor = note.color || 'note-blue';
+                const colorRadio = document.querySelector(`input[name="note_color"][value="${noteColor}"]`);
+                if (colorRadio) colorRadio.checked = true;
+                
                 let cancelBtn = document.getElementById('cancel-edit-note-btn');
                 if (!cancelBtn) {
                     cancelBtn = document.createElement('button');
@@ -647,6 +654,8 @@ export function renderNotes() {
                         store.setEditingNoteId(null);
                         noteInput.value = '';
                         saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                        const defaultColor = document.querySelector('input[name="note_color"][value="note-blue"]');
+                        if (defaultColor) defaultColor.checked = true;
                         cancelBtn.style.display = 'none';
                     });
                     saveBtn.parentNode.insertBefore(cancelBtn, saveBtn.nextSibling);

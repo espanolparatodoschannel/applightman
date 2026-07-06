@@ -366,9 +366,22 @@ function setupEventListeners() {
                 const colorRadio = document.querySelector('input[name="note_color"]:checked');
                 const color = colorRadio ? colorRadio.value : 'note-blue';
                 
-                store.addNote(text, color);
-                ui.showToast('Note enregistrée !', 'success');
+                if (store.editingNoteId) {
+                    store.editNote(store.editingNoteId, text, color);
+                    store.setEditingNoteId(null);
+                    ui.elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                    const cancelBtn = document.getElementById('cancel-edit-note-btn');
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+                    ui.showToast('Note modifiée !', 'success');
+                } else {
+                    store.addNote(text, color);
+                    ui.showToast('Note enregistrée !', 'success');
+                }
+                
                 ui.elements.noteTextInput.value = '';
+                const defaultColor = document.querySelector('input[name="note_color"][value="note-blue"]');
+                if (defaultColor) defaultColor.checked = true;
+                
                 ui.renderNotes();
             } else {
                 ui.showToast('La note ne peut pas être vide.', 'error');
