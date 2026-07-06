@@ -11,7 +11,7 @@ function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_OPTIONS, ["Id", "Description", "Catégorie"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_INVENTAIRE, ["Id", "Description", "Catégorie", "Name", "Prix", "Stock", "Dépense", "Solde"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_INVENTAIRE, ["Id", "Description", "Catégorie", "Name", "Prix", "Stock", "Limite", "Dépense", "Solde"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "# Type de tâche", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
   ensureUUIDColumn();
 }
@@ -71,7 +71,7 @@ function doPost(e) {
       if (lastRow > 1 && uuidIdx > -1) {
         const uuidsData = sheet.getRange(2, uuidIdx + 1, lastRow - 1, 1).getValues();
         uuidsData.forEach(r => {
-            if (r[0]) existingUuids.add(r[0].toString());
+          if (r[0]) existingUuids.add(r[0].toString());
         });
       }
 
@@ -79,9 +79,9 @@ function doPost(e) {
 
       for (const record of recordsToInsert) {
         if (record.uuid && existingUuids.has(record.uuid.toString())) {
-            continue; // Omitir duplicados
+          continue; // Omitir duplicados
         }
-        
+
         const row = new Array(headers.length).fill("");
         if (idIdx > -1) row[idIdx] = record.id_item;
         if (fechaIdx > -1) row[fechaIdx] = record.fecha;
@@ -95,10 +95,10 @@ function doPost(e) {
         if (numSoumIdx > -1) row[numSoumIdx] = record.num_soumission;
         if (noteIdx > -1) row[noteIdx] = record.note;
         if (uuidIdx > -1) row[uuidIdx] = record.uuid;
-        
+
         rowsToAppend.push(row);
         if (record.uuid) {
-            existingUuids.add(record.uuid.toString());
+          existingUuids.add(record.uuid.toString());
         }
       }
 
@@ -245,30 +245,32 @@ function doGet(e) {
       let inventoryList = [];
       const invSheet = ss.getSheetByName(SHEET_NAME_INVENTAIRE);
       if (invSheet) {
-          const invData = invSheet.getDataRange().getValues();
-          if (invData.length > 1) {
-              const headers = invData[0];
-              const idIdx = headers.indexOf("Id");
-              const descIdx = headers.indexOf("Description");
-              const catIdx = headers.indexOf("Catégorie");
-              const nameIdx = headers.indexOf("Name");
-              const prixIdx = headers.indexOf("Prix");
-              const stockIdx = headers.indexOf("Stock");
+        const invData = invSheet.getDataRange().getValues();
+        if (invData.length > 1) {
+          const headers = invData[0];
+          const idIdx = headers.indexOf("Id");
+          const descIdx = headers.indexOf("Description");
+          const catIdx = headers.indexOf("Catégorie");
+          const nameIdx = headers.indexOf("Name");
+          const prixIdx = headers.indexOf("Prix");
+          const stockIdx = headers.indexOf("Stock");
+          const limiteIdx = headers.indexOf("Limite");
 
-              for (let i = 1; i < invData.length; i++) {
-                  const row = invData[i];
-                  if (idIdx > -1 && row[idIdx]) {
-                      inventoryList.push({
-                          id: row[idIdx],
-                          description: descIdx > -1 ? row[descIdx] : "",
-                          categorie: catIdx > -1 ? row[catIdx] : "",
-                          name: nameIdx > -1 ? row[nameIdx] : "",
-                          prix: prixIdx > -1 ? row[prixIdx] : "",
-                          stock: stockIdx > -1 ? row[stockIdx] : 0
-                      });
-                  }
-              }
+          for (let i = 1; i < invData.length; i++) {
+            const row = invData[i];
+            if (idIdx > -1 && row[idIdx]) {
+              inventoryList.push({
+                id: row[idIdx],
+                description: descIdx > -1 ? row[descIdx] : "",
+                categorie: catIdx > -1 ? row[catIdx] : "",
+                name: nameIdx > -1 ? row[nameIdx] : "",
+                prix: prixIdx > -1 ? row[prixIdx] : "",
+                stock: stockIdx > -1 ? row[stockIdx] : 0,
+                limite: limiteIdx > -1 ? row[limiteIdx] : ""
+              });
+            }
           }
+        }
       }
 
       // 4. Obtener Registros limitados a los últimos 500 para evitar timeout
