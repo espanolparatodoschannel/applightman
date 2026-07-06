@@ -65,6 +65,12 @@ export function getFilteredRecords() {
 
     if (tVal !== 'all') {
         filtered = filtered.filter(r => r.tache === tVal);
+    } else {
+        // Excluir registros antiguos de "Réception de matériel" para que no manchen las estadísticas
+        filtered = filtered.filter(r => {
+            const t = String(r.tache || '').toLowerCase();
+            return !t.includes('reception') && !t.includes('réception');
+        });
     }
 
     return filtered;
