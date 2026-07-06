@@ -24,11 +24,6 @@ export let appOptions = {
 export let records = [];
 export let syncQueue = JSON.parse(localStorage.getItem('lightman_sync_queue')) || [];
 export let editingRecordUuid = null;
-export let keepData = false;
-
-export function setKeepData(val) {
-    keepData = val;
-}
 
 export function setEditingRecordUuid(uuid) {
     editingRecordUuid = uuid;

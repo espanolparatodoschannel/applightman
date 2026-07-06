@@ -1340,6 +1340,10 @@ body {
     box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--text-primary);
 }
 
+.note-item {
+    border-left: 4px solid transparent;
+}
+
 .note-item.note-blue { border-left-color: var(--primary); }
 .note-item.note-yellow { border-left-color: #f59e0b; }
 .note-item.note-red { border-left-color: var(--error); }

@@ -224,18 +224,6 @@ function setupEventListeners() {
 
     let isSubmitting = false;
     if (ui.elements.form) {
-        const saveContinueBtn = document.getElementById('save-continue-btn');
-        if (saveContinueBtn) {
-            saveContinueBtn.addEventListener('click', () => {
-                if (ui.elements.form.checkValidity()) {
-                    store.setKeepData(true);
-                    ui.elements.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                } else {
-                    ui.elements.form.reportValidity();
-                }
-            });
-        }
-
         ui.elements.form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isSubmitting) return;

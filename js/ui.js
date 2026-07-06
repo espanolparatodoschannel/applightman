@@ -233,33 +233,20 @@ export function updateSyncBadge() {
 }
 
 export function resetFormAndRefresh() {
-    if (store.keepData) {
-        if (elements.idInput) elements.idInput.value = '';
-        if (elements.quantiteInput) elements.quantiteInput.value = '1';
-        if (elements.noteInput) elements.noteInput.value = '';
-        if (elements.categorieSelect) elements.categorieSelect.value = '';
-        if (elements.descSelect) {
-            elements.descSelect.innerHTML = '<option value="" disabled selected>Sélectionnez une description</option>';
-        }
-    } else {
-        if (elements.form) elements.form.reset();
-        if (elements.dateInput) {
-            elements.dateInput.valueAsDate = new Date();
-            updateDateDisplay();
-        }
-        if (elements.groupBon) elements.groupBon.classList.add('hidden-field');
-        if (elements.groupSoumission) elements.groupSoumission.classList.add('hidden-field');
-        if (elements.groupTacheNum) elements.groupTacheNum.classList.add('hidden-field');
-        if (elements.numBonInput) elements.numBonInput.required = false;
-        if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
-        if (elements.numTacheInput) elements.numTacheInput.required = false;
-        if (elements.descSelect) {
-            elements.descSelect.innerHTML = '<option value="" disabled selected>Sélectionnez une description</option>';
-        }
+    if (elements.form) elements.form.reset();
+    if (elements.dateInput) {
+        elements.dateInput.valueAsDate = new Date();
+        updateDateDisplay();
     }
-    
-    // Resetear el flag para la siguiente vez
-    store.setKeepData(false);
+    if (elements.groupBon) elements.groupBon.classList.add('hidden-field');
+    if (elements.groupSoumission) elements.groupSoumission.classList.add('hidden-field');
+    if (elements.groupTacheNum) elements.groupTacheNum.classList.add('hidden-field');
+    if (elements.numBonInput) elements.numBonInput.required = false;
+    if (elements.numSoumissionInput) elements.numSoumissionInput.required = false;
+    if (elements.numTacheInput) elements.numTacheInput.required = false;
+    if (elements.descSelect) {
+        elements.descSelect.innerHTML = '<option value="" disabled selected>Sélectionnez une description</option>';
+    }
     
     populateAllSelects();
     
@@ -600,7 +587,7 @@ export function renderNotes() {
         const checkedAttr = note.completed ? 'checked' : '';
         
         return `
-            <div class="card note-item ${noteColorClass} ${completedClass}" style="margin-bottom: 0.75rem; padding: 1rem; border-left: 4px solid;">
+            <div class="card note-item ${noteColorClass} ${completedClass}" style="margin-bottom: 0.75rem; padding: 1rem;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <input type="checkbox" class="note-checkbox" data-id="${note.id}" ${checkedAttr} style="width: 18px; height: 18px; cursor: pointer;">
