@@ -37,10 +37,15 @@
             <h1>Lightman</h1>
             <i class="fa-regular fa-lightbulb" id="theme-toggle" title="Changer de thème" style="margin-left: 0.25rem;"></i>
         </div>
-        <button id="sync-btn" class="icon-btn" title="Synchroniser avec Google Sheets" style="position: relative;">
-            <i class="fa-solid fa-rotate"></i>
-            <span id="sync-badge" class="badge hidden">0</span>
-        </button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button id="sync-btn" class="icon-btn" title="Synchroniser avec Google Sheets" style="position: relative;">
+                <i class="fa-solid fa-rotate"></i>
+                <span id="sync-badge" class="badge hidden">0</span>
+            </button>
+            <a href="#" class="nav-item icon-btn" data-target="view-config" title="Configuration" style="width: 44px; height: 44px; color: white; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                <i class="fa-solid fa-gear" style="font-size: 1.2rem;"></i>
+            </a>
+        </div>
     </header>
 
     <!-- Main Content Area -->
@@ -431,10 +436,6 @@
         <a href="#" class="nav-item" data-target="view-notes">
             <i class="fa-solid fa-note-sticky"></i>
             <span>Notes</span>
-        </a>
-        <a href="#" class="nav-item" data-target="view-config">
-            <i class="fa-solid fa-gear"></i>
-            <span>Config</span>
         </a>
     </nav>
 

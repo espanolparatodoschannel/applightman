@@ -246,22 +246,31 @@ function setupEventListeners() {
 
             const historyData = store.getHistory();
             if (historyData.length > 0 && !store.editingRecordUuid) {
-                const lastRecord = historyData[0];
-                if (
-                    lastRecord.id_item === record.id_item &&
-                    lastRecord.etage === record.etage &&
-                    lastRecord.tache === record.tache &&
-                    lastRecord.quantite === record.quantite &&
-                    lastRecord.num_bon === record.num_bon &&
-                    lastRecord.num_tache === record.num_tache
-                ) {
-                    const isConfirmed = await ui.showConfirm("⚠️ Attention : Ce registre semble être identique au précédent. Voulez-vous vraiment l'enregistrer à nouveau ?");
+                const duplicate = historyData.find(oldRecord => {
+                    const oldDateRaw = oldRecord.fecha || oldRecord.date;
+                    const oldDateStr = String(oldDateRaw || "").substring(0, 10);
+                    const newDateStr = String(record.fecha || "").substring(0, 10);
+
+                    const clean = (val) => String(val || "").replace(/#/g, "").trim().toLowerCase();
+
+                    return oldDateStr === newDateStr &&
+                           clean(oldRecord.id_item) === clean(record.id_item) &&
+                           clean(oldRecord.etage) === clean(record.etage) &&
+                           clean(oldRecord.tache) === clean(record.tache) &&
+                           String(oldRecord.quantite) === String(record.quantite) &&
+                           clean(oldRecord.num_bon) === clean(record.num_bon) &&
+                           clean(oldRecord.num_tache) === clean(record.num_tache) &&
+                           clean(oldRecord.num_soumission) === clean(record.num_soumission);
+                });
+
+                if (duplicate) {
+                    const isConfirmed = await ui.showConfirm("⚠️ Attention : Un registre identique existe déjà pour cette date. Voulez-vous vraiment l'enregistrer à nouveau ?");
                     if (!isConfirmed) {
                         return;
                     }
                 }
             }
-            
+
             isSubmitting = true;
             const submitBtn = ui.elements.form.querySelector('button[type="submit"]');
             if (submitBtn) submitBtn.disabled = true;
