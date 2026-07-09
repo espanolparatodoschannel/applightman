@@ -18,7 +18,7 @@
     --error: #ef4444;
     
     --nav-bg: rgba(255, 255, 255, 0.85);
-    --header-bg: rgba(37, 99, 235, 0.95);
+    --header-bg: rgba(255, 255, 255, 0.95);
     
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
@@ -121,7 +121,7 @@ body {
 /* Glassmorphism Header */
 .app-header {
     background: var(--header-bg);
-    color: #ffffff;
+    color: var(--text-primary);
     padding: 1.5rem 1.25rem 1rem;
     display: flex;
     justify-content: space-between;
@@ -140,7 +140,7 @@ body {
 
 .logo-container i {
     font-size: 1.5rem;
-    color: var(--primary-light);
+    color: var(--primary);
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     cursor: pointer;
     transition: transform var(--transition-snappy), color var(--transition-smooth), filter var(--transition-smooth);
@@ -192,9 +192,9 @@ body {
 }
 
 .icon-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -207,7 +207,7 @@ body {
 
 .icon-btn:active {
     transform: scale(0.92);
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--border-color);
 }
 
 /* Main Area */
