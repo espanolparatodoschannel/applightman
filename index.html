@@ -35,13 +35,8 @@
         <div class="logo-container">
             <img src="lightman_car.png" alt="Lightman Logo" class="app-logo">
             <h1>Lightman</h1>
-            <i class="fa-regular fa-lightbulb" id="theme-toggle" title="Changer de thème" style="margin-left: 0.25rem;"></i>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <button id="sync-btn" class="icon-btn" title="Synchroniser avec Google Sheets" style="position: relative;">
-                <i class="fa-solid fa-rotate"></i>
-                <span id="sync-badge" class="badge hidden">0</span>
-            </button>
             <a href="#" class="nav-item icon-btn" data-target="view-config" title="Configuration" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
                 <i class="fa-solid fa-gear" style="font-size: 1.2rem;"></i>
             </a>
@@ -405,10 +400,23 @@
 
 
                 <h3>Application</h3>
-                <p class="help-text" style="font-size: 0.85rem;">Si l'application ne se met pas à jour automatiquement, vous pouvez vider le cache.</p>
-                <button id="reload-app-btn" class="btn-secondary" style="width: 100%; border-color: rgba(239, 68, 68, 0.4); color: var(--error);">
-                    <i class="fa-solid fa-arrows-rotate"></i> Vider le cache & Recharger
-                </button>
+                <p class="help-text" style="font-size: 0.85rem;">Gérer les données, l'apparence et le cache de l'application.</p>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <button id="sync-btn" class="btn-secondary" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem;">
+                        <span><i class="fa-solid fa-rotate" style="width: 24px;"></i> Synchroniser les données</span>
+                        <span id="sync-badge" class="badge hidden" style="position: static; transform: none; display: inline-flex;">0</span>
+                    </button>
+                    
+                    <div class="btn-secondary" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; cursor: pointer;" onclick="document.getElementById('theme-toggle').click()">
+                        <span><i class="fa-solid fa-palette" style="width: 24px;"></i> Thème Visuel</span>
+                        <i class="fa-regular fa-lightbulb" id="theme-toggle" style="font-size: 1.3rem; pointer-events: none;"></i>
+                    </div>
+
+                    <button id="reload-app-btn" class="btn-secondary" style="width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 0.75rem 1.25rem; border-color: rgba(239, 68, 68, 0.4); color: var(--error);">
+                        <i class="fa-solid fa-arrows-rotate" style="width: 24px;"></i> Vider le cache & Recharger
+                    </button>
+                </div>
             </div>
         </section>
 
