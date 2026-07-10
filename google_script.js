@@ -12,7 +12,7 @@ function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_INVENTAIRE, ["Id", "Description", "Catégorie", "Name", "Prix", "Stock", "Limite", "Dépense", "Solde"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "Tournée", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "Tournée", "Bon de travail", "Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
   ensureUUIDColumn();
 }
 
@@ -47,7 +47,7 @@ function doPost(e) {
       }
 
       if (headers.length === 0 || (headers.length === 1 && headers[0] === "")) {
-        headers = ["Date", "Type de tâche", "Tournée", "# Bon de trabajo", "# Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"];
+        headers = ["Date", "Type de tâche", "Tournée", "Bon de travail", "Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"];
         sheet.appendRow(headers);
       }
 
@@ -63,7 +63,10 @@ function doPost(e) {
       if (numTacheIdx === -1) numTacheIdx = headers.indexOf("Tournée");
       let numBonIdx = headers.indexOf("# Bon de trabajo");
       if (numBonIdx === -1) numBonIdx = headers.indexOf("# Bon de travail");
-      const numSoumIdx = headers.indexOf("# Soumission");
+      if (numBonIdx === -1) numBonIdx = headers.indexOf("Bon de trabajo");
+      if (numBonIdx === -1) numBonIdx = headers.indexOf("Bon de travail");
+      let numSoumIdx = headers.indexOf("# Soumission");
+      if (numSoumIdx === -1) numSoumIdx = headers.indexOf("Soumission");
       const noteIdx = headers.indexOf("Note");
       const uuidIdx = headers.indexOf("UUID");
 
@@ -167,8 +170,8 @@ function doPost(e) {
                 else if (h === "Note") updatedRow.push(record.note || "");
                 else if (h === "Type de tâche") updatedRow.push(record.tache || "");
                 else if (h === "# Type de tâche" || h === "Tournée") updatedRow.push(record.num_tache || "");
-                else if (h === "# Bon de trabajo" || h === "# Bon de travail") updatedRow.push(record.num_bon || "");
-                else if (h === "# Soumission") updatedRow.push(record.num_soumission || "");
+                else if (h === "# Bon de trabajo" || h === "# Bon de travail" || h === "Bon de trabajo" || h === "Bon de travail") updatedRow.push(record.num_bon || "");
+                else if (h === "# Soumission" || h === "Soumission") updatedRow.push(record.num_soumission || "");
                 else if (h === "UUID") updatedRow.push(targetUuid);
                 else updatedRow.push("");
               }
@@ -291,9 +294,12 @@ function doGet(e) {
         const tacheIdx = headers.indexOf("Type de tâche");
         let numTacheIdx = headers.indexOf("# Type de tâche");
         if (numTacheIdx === -1) numTacheIdx = headers.indexOf("Tournée");
-        let numBonIdx = headers.indexOf("# Bon de trabajo");
+        let numBonIdx = recordsSheet.getLastRow() > 0 ? headers.indexOf("# Bon de trabajo") : -1;
         if (numBonIdx === -1) numBonIdx = headers.indexOf("# Bon de travail");
-        const numSoumIdx = headers.indexOf("# Soumission");
+        if (numBonIdx === -1) numBonIdx = headers.indexOf("Bon de trabajo");
+        if (numBonIdx === -1) numBonIdx = headers.indexOf("Bon de travail");
+        let numSoumIdx = headers.indexOf("# Soumission");
+        if (numSoumIdx === -1) numSoumIdx = headers.indexOf("Soumission");
         const idIdx = headers.indexOf("Id");
         const noteIdx = headers.indexOf("Note");
         const uuidIdx = headers.indexOf("UUID");
