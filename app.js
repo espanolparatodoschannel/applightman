@@ -90,10 +90,15 @@ function setupEventListeners() {
         ui.elements.filterMonth.addEventListener('change', charts.updateDashboard);
         ui.elements.filterEtage.addEventListener('change', charts.updateDashboard);
         ui.elements.filterTache.addEventListener('change', charts.updateDashboard);
+        if (ui.elements.filterCategorie) ui.elements.filterCategorie.addEventListener('change', charts.updateDashboard);
+        if (ui.elements.filterDescription) ui.elements.filterDescription.addEventListener('change', charts.updateDashboard);
+        
         ui.elements.clearFiltersBtn.addEventListener('click', () => {
             ui.elements.filterMonth.value = 'all';
             ui.elements.filterEtage.value = 'all';
             ui.elements.filterTache.value = 'all';
+            if (ui.elements.filterCategorie) ui.elements.filterCategorie.value = 'all';
+            if (ui.elements.filterDescription) ui.elements.filterDescription.value = 'all';
             charts.updateDashboard();
         });
     }

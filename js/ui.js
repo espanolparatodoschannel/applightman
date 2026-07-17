@@ -33,6 +33,8 @@ export const elements = {
     filterMonth: document.getElementById('filter-month'),
     filterEtage: document.getElementById('filter-etage'),
     filterTache: document.getElementById('filter-tache'),
+    filterCategorie: document.getElementById('filter-categorie'),
+    filterDescription: document.getElementById('filter-description'),
     clearFiltersBtn: document.getElementById('clear-filters-btn'),
     searchHistory: document.getElementById('search-history'),
     historySummary: document.getElementById('history-summary'),

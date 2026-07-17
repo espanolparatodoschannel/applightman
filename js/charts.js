@@ -48,6 +48,8 @@ export function getFilteredRecords() {
     const mVal = ui.elements.filterMonth.value;
     const eVal = ui.elements.filterEtage.value;
     const tVal = ui.elements.filterTache.value;
+    const cVal = ui.elements.filterCategorie ? ui.elements.filterCategorie.value : 'all';
+    const dVal = ui.elements.filterDescription ? ui.elements.filterDescription.value : 'all';
 
     if (mVal !== 'all') {
         filtered = filtered.filter(r => {
@@ -70,6 +72,19 @@ export function getFilteredRecords() {
         filtered = filtered.filter(r => {
             const t = String(r.tache || '').toLowerCase();
             return !t.includes('reception') && !t.includes('réception');
+        });
+    }
+
+    if (cVal !== 'all') {
+        filtered = filtered.filter(r => r.categorie === cVal);
+    }
+
+    if (dVal !== 'all') {
+        filtered = filtered.filter(r => {
+            const idKey = r.id_item || "Inconnu";
+            const foundOpt = store.appOptions.opciones.find(opt => opt.id === idKey);
+            const desc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || idKey);
+            return desc === dVal;
         });
     }
 
@@ -633,14 +648,33 @@ export function populateFilters() {
     });
 
     const categories = new Set();
+    const descriptions = new Set();
     store.records.forEach(r => {
         if (r.categorie) categories.add(r.categorie);
+        const idKey = r.id_item || "Inconnu";
+        const foundOpt = store.appOptions.opciones.find(opt => opt.id === idKey);
+        const desc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || idKey);
+        if (desc) descriptions.add(desc);
     });
 
     if (ui.elements.filterHistoryCategorie) {
         ui.elements.filterHistoryCategorie.innerHTML = '<option value="all">Toutes les catégories</option>';
         Array.from(categories).sort().forEach(c => {
             ui.elements.filterHistoryCategorie.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+    }
+
+    if (ui.elements.filterCategorie) {
+        ui.elements.filterCategorie.innerHTML = '<option value="all">Toutes les catégories</option>';
+        Array.from(categories).sort().forEach(c => {
+            ui.elements.filterCategorie.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+    }
+
+    if (ui.elements.filterDescription) {
+        ui.elements.filterDescription.innerHTML = '<option value="all">Toutes les descriptions</option>';
+        Array.from(descriptions).sort().forEach(d => {
+            ui.elements.filterDescription.innerHTML += `<option value="${d}">${d}</option>`;
         });
     }
 }
