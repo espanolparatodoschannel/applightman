@@ -164,38 +164,43 @@
 
             <div class="card">
                 <h3 style="margin-top: 0;"><i class="fa-solid fa-filter"></i> Filtres</h3>
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                    <label for="filter-month">Mois / Année</label>
-                    <select id="filter-month">
-                        <option value="all">Tous les mois</option>
-                    </select>
+                <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-month" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Mois / Année</label>
+                            <select id="filter-month" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Tous les mois</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-etage" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Étage</label>
+                            <select id="filter-etage" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Tous les étages</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-tache" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Type de tâche</label>
+                            <select id="filter-tache" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Toutes les tâches</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-categorie" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Catégorie</label>
+                            <select id="filter-categorie" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Toutes les catégories</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-description" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Description</label>
+                            <select id="filter-description" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Toutes les descriptions</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="clear-filters-btn" class="btn-secondary" style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                        <i class="fa-solid fa-rotate-left"></i> Réinitialiser les filtres
+                    </button>
                 </div>
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                    <label for="filter-etage">Étage</label>
-                    <select id="filter-etage">
-                        <option value="all">Tous les étages</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                    <label for="filter-tache">Type de tâche</label>
-                    <select id="filter-tache">
-                        <option value="all">Toutes les tâches</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                    <label for="filter-categorie">Catégorie</label>
-                    <select id="filter-categorie">
-                        <option value="all">Toutes les catégories</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label for="filter-description">Description</label>
-                    <select id="filter-description">
-                        <option value="all">Toutes les descriptions</option>
-                    </select>
-                </div>
-                <button id="clear-filters-btn" class="btn-secondary" style="width: 100%;">Réinitialiser les
-                    filtres</button>
             </div>
 
 
