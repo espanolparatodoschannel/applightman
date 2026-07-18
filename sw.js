@@ -1,15 +1,15 @@
-const CACHE_NAME = 'lightman-cache-v60';
+const CACHE_NAME = 'lightman-cache-v61';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/js/utils.js',
-  '/js/store.js',
-  '/js/ui.js',
-  '/js/charts.js',
-  '/js/api.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './js/utils.js',
+  './js/store.js',
+  './js/ui.js',
+  './js/charts.js',
+  './js/api.js',
+  './manifest.json'
 ];
 
 self.addEventListener('install', event => {
