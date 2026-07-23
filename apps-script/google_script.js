@@ -245,9 +245,9 @@ function doGet(e) {
         }
       }
 
-      // 4. Obtener Inventaire
+      // 4. Obtener Inventaire (Ahora desde Opciones)
       let inventoryList = [];
-      const invSheet = ss.getSheetByName(SHEET_NAME_INVENTAIRE);
+      const invSheet = ss.getSheetByName(SHEET_NAME_OPTIONS);
       if (invSheet) {
         const invData = invSheet.getDataRange().getValues();
         if (invData.length > 1) {
@@ -259,6 +259,9 @@ function doGet(e) {
           const prixIdx = headers.indexOf("Prix");
           const stockIdx = headers.indexOf("Stock");
           const limiteIdx = headers.indexOf("Limite");
+          const consumoIdx = headers.findIndex(h => /consumo|dépense|depense/i.test(String(h)));
+          const promMesIdx = headers.findIndex(h => /prom|moyenne|moy/i.test(String(h)));
+          const soldeIdx = headers.indexOf("Solde");
 
           for (let i = 1; i < invData.length; i++) {
             const row = invData[i];
@@ -270,7 +273,10 @@ function doGet(e) {
                 name: nameIdx > -1 ? row[nameIdx] : "",
                 prix: prixIdx > -1 ? row[prixIdx] : "",
                 stock: stockIdx > -1 ? row[stockIdx] : 0,
-                limite: limiteIdx > -1 ? row[limiteIdx] : ""
+                limite: limiteIdx > -1 ? row[limiteIdx] : "",
+                consumo: consumoIdx > -1 ? row[consumoIdx] : "",
+                promMes: promMesIdx > -1 ? row[promMesIdx] : "",
+                solde: soldeIdx > -1 ? row[soldeIdx] : ""
               });
             }
           }

@@ -263,7 +263,7 @@ export function updateDashboard() {
         if (ui.elements.filterHistoryTache) ui.elements.filterHistoryTache.value = 'all';
         if (ui.elements.searchHistory) ui.elements.searchHistory.value = '';
 
-        if ((canvasId === 'monthlyBulbsChart' || canvasId === 'cumulativeTrendChart' || canvasId === 'taskTypeEvolutionChart') && ui.elements.filterHistoryMonth) {
+        if ((canvasId === 'monthlyBulbsChart' || canvasId === 'taskTypeEvolutionChart') && ui.elements.filterHistoryMonth) {
             ui.elements.filterHistoryMonth.value = sortedMonths[index] || 'all';
         } else if (canvasId === 'topEtagesChart' && ui.elements.filterHistoryEtage) {
             ui.elements.filterHistoryEtage.value = label || 'all';
@@ -432,19 +432,6 @@ export function updateDashboard() {
         }
     });
 
-    let cumulativeSum = 0;
-    const cumulativeValues = monthlyValues.map(val => {
-        cumulativeSum += val;
-        return cumulativeSum;
-    });
-
-    renderChart('cumulativeTrendChart', 'line', monthlyLabels, cumulativeValues, '#8b5cf6', {
-        datasetLabel: 'Total Cumulé',
-        fill: true,
-        plugins: {
-            datalabels: { anchor: 'end', align: 'top', color: textColor, font: { weight: 'bold' } }
-        }
-    });
 }
 
 function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {

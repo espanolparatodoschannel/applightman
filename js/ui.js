@@ -684,15 +684,27 @@ export function renderInventory() {
     const filterCat = (elements.filterInvCategorie ? elements.filterInvCategorie.value : "all");
     const filterDesc = (elements.filterInvDescription ? elements.filterInvDescription.value : "all");
     
-    // Calculate Depense
+    // Calculate Consumo & Total Months
     const records = store.records || [];
     const depenseMap = {};
+    const monthSet = new Set();
     records.forEach(rec => {
         if (rec.id_item && rec.quantite) {
             depenseMap[rec.id_item] = (depenseMap[rec.id_item] || 0) + parseInt(rec.quantite, 10);
         }
+        const dStr = rec.date || rec.fecha;
+        if (dStr) {
+            const d = new Date(dStr);
+            if (!isNaN(d)) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                monthSet.add(`${y}-${m}`);
+            }
+        }
     });
     
+    const totalMonths = Math.max(1, monthSet.size);
+
     elements.inventoryContainer.innerHTML = '';
     
     let count = 0;
@@ -703,13 +715,34 @@ export function renderInventory() {
         if (filterCat !== 'all' && (!item.categorie || String(item.categorie).trim() !== String(filterCat).trim())) return;
         if (filterDesc !== 'all' && (!item.description || String(item.description).trim() !== String(filterDesc).trim())) return;
         
-        const depense = depenseMap[item.id] || 0;
-        const initialStock = parseInt(item.stock) || 0;
-        const solde = initialStock - depense;
+        // 1. Consumo
+        const consumoCalc = depenseMap[item.id] || 0;
+        const consumo = (item.consumo !== undefined && item.consumo !== "") ? item.consumo : consumoCalc;
         
+        // 2. Prom. mes
+        let promMes;
+        if (item.promMes !== undefined && item.promMes !== "") {
+            promMes = item.promMes;
+        } else if (item['Prom. mes'] !== undefined && item['Prom. mes'] !== "") {
+            promMes = item['Prom. mes'];
+        } else {
+            promMes = (Number(consumo) / totalMonths).toFixed(1);
+        }
+
+        // 3. Stock
+        const initialStock = parseInt(item.stock, 10) || 0;
+        let displayStock;
+        if (item.solde !== undefined && item.solde !== "") {
+            displayStock = parseInt(item.solde, 10);
+        } else if (item.stock !== undefined && item.stock !== "") {
+            displayStock = initialStock;
+        } else {
+            displayStock = 0;
+        }
+
         // Determinar el límite/umbral
         const seuil = parseInt(item.limite || item.Limite) || 5;
-        const isCritical = solde <= seuil;
+        const isCritical = displayStock <= seuil;
         
         if (isCritical) {
             criticalStockCount++;
@@ -721,16 +754,14 @@ export function renderInventory() {
         count++;
 
         const stockClass = isCritical ? 'low-stock' : 'good-stock';
-        const displaySolde = solde;
-        
         const formattedPrix = parseFloat(item.prix || 0).toFixed(2);
         
         const card = document.createElement('div');
         card.className = 'inv-card';
-        const percentage = initialStock > 0 ? Math.max(0, Math.min(100, (displaySolde / initialStock) * 100)) : 0;
+        const percentage = initialStock > 0 ? Math.max(0, Math.min(100, (displayStock / initialStock) * 100)) : 0;
         let progressColor = 'var(--success)';
         if (isCritical) progressColor = 'var(--error)';
-        else if (percentage <= 30 || solde <= seuil * 2) progressColor = '#f59e0b'; // Amber for warning
+        else if (percentage <= 30 || displayStock <= seuil * 2) progressColor = '#f59e0b'; // Amber for warning
 
         card.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -749,18 +780,18 @@ export function renderInventory() {
             <div class="pro-card-body" style="padding: 1.25rem 0 0 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
                     <div style="text-align: center; flex: 1;">
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Consumo</span>
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${consumo}</span>
+                    </div>
+                    <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
+                    <div style="text-align: center; flex: 1;">
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Prom. mes</span>
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${promMes}</span>
+                    </div>
+                    <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
+                    <div style="text-align: center; flex: 1;">
                         <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Stock</span>
-                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${initialStock}</span>
-                    </div>
-                    <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
-                    <div style="text-align: center; flex: 1;">
-                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Dépense</span>
-                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${depense}</span>
-                    </div>
-                    <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
-                    <div style="text-align: center; flex: 1;">
-                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Solde</span>
-                        <span style="font-size: 1.15rem; font-weight: 700;" class="${stockClass}">${displaySolde}</span>
+                        <span style="font-size: 1.15rem; font-weight: 700;" class="${stockClass}">${displayStock}</span>
                     </div>
                 </div>
             </div>

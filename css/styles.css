@@ -446,6 +446,7 @@ body {
     font-weight: 800;
     color: var(--primary);
     background: linear-gradient(to right, var(--primary), var(--primary-light));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -757,10 +758,12 @@ body {
 .stepper-control input[type=number]::-webkit-inner-spin-button, 
 .stepper-control input[type=number]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
+  appearance: none;
   margin: 0; 
 }
 .stepper-control input[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 /* 2. Sticky Form Actions (Mobile) */

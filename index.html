@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css?v=1.3">
+    <link rel="stylesheet" href="css/styles.css">
     <script>
         (function () {
             const savedTheme = localStorage.getItem('lightman_theme');
@@ -33,11 +33,12 @@
     <!-- Header -->
     <header class="app-header">
         <div class="logo-container">
-            <img src="lightman_car.png" alt="Lightman Logo" class="app-logo">
+            <img src="assets/img/lightman_car.png" alt="Lightman Logo" class="app-logo">
             <h1>Lightman</h1>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <a href="#" class="nav-item icon-btn" data-target="view-config" title="Configuration" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+            <a href="#" class="nav-item icon-btn" data-target="view-config" title="Configuration"
+                style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
                 <i class="fa-solid fa-gear" style="font-size: 1.2rem;"></i>
             </a>
         </div>
@@ -157,7 +158,8 @@
                     </div>
                     <div class="stat-box">
                         <span class="stat-label">Produit favori</span>
-                        <span id="stat-top-product" class="stat-value" style="font-size: 1.2rem; word-break: break-all;">-</span>
+                        <span id="stat-top-product" class="stat-value"
+                            style="font-size: 1.2rem; word-break: break-all;">-</span>
                     </div>
                 </div>
             </div>
@@ -165,39 +167,48 @@
             <div class="card">
                 <h3 style="margin-top: 0;"><i class="fa-solid fa-filter"></i> Filtres</h3>
                 <div style="margin-bottom: 1.25rem;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-month" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Mois / Année</label>
+                            <label for="filter-month"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Mois /
+                                Année</label>
                             <select id="filter-month" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Tous les mois</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-etage" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Étage</label>
+                            <label for="filter-etage"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Étage</label>
                             <select id="filter-etage" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Tous les étages</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-tache" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Type de tâche</label>
+                            <label for="filter-tache"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Type de
+                                tâche</label>
                             <select id="filter-tache" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Toutes les tâches</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-categorie" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Catégorie</label>
+                            <label for="filter-categorie"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Catégorie</label>
                             <select id="filter-categorie" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Toutes les catégories</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-description" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Description</label>
+                            <label for="filter-description"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Description</label>
                             <select id="filter-description" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Toutes les descriptions</option>
                             </select>
                         </div>
                     </div>
-                    <button id="clear-filters-btn" class="btn-secondary" style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                    <button id="clear-filters-btn" class="btn-secondary"
+                        style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.75rem;">
                         <i class="fa-solid fa-rotate-left"></i> Réinitialiser les filtres
                     </button>
                 </div>
@@ -206,54 +217,47 @@
 
 
             <div id="charts-container">
-            <div class="card chart-card">
-                <h3>Ampoules changées par mois</h3>
-                <div class="chart-container">
-                    <canvas id="monthlyBulbsChart"></canvas>
+                <div class="card chart-card">
+                    <h3>Ampoules changées par mois</h3>
+                    <div class="chart-container">
+                        <canvas id="monthlyBulbsChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card chart-card">
-                <h3>Tendance Cumulative Annuelle</h3>
-                <div class="chart-container">
-                    <canvas id="cumulativeTrendChart"></canvas>
+                <div class="card chart-card">
+                    <h3>Par type de tâche (Total)</h3>
+                    <div class="chart-container">
+                        <canvas id="taskTypeChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card chart-card">
-                <h3>Par type de tâche (Total)</h3>
-                <div class="chart-container">
-                    <canvas id="taskTypeChart"></canvas>
+                <div class="card chart-card">
+                    <h3>Évolution par type de tâche</h3>
+                    <div class="chart-container">
+                        <canvas id="taskTypeEvolutionChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card chart-card">
-                <h3>Évolution par type de tâche</h3>
-                <div class="chart-container">
-                    <canvas id="taskTypeEvolutionChart"></canvas>
+                <div class="card chart-card">
+                    <h3>Top 5 Étages (les plus consommateurs)</h3>
+                    <div class="chart-container">
+                        <canvas id="topEtagesChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card chart-card">
-                <h3>Top 5 Étages (les plus consommateurs)</h3>
-                <div class="chart-container">
-                    <canvas id="topEtagesChart"></canvas>
+                <div class="card chart-card">
+                    <h3>Top 5 produits</h3>
+                    <div class="chart-container">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card chart-card">
-                <h3>Top 5 produits</h3>
-                <div class="chart-container">
-                    <canvas id="topProductsChart"></canvas>
+                <div class="card chart-card">
+                    <h3>Par catégorie</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
                 </div>
-            </div>
-
-            <div class="card chart-card">
-                <h3>Par catégorie</h3>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-            </div>
             </div>
         </section>
 
@@ -261,7 +265,8 @@
         <section id="view-inventaire" class="view">
             <div class="card">
                 <h2><i class="fa-solid fa-box-open"></i> Inventaire</h2>
-                <div class="inventory-controls" style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="inventory-controls"
+                    style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="filter-inv-categorie">Catégorie</label>
                         <select id="filter-inv-categorie">
@@ -275,10 +280,12 @@
                         </select>
                     </div>
 
-                    <button id="filter-critical-stock-btn" class="btn-secondary" style="width: 100%; margin-top: 0.5rem; border-color: var(--error); color: var(--error);">
+                    <button id="filter-critical-stock-btn" class="btn-secondary"
+                        style="width: 100%; margin-top: 0.5rem; border-color: var(--error); color: var(--error);">
                         <i class="fa-solid fa-triangle-exclamation"></i> Voir Stock Critique
                     </button>
-                    <button id="clear-inv-filters-btn" class="btn-secondary" style="width: 100%; margin-top: 0.5rem;">Réinitialiser les filtres</button>
+                    <button id="clear-inv-filters-btn" class="btn-secondary"
+                        style="width: 100%; margin-top: 0.5rem;">Réinitialiser les filtres</button>
                 </div>
                 <div id="inventory-container" class="inventory-grid">
                     <!-- Dynamic inventory items here -->
@@ -294,41 +301,54 @@
 
                 <!-- Filtres Historique -->
                 <div style="margin-bottom: 1.25rem;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-history-month" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Mois / Année</label>
-                            <select id="filter-history-month" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                            <label for="filter-history-month"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Mois /
+                                Année</label>
+                            <select id="filter-history-month"
+                                style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Tous les mois</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-history-etage" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Étage</label>
-                            <select id="filter-history-etage" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                            <label for="filter-history-etage"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Étage</label>
+                            <select id="filter-history-etage"
+                                style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Tous les étages</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-history-tache" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Type de tâche</label>
-                            <select id="filter-history-tache" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                            <label for="filter-history-tache"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Type de
+                                tâche</label>
+                            <select id="filter-history-tache"
+                                style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Toutes les tâches</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="filter-history-categorie" style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Catégorie</label>
-                            <select id="filter-history-categorie" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                            <label for="filter-history-categorie"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;">Catégorie</label>
+                            <select id="filter-history-categorie"
+                                style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Toutes les catégories</option>
                             </select>
                         </div>
                     </div>
-                    <button id="clear-history-filters-btn" class="btn-secondary" style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                    <button id="clear-history-filters-btn" class="btn-secondary"
+                        style="width: 100%; font-size: 0.85rem; padding: 0.4rem 0.75rem;">
                         <i class="fa-solid fa-rotate-left"></i> Réinitialiser les filtres
                     </button>
                 </div>
-                
+
                 <div class="form-group" style="margin-bottom: 1.25rem;">
                     <div class="search-input-container">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="search-history" placeholder="Rechercher par description, étage, tâche, note...">
+                        <input type="text" id="search-history"
+                            placeholder="Rechercher par description, étage, tâche, note...">
                     </div>
                 </div>
 
@@ -336,7 +356,7 @@
                     <span id="history-summary">Total: 0 remplacements</span>
                 </div>
             </div> <!-- End of the card containing filters and search -->
-            
+
             <div id="history-container">
                 <p class="help-text">Aucun enregistrement récent.</p>
             </div>
@@ -345,12 +365,13 @@
         <section id="view-notes" class="view">
             <div class="card" style="border-top: 4px solid var(--primary);">
                 <h2><i class="fa-solid fa-note-sticky"></i> Nouvelles Notes</h2>
-                
+
                 <div class="form-group">
                     <label for="note-text"><i class="fa-solid fa-pencil"></i> Rédiger une note</label>
-                    <textarea id="note-text" rows="4" placeholder="Tapez votre rappel ou note ici..." style="width: 100%; border: 2px solid transparent; border-radius: var(--radius-sm); font-size: 1.05rem; padding: 0.875rem 1rem; background-color: var(--input-bg); color: var(--text-primary); font-family: inherit; resize: vertical; transition: all var(--transition-snappy);"></textarea>
+                    <textarea id="note-text" rows="4" placeholder="Tapez votre rappel ou note ici..."
+                        style="width: 100%; border: 2px solid transparent; border-radius: var(--radius-sm); font-size: 1.05rem; padding: 0.875rem 1rem; background-color: var(--input-bg); color: var(--text-primary); font-family: inherit; resize: vertical; transition: all var(--transition-snappy);"></textarea>
                 </div>
-                
+
                 <div class="form-group" style="margin-top: 1rem;">
                     <label style="margin-bottom: 0.5rem;"><i class="fa-solid fa-palette"></i> Couleur de la note</label>
                     <div style="display: flex; gap: 1rem; align-items: center;">
@@ -376,11 +397,12 @@
                     <i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note
                 </button>
             </div>
-            
+
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2 style="margin: 0;"><i class="fa-solid fa-list-check"></i> Mes Notes</h2>
-                    <button id="clear-completed-notes-btn" class="btn-secondary" style="width: auto; padding: 0.25rem 0.75rem; min-height: 0; font-size: 0.85rem; margin: 0; border-color: var(--text-secondary); color: var(--text-secondary);">
+                    <button id="clear-completed-notes-btn" class="btn-secondary"
+                        style="width: auto; padding: 0.25rem 0.75rem; min-height: 0; font-size: 0.85rem; margin: 0; border-color: var(--text-secondary); color: var(--text-secondary);">
                         <i class="fa-solid fa-broom"></i> Nettoyer
                     </button>
                 </div>
@@ -417,20 +439,27 @@
 
 
                 <h3>Application</h3>
-                <p class="help-text" style="font-size: 0.85rem;">Gérer les données, l'apparence et le cache de l'application.</p>
+                <p class="help-text" style="font-size: 0.85rem;">Gérer les données, l'apparence et le cache de
+                    l'application.</p>
 
                 <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.5rem;">
-                    <button id="sync-btn" class="btn-secondary" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem;">
+                    <button id="sync-btn" class="btn-secondary"
+                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem;">
                         <span><i class="fa-solid fa-rotate" style="width: 24px;"></i> Synchroniser les données</span>
-                        <span id="sync-badge" class="badge hidden" style="position: static; transform: none; display: inline-flex;">0</span>
+                        <span id="sync-badge" class="badge hidden"
+                            style="position: static; transform: none; display: inline-flex;">0</span>
                     </button>
-                    
-                    <div class="btn-secondary" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; cursor: pointer;" onclick="document.getElementById('theme-toggle').click()">
+
+                    <div class="btn-secondary"
+                        style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; cursor: pointer;"
+                        onclick="document.getElementById('theme-toggle').click()">
                         <span><i class="fa-solid fa-palette" style="width: 24px;"></i> Thème Visuel</span>
-                        <i class="fa-regular fa-lightbulb" id="theme-toggle" style="font-size: 1.3rem; pointer-events: none;"></i>
+                        <i class="fa-regular fa-lightbulb" id="theme-toggle"
+                            style="font-size: 1.3rem; pointer-events: none;"></i>
                     </div>
 
-                    <button id="reload-app-btn" class="btn-secondary" style="width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 0.75rem 1.25rem; border-color: rgba(239, 68, 68, 0.4); color: var(--error);">
+                    <button id="reload-app-btn" class="btn-secondary"
+                        style="width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 0.75rem 1.25rem; border-color: rgba(239, 68, 68, 0.4); color: var(--error);">
                         <i class="fa-solid fa-arrows-rotate" style="width: 24px;"></i> Vider le cache & Recharger
                     </button>
                 </div>
@@ -474,7 +503,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script type="module" src="app.js?v=1.3"></script>
+    <script type="module" src="js/app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

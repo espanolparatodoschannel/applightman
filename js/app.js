@@ -1,9 +1,9 @@
 // app.js
-import * as store from './js/store.js';
-import * as ui from './js/ui.js';
-import * as charts from './js/charts.js';
-import * as api from './js/api.js';
-import { generateUUID } from './js/utils.js';
+import * as store from './store.js';
+import * as ui from './ui.js';
+import * as charts from './charts.js';
+import * as api from './api.js';
+import { generateUUID } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
