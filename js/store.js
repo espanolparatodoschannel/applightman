@@ -1,7 +1,8 @@
 // js/store.js
 
 export const CONFIG_KEY = "lightman_api_url";
-export let apiUrl = localStorage.getItem(CONFIG_KEY) || "https://script.google.com/macros/s/AKfycbwI3o54GHtgvGu7pafOkRiDL8jWoLw2sHSw2TfAGD2k_KCRtZO6f-ma2RQYx_gZD5OHvQ/exec";
+// [FIX G-1] URL nunca se escribe en el código — el usuario debe configurarla en la pantalla de Configuración
+export let apiUrl = localStorage.getItem(CONFIG_KEY) || "";
 
 // Mock Data
 export const mockOptions = {
@@ -154,4 +155,49 @@ export function clearCompletedNotes() {
     let notes = getNotes();
     notes = notes.filter(n => !n.completed);
     localStorage.setItem('lightman_notes', JSON.stringify(notes));
+}
+
+// [FIX M-7] Función centralizada de filtrado — usada por charts.js y ui.js para evitar duplicación de lógica
+export function filterRecords(records, { month = 'all', etage = 'all', tache = 'all', categorie = 'all', description = 'all' } = {}) {
+    let filtered = [...records];
+
+    if (month !== 'all') {
+        filtered = filtered.filter(r => {
+            const d = new Date(r.date || r.fecha);
+            if (isNaN(d)) return false;
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            return `${y}-${m}` === month;
+        });
+    }
+
+    if (etage !== 'all') {
+        filtered = filtered.filter(r => String(r.etage).trim() === etage);
+    }
+
+    if (tache !== 'all') {
+        filtered = filtered.filter(r => r.tache === tache);
+    }
+
+    if (categorie !== 'all') {
+        filtered = filtered.filter(r => {
+            let recCat = r.categorie;
+            if (!recCat && r.id_item) {
+                const foundOpt = appOptions.opciones.find(opt => opt.id === r.id_item);
+                if (foundOpt) recCat = foundOpt.categorie;
+            }
+            return recCat === categorie;
+        });
+    }
+
+    if (description !== 'all') {
+        filtered = filtered.filter(r => {
+            const idKey = r.id_item || 'Inconnu';
+            const foundOpt = appOptions.opciones.find(opt => opt.id === idKey);
+            const desc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || idKey);
+            return desc === description;
+        });
+    }
+
+    return filtered;
 }

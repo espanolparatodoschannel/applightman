@@ -41,50 +41,26 @@ export const pieLinesPlugin = {
     }
 };
 
+// [FIX M-7] Usa la función centralizada de filtrado de store.js en lugar de duplicar la lógica
 export function getFilteredRecords() {
-    let filtered = store.records;
-    if (!ui.elements.filterMonth) return filtered;
+    if (!ui.elements.filterMonth) return store.records;
 
-    const mVal = ui.elements.filterMonth.value;
-    const eVal = ui.elements.filterEtage.value;
-    const tVal = ui.elements.filterTache.value;
-    const cVal = ui.elements.filterCategorie ? ui.elements.filterCategorie.value : 'all';
-    const dVal = ui.elements.filterDescription ? ui.elements.filterDescription.value : 'all';
+    const tVal = ui.elements.filterTache ? ui.elements.filterTache.value : 'all';
 
-    if (mVal !== 'all') {
-        filtered = filtered.filter(r => {
-            const d = new Date(r.date || r.fecha);
-            if (isNaN(d)) return false;
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            return `${y}-${m}` === mVal;
-        });
-    }
+    let filtered = store.filterRecords(store.records, {
+        month: ui.elements.filterMonth ? ui.elements.filterMonth.value : 'all',
+        etage: ui.elements.filterEtage ? ui.elements.filterEtage.value : 'all',
+        tache: tVal,
+        categorie: ui.elements.filterCategorie ? ui.elements.filterCategorie.value : 'all',
+        description: ui.elements.filterDescription ? ui.elements.filterDescription.value : 'all'
+    });
 
-    if (eVal !== 'all') {
-        filtered = filtered.filter(r => String(r.etage).trim() === eVal);
-    }
-
-    if (tVal !== 'all') {
-        filtered = filtered.filter(r => r.tache === tVal);
-    } else {
-        // Excluir registros antiguos de "Réception de matériel" para que no manchen las estadísticas
+    // Excluir registros de "Réception de matériel" solo cuando no hay filtro de tarea activo
+    // (comportamiento específico de Estadísticas para no distorsionar los datos)
+    if (tVal === 'all') {
         filtered = filtered.filter(r => {
             const t = String(r.tache || '').toLowerCase();
             return !t.includes('reception') && !t.includes('réception');
-        });
-    }
-
-    if (cVal !== 'all') {
-        filtered = filtered.filter(r => r.categorie === cVal);
-    }
-
-    if (dVal !== 'all') {
-        filtered = filtered.filter(r => {
-            const idKey = r.id_item || "Inconnu";
-            const foundOpt = store.appOptions.opciones.find(opt => opt.id === idKey);
-            const desc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || idKey);
-            return desc === dVal;
         });
     }
 

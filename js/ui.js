@@ -39,7 +39,6 @@ export const elements = {
     searchHistory: document.getElementById('search-history'),
     historySummary: document.getElementById('history-summary'),
     reloadAppBtn: document.getElementById('reload-app-btn'),
-    filterCriticalStockBtn: document.getElementById('filter-critical-stock-btn'),
     navBadgeInventaire: document.getElementById('nav-badge-inventaire'),
     
     statAvg: document.getElementById('stat-avg'),
@@ -60,8 +59,17 @@ export const elements = {
     inventoryContainer: document.getElementById('inventory-container'),
     filterInvCategorie: document.getElementById('filter-inv-categorie'),
     filterInvDescription: document.getElementById('filter-inv-description'),
+    filterInvAutonomie: document.getElementById('filter-inv-autonomie'),
+    searchInv: document.getElementById('search-inv'),
     clearInvFiltersBtn: document.getElementById('clear-inv-filters-btn')
 };
+
+// [FIX G-3] Sanitiza texto de usuario antes de insertarlo en HTML para prevenir XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = String(text ?? '');
+    return div.innerHTML;
+}
 
 export function showToast(message, type = 'success') {
     const existing = document.getElementById('custom-toast');
@@ -79,7 +87,7 @@ export function showToast(message, type = 'success') {
     toast.className = 'toast-container';
     toast.innerHTML = `
         <i class="fa-solid ${iconMap[type] || iconMap.info} toast-icon ${type}"></i>
-        <span style="font-weight: 500; font-size: 0.95rem;">${message}</span>
+        <span style="font-weight: 500; font-size: 0.95rem;">${escapeHtml(message)}</span>
     `;
     
     document.body.appendChild(toast);
@@ -104,7 +112,7 @@ export function showConfirm(message) {
             <div class="confirm-box">
                 <div class="confirm-content">
                     <i class="fa-solid fa-triangle-exclamation confirm-icon"></i>
-                    <p>${message}</p>
+                    <p>${escapeHtml(message)}</p>
                 </div>
                 <div class="confirm-actions">
                     <button class="btn-cancel">Annuler</button>
@@ -212,7 +220,7 @@ export function updateDateDisplay() {
             const monthIndex = parseInt(parts[1], 10) - 1;
             const day = parseInt(parts[2], 10);
             
-            const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+            const months = ["jan", "fév", "mar", "avr", "mai", "juin", "juil", "août", "sep", "oct", "nov", "déc"];
             
             elements.dateDisplay.textContent = `${day}-${months[monthIndex]}-${year}`;
             elements.dateDisplay.classList.remove('placeholder-active');
@@ -278,37 +286,14 @@ export function renderHistory() {
         return dateB - dateA;
     });
     
+    // [FIX M-7] Usar la función centralizada de filtrado en lugar de duplicar la lógica
     if (elements.filterHistoryMonth) {
-        const hmVal = elements.filterHistoryMonth.value;
-        const heVal = elements.filterHistoryEtage.value;
-        const htVal = elements.filterHistoryTache.value;
-        const hcVal = elements.filterHistoryCategorie ? elements.filterHistoryCategorie.value : 'all';
-        
-        if (hmVal !== 'all') {
-            history = history.filter(r => {
-                const d = new Date(r.date || r.fecha);
-                if (isNaN(d)) return false;
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                return `${y}-${m}` === hmVal;
-            });
-        }
-        if (heVal !== 'all') {
-            history = history.filter(r => String(r.etage).trim() === heVal);
-        }
-        if (htVal !== 'all') {
-            history = history.filter(r => r.tache === htVal);
-        }
-        if (hcVal !== 'all') {
-            history = history.filter(r => {
-                let recCat = r.categorie;
-                if (!recCat && r.id_item) {
-                    const foundOpt = store.appOptions.opciones.find(opt => opt.id === r.id_item);
-                    if (foundOpt) recCat = foundOpt.categorie;
-                }
-                return recCat === hcVal;
-            });
-        }
+        history = store.filterRecords(history, {
+            month: elements.filterHistoryMonth.value,
+            etage: elements.filterHistoryEtage ? elements.filterHistoryEtage.value : 'all',
+            tache: elements.filterHistoryTache ? elements.filterHistoryTache.value : 'all',
+            categorie: elements.filterHistoryCategorie ? elements.filterHistoryCategorie.value : 'all'
+        });
     }
     
     const searchVal = elements.searchHistory ? elements.searchHistory.value.trim().toLowerCase() : "";
@@ -515,7 +500,8 @@ export function renderHistory() {
                     elements.catSelect.dispatchEvent(new Event('change'));
                 }
                 if (elements.descSelect) {
-                    setTimeout(() => {
+                    // [FIX M-5] Doble requestAnimationFrame en lugar de setTimeout fijo— espera que el DOM se actualice antes de asignar valores
+                    requestAnimationFrame(() => requestAnimationFrame(() => {
                         elements.descSelect.value = recordDesc;
                         elements.descSelect.dispatchEvent(new Event('change'));
                         
@@ -523,7 +509,7 @@ export function renderHistory() {
                         if (elements.idInput) {
                             elements.idInput.value = record.id_item || "";
                         }
-                    }, 50);
+                    }));
                 } else if (elements.idInput) {
                     elements.idInput.value = record.id_item || "";
                 }
@@ -604,7 +590,7 @@ export function renderNotes() {
                         </button>
                     </div>
                 </div>
-                <p class="note-content" style="margin: 0; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;">${note.text}</p>
+                <p class="note-content" style="margin: 0; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap;">${escapeHtml(note.text)}</p>
             </div>
         `;
     }).join('');
@@ -683,6 +669,8 @@ export function renderInventory() {
     let inventory = store.appOptions.inventory || [];
     const filterCat = (elements.filterInvCategorie ? elements.filterInvCategorie.value : "all");
     const filterDesc = (elements.filterInvDescription ? elements.filterInvDescription.value : "all");
+    const filterAuto = (elements.filterInvAutonomie ? elements.filterInvAutonomie.value : "all");
+    const searchText = (elements.searchInv ? elements.searchInv.value.trim().toLowerCase() : "");
     
     // Calculate Consumo & Total Months
     const records = store.records || [];
@@ -708,12 +696,15 @@ export function renderInventory() {
     elements.inventoryContainer.innerHTML = '';
     
     let count = 0;
-    let criticalStockCount = 0;
-    const isCriticalFilterActive = elements.filterCriticalStockBtn && elements.filterCriticalStockBtn.classList.contains('btn-critical-active');
     
     inventory.forEach(item => {
         if (filterCat !== 'all' && (!item.categorie || String(item.categorie).trim() !== String(filterCat).trim())) return;
         if (filterDesc !== 'all' && (!item.description || String(item.description).trim() !== String(filterDesc).trim())) return;
+        
+        if (searchText) {
+            const searchStr = `${item.id || ''} ${item.description || ''} ${item.name || ''}`.toLowerCase();
+            if (!searchStr.includes(searchText)) return;
+        }
         
         // 1. Consumo
         const consumoCalc = depenseMap[item.id] || 0;
@@ -740,17 +731,27 @@ export function renderInventory() {
             displayStock = 0;
         }
 
+        // 4. Autonomie
+        const avgMes = parseFloat(promMes);
+        let monthsLeft = 999; 
+        if (avgMes > 0 && displayStock >= 0) {
+            monthsLeft = parseFloat((displayStock / avgMes).toFixed(1));
+        } else if (displayStock === 0) {
+            monthsLeft = 0;
+        }
+        
+        // Appliquer le filtre d'autonomie
+        if (filterAuto !== 'all') {
+            if (filterAuto === 'epuise' && displayStock > 0) return;
+            if (filterAuto === 'critique' && (displayStock === 0 || monthsLeft >= 2)) return;
+            if (filterAuto === 'attention' && (monthsLeft < 2 || monthsLeft >= 6)) return;
+            if (filterAuto === 'ok' && monthsLeft < 6) return;
+        }
+
         // Determinar el límite/umbral
         const seuil = parseInt(item.limite || item.Limite) || 5;
         const isCritical = displayStock <= seuil;
         
-        if (isCritical) {
-            criticalStockCount++;
-        }
-        
-        // Si el filtro de stock crítico está activo, saltar los que están bien
-        if (isCriticalFilterActive && !isCritical) return;
-
         count++;
 
         const stockClass = isCritical ? 'low-stock' : 'good-stock';
@@ -763,6 +764,32 @@ export function renderInventory() {
         if (isCritical) progressColor = 'var(--error)';
         else if (percentage <= 30 || displayStock <= seuil * 2) progressColor = '#f59e0b'; // Amber for warning
 
+        let autonomieText = "N/A";
+        let autonomieColor = "var(--text-secondary)";
+        let autonomieBg = "rgba(107, 114, 128, 0.1)";
+
+        if (avgMes > 0 && displayStock >= 0) {
+            autonomieText = `${monthsLeft} mois`;
+            if (monthsLeft < 2) {
+                autonomieColor = "var(--error)";
+                autonomieBg = "rgba(239, 68, 68, 0.1)";
+            } else if (monthsLeft < 6) {
+                autonomieColor = "#f59e0b"; // Amber
+                autonomieBg = "rgba(245, 158, 11, 0.1)"; 
+            } else {
+                autonomieColor = "var(--success)";
+                autonomieBg = "rgba(16, 185, 129, 0.1)";
+            }
+        } else if (displayStock === 0) {
+            autonomieText = "Épuisé";
+            autonomieColor = "var(--error)";
+            autonomieBg = "rgba(239, 68, 68, 0.1)";
+        } else if (avgMes === 0 && displayStock > 0) {
+            autonomieText = "+12 mois";
+            autonomieColor = "var(--success)";
+            autonomieBg = "rgba(16, 185, 129, 0.1)";
+        }
+
         card.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <div class="inv-title" style="display: flex; align-items: flex-start; margin: 0; max-width: 100%;">
@@ -774,18 +801,19 @@ export function renderInventory() {
                     <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-tag" style="margin-right: 0.25rem;"></i> ${item.id}</span>
                     <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><i class="fa-regular fa-folder-open" style="margin-right: 0.25rem;"></i> ${item.categorie || 'Sans Catégorie'}</span>
                     <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${formattedPrix}</span>
+                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: ${autonomieBg}; color: ${autonomieColor}; font-weight: 600; font-size: 0.75rem;" title="Autonomie estimée"><i class="fa-solid fa-hourglass-half" style="margin-right: 0.25rem;"></i> ${autonomieText}</span>
                 </div>
             </div>
             
             <div class="pro-card-body" style="padding: 1.25rem 0 0 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
                     <div style="text-align: center; flex: 1;">
-                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Consumo</span>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Consom.</span>
                         <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${consumo}</span>
                     </div>
                     <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
                     <div style="text-align: center; flex: 1;">
-                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Prom. mes</span>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Moy./mois</span>
                         <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">${promMes}</span>
                     </div>
                     <div style="width: 1px; height: 36px; background: var(--border-color); opacity: 0.6;"></div>
@@ -815,8 +843,13 @@ export function renderInventory() {
 
     // Update badge
     if (elements.navBadgeInventaire) {
-        if (criticalStockCount > 0) {
-            elements.navBadgeInventaire.textContent = criticalStockCount;
+        const seuil_badge_count = (store.appOptions.inventory || []).filter(item => {
+            const s = parseInt(item.stock, 10) || 0;
+            const lim = parseInt(item.limite || item.Limite) || 5;
+            return s <= lim;
+        }).length;
+        if (seuil_badge_count > 0) {
+            elements.navBadgeInventaire.textContent = seuil_badge_count;
             elements.navBadgeInventaire.classList.remove('hidden');
         } else {
             elements.navBadgeInventaire.classList.add('hidden');

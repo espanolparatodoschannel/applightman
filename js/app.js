@@ -3,7 +3,7 @@ import * as store from './store.js';
 import * as ui from './ui.js';
 import * as charts from './charts.js';
 import * as api from './api.js';
-import { generateUUID } from './utils.js';
+import { generateUUID, debounce } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
@@ -143,18 +143,23 @@ function setupEventListeners() {
             if (ui.elements.filterInvCategorie) ui.elements.filterInvCategorie.value = 'all';
             ui.updateInventoryDescriptionFilter(); // Repopulate all
             if (ui.elements.filterInvDescription) ui.elements.filterInvDescription.value = 'all';
-
-            if (ui.elements.filterCriticalStockBtn) {
-                ui.elements.filterCriticalStockBtn.classList.remove('btn-critical-active');
-            }
+            if (ui.elements.filterInvAutonomie) ui.elements.filterInvAutonomie.value = 'all';
+            if (ui.elements.searchInv) ui.elements.searchInv.value = '';
             ui.renderInventory();
         });
     }
-    if (ui.elements.filterCriticalStockBtn) {
-        ui.elements.filterCriticalStockBtn.addEventListener('click', () => {
-            ui.elements.filterCriticalStockBtn.classList.toggle('btn-critical-active');
+    
+    if (ui.elements.filterInvAutonomie) {
+        ui.elements.filterInvAutonomie.addEventListener('change', () => {
             ui.renderInventory();
         });
+    }
+    
+    if (ui.elements.searchInv) {
+        // [FIX M-4] Debounce: espera 250ms antes de filtrar el inventario
+        ui.elements.searchInv.addEventListener('input', debounce(() => {
+            ui.renderInventory();
+        }, 250));
     }
     if (ui.elements.tacheSelect) {
         ui.elements.tacheSelect.addEventListener('change', (e) => {
@@ -369,8 +374,9 @@ function setupEventListeners() {
         });
     }
 
+    // [FIX M-4] Debounce: espera 250ms antes de buscar para no reconstruir la lista en cada tecla
     if (ui.elements.searchHistory) {
-        ui.elements.searchHistory.addEventListener('input', ui.renderHistory);
+        ui.elements.searchHistory.addEventListener('input', debounce(ui.renderHistory, 250));
     }
 
     if (ui.elements.saveNoteBtn && ui.elements.noteTextInput) {

@@ -25,7 +25,7 @@ export async function fetchDataFromCloud(showBlockingLoader = true) {
             charts.populateFilters();
             charts.updateDashboard();
             ui.renderHistory();
-        ui.renderInventory();
+            ui.renderInventory();
         } else {
             throw new Error(data.message || "Error desconocido");
         }
@@ -48,6 +48,7 @@ export async function fetchDataFromCloud(showBlockingLoader = true) {
     }
 }
 
+// [FIX G-2] Se elimina mode:'no-cors' — ahora la app puede verificar si el guardado fue exitoso
 export async function saveRecordToCloud(record) {
     if (!navigator.onLine) {
         addToOfflineQueue(record);
@@ -56,13 +57,15 @@ export async function saveRecordToCloud(record) {
 
     ui.showLoader("Enregistrement...");
     try {
-        await fetch(store.apiUrl, {
+        const response = await fetch(store.apiUrl, {
             method: 'POST',
-            mode: 'no-cors',
             body: JSON.stringify({ action: 'addRecordsBatch', records: [record] })
         });
-        
-        // As mode is no-cors, the response is opaque. We assume success.
+
+        if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+        const result = await response.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Erreur serveur');
+
         if (navigator.vibrate) navigator.vibrate([200]);
         ui.showToast("Enregistrement réussi !", "success");
         store.addToHistory(record);
@@ -94,19 +97,22 @@ function addToOfflineQueue(record) {
     ui.showToast("Hors ligne : Enregistrement sauvegardé localement. Il sera synchronisé dès que la connexion sera rétablie.", "warning");
 }
 
+// [FIX G-2] Se verifica la respuesta del servidor — antes se asumía éxito siempre
 export async function syncOfflineQueue() {
     if (store.syncQueue.length === 0 || !store.apiUrl || !navigator.onLine) return;
     
     ui.showLoader(`Synchronisation de ${store.syncQueue.length} éléments...`);
     
     try {
-        await fetch(store.apiUrl, {
+        const response = await fetch(store.apiUrl, {
             method: 'POST',
-            mode: 'no-cors',
             body: JSON.stringify({ action: 'addRecordsBatch', records: store.syncQueue })
         });
-        
-        // Assume success
+
+        if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+        const result = await response.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Erreur serveur');
+
         store.updateSyncQueue([]);
         ui.updateSyncBadge();
         if (navigator.vibrate) navigator.vibrate([200]);
@@ -123,6 +129,7 @@ export async function syncOfflineQueue() {
     }
 }
 
+// [FIX G-2] Se verifica la respuesta del servidor — antes se asumía éxito siempre
 export async function deleteRecord(uuid) {
     if (!navigator.onLine) {
         ui.showToast("Vous devez être en ligne pour supprimer un enregistrement.", "warning");
@@ -131,12 +138,15 @@ export async function deleteRecord(uuid) {
 
     ui.showLoader("Suppression...");
     try {
-        await fetch(store.apiUrl, {
+        const response = await fetch(store.apiUrl, {
             method: 'POST',
-            mode: 'no-cors',
             body: JSON.stringify({ action: 'deleteRecord', uuid: uuid })
         });
-        
+
+        if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+        const result = await response.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Enregistrement non trouvé');
+
         if (navigator.vibrate) navigator.vibrate([200]);
         ui.showToast("Suppression réussie !", "success");
         
@@ -149,12 +159,13 @@ export async function deleteRecord(uuid) {
     } catch (error) {
         console.error("Delete Error:", error);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        ui.showToast("Erreur lors de la suppression.", "error");
+        ui.showToast(`Erreur lors de la suppression : ${error.message}`, "error");
     } finally {
         ui.hideLoader();
     }
 }
 
+// [FIX G-2] Se verifica la respuesta del servidor — antes se asumía éxito siempre
 export async function editRecord(uuid, updatedRecord) {
     if (!navigator.onLine) {
         ui.showToast("Vous devez être en ligne pour modifier un enregistrement.", "warning");
@@ -163,12 +174,15 @@ export async function editRecord(uuid, updatedRecord) {
 
     ui.showLoader("Modification...");
     try {
-        await fetch(store.apiUrl, {
+        const response = await fetch(store.apiUrl, {
             method: 'POST',
-            mode: 'no-cors',
             body: JSON.stringify({ action: 'editRecord', uuid: uuid, record: updatedRecord })
         });
-        
+
+        if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+        const result = await response.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Enregistrement non trouvé');
+
         if (navigator.vibrate) navigator.vibrate([200]);
         ui.showToast("Modification réussie !", "success");
         
@@ -183,7 +197,7 @@ export async function editRecord(uuid, updatedRecord) {
     } catch (error) {
         console.error("Edit Error:", error);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        ui.showToast("Erreur lors de la modification.", "error");
+        ui.showToast(`Erreur lors de la modification : ${error.message}`, "error");
     } finally {
         ui.hideLoader();
     }

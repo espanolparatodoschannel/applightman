@@ -191,83 +191,97 @@ function doPost(e) {
 
 function doGet(e) {
   try {
-    setup();
+    // [FIX M-6] setup() eliminado de doGet — solo debe ejecutarse una vez al instalar,
+    // no en cada lectura de datos. Ejecutar setup() manualmente desde el editor de GAS si es necesario.
 
     const action = e.parameter.action || 'getData';
 
     if (action === 'getData') {
       const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-      // 1. Obtener Opciones
-      const optionsData = ss.getSheetByName(SHEET_NAME_OPTIONS).getDataRange().getValues();
+      // 1. Obtener Opciones (solo Id, Description, Catégorie para el formulario)
+      const opcionesSheet = ss.getSheetByName(SHEET_NAME_OPTIONS);
       const opcionesList = [];
-      if (optionsData.length > 1) {
-        const headers = optionsData[0];
-        const idIdx = headers.indexOf("Id");
-        const descIdx = headers.indexOf("Description");
-        const catIdx = headers.indexOf("Catégorie");
+      if (opcionesSheet) {
+        const optionsData = opcionesSheet.getDataRange().getValues();
+        if (optionsData.length > 1) {
+          const headers = optionsData[0];
+          const idIdx = headers.indexOf("Id");
+          const descIdx = headers.indexOf("Description");
+          const catIdx = headers.indexOf("Catégorie");
 
-        for (let i = 1; i < optionsData.length; i++) {
-          const row = optionsData[i];
-          const desc = descIdx > -1 ? row[descIdx] : "";
-          const cat = catIdx > -1 ? row[catIdx] : "";
-          if (desc || cat) {
-            opcionesList.push({
-              id: idIdx > -1 ? row[idIdx] : "",
-              description: desc,
-              categorie: cat
-            });
+          for (let i = 1; i < optionsData.length; i++) {
+            const row = optionsData[i];
+            const desc = descIdx > -1 ? row[descIdx] : "";
+            const cat = catIdx > -1 ? row[catIdx] : "";
+            if (desc || cat) {
+              opcionesList.push({
+                id: idIdx > -1 ? row[idIdx] : "",
+                description: desc,
+                categorie: cat
+              });
+            }
           }
         }
       }
 
       // 2. Obtener Étages
-      const etagesData = ss.getSheetByName(SHEET_NAME_ETAGES).getDataRange().getValues();
       const etagesList = [];
-      if (etagesData.length > 1) {
-        const headers = etagesData[0];
-        const etageIdx = headers.indexOf("Étages");
-        for (let i = 1; i < etagesData.length; i++) {
-          const val = etageIdx > -1 ? etagesData[i][etageIdx] : etagesData[i][0];
-          if (val !== undefined && val !== "") etagesList.push(val);
+      const etagesSheet = ss.getSheetByName(SHEET_NAME_ETAGES);
+      if (etagesSheet) {
+        const etagesData = etagesSheet.getDataRange().getValues();
+        if (etagesData.length > 1) {
+          const headers = etagesData[0];
+          const etageIdx = headers.indexOf("Étages");
+          for (let i = 1; i < etagesData.length; i++) {
+            const val = etageIdx > -1 ? etagesData[i][etageIdx] : etagesData[i][0];
+            if (val !== undefined && val !== "") etagesList.push(val);
+          }
         }
       }
 
       // 3. Obtener Tâches
-      const tachesData = ss.getSheetByName(SHEET_NAME_TACHES).getDataRange().getValues();
       const tachesList = [];
-      if (tachesData.length > 1) {
-        const headers = tachesData[0];
-        const tacheIdx = headers.indexOf("Tâches");
-        for (let i = 1; i < tachesData.length; i++) {
-          const val = tacheIdx > -1 ? tachesData[i][tacheIdx] : tachesData[i][0];
-          if (val !== undefined && val !== "") tachesList.push(val);
+      const tachesSheet = ss.getSheetByName(SHEET_NAME_TACHES);
+      if (tachesSheet) {
+        const tachesData = tachesSheet.getDataRange().getValues();
+        if (tachesData.length > 1) {
+          const headers = tachesData[0];
+          const tacheIdx = headers.indexOf("Tâches");
+          for (let i = 1; i < tachesData.length; i++) {
+            const val = tacheIdx > -1 ? tachesData[i][tacheIdx] : tachesData[i][0];
+            if (val !== undefined && val !== "") tachesList.push(val);
+          }
         }
       }
 
-      // 4. Obtener Inventaire (Ahora desde Opciones)
+      // 4. Obtener Inventaire (desde hoja Opciones)
+      // Columnas de la hoja: Id | Description | Catégorie | Name | Prix | Moy./mois | Inv. Inicial | Consom. | Stock | Limite
       let inventoryList = [];
       const invSheet = ss.getSheetByName(SHEET_NAME_OPTIONS);
       if (invSheet) {
         const invData = invSheet.getDataRange().getValues();
         if (invData.length > 1) {
-          const headers = invData[0];
-          const idIdx = headers.indexOf("Id");
-          const descIdx = headers.indexOf("Description");
-          const catIdx = headers.indexOf("Catégorie");
-          const nameIdx = headers.indexOf("Name");
-          const prixIdx = headers.indexOf("Prix");
-          const stockIdx = headers.indexOf("Stock");
-          const limiteIdx = headers.indexOf("Limite");
-          const consumoIdx = headers.findIndex(h => /consumo|dépense|depense/i.test(String(h)));
-          const promMesIdx = headers.findIndex(h => /prom|moyenne|moy/i.test(String(h)));
-          const soldeIdx = headers.indexOf("Solde");
+          const headers = invData[0].map(h => String(h).trim());
+
+          // Mapeo flexible de columnas (admite variaciones de nombre)
+          const idIdx = headers.findIndex(h => /^id$|^code$|^identifiant$/i.test(h));
+          const descIdx = headers.findIndex(h => /^description$/i.test(h));
+          const catIdx = headers.findIndex(h => /^cat[eé]gorie$/i.test(h));
+          const nameIdx = headers.findIndex(h => /^name$|^nom$/i.test(h));
+          const prixIdx = headers.findIndex(h => /^prix$|^price$/i.test(h));
+          const stockIdx = headers.findIndex(h => /^stock$/i.test(h));
+          const limiteIdx = headers.findIndex(h => /^limite$|^limit$/i.test(h));
+          const consumoIdx = headers.findIndex(h => /consom|consumo|d[eé]pense/i.test(h));
+          const promMesIdx = headers.findIndex(h => /moy\.\/mois|moy|prom|moyenne/i.test(h));
+          const invInicIdx = headers.findIndex(h => /inv\.?\s*inic/i.test(h));
 
           for (let i = 1; i < invData.length; i++) {
             const row = invData[i];
-            if (idIdx > -1 && row[idIdx]) {
+            const idVal = idIdx > -1 ? row[idIdx] : row[0]; // fallback a col 0
+            if (idVal !== undefined && String(idVal).trim() !== "") {
               inventoryList.push({
-                id: row[idIdx],
+                id: String(idVal).trim(),
                 description: descIdx > -1 ? row[descIdx] : "",
                 categorie: catIdx > -1 ? row[catIdx] : "",
                 name: nameIdx > -1 ? row[nameIdx] : "",
@@ -276,7 +290,8 @@ function doGet(e) {
                 limite: limiteIdx > -1 ? row[limiteIdx] : "",
                 consumo: consumoIdx > -1 ? row[consumoIdx] : "",
                 promMes: promMesIdx > -1 ? row[promMesIdx] : "",
-                solde: soldeIdx > -1 ? row[soldeIdx] : ""
+                invInicial: invInicIdx > -1 ? row[invInicIdx] : "",
+                solde: "" // no hay columna Solde en Opciones
               });
             }
           }
@@ -323,14 +338,8 @@ function doGet(e) {
           let idVal = idIdx > -1 ? row[idIdx] : "";
           let uuidVal = uuidIdx > -1 ? row[uuidIdx] : "";
 
-          // Auto-correction
-          if (descVal === "F32T8/TL930/ALTO PHILIPS-479592 30/CASE" && idVal === "FC-15") {
-            if (idIdx > -1) {
-              idVal = "FC-23";
-              row[idIdx] = "FC-23";
-              sheetUpdated = true;
-            }
-          }
+          // [FIX G-5] Corrección automática eliminada — modificar los datos directamente en Google Sheets
+          // si se necesita una corrección puntual.
 
           // Auto-populate UUID if missing
           if (uuidIdx > -1 && !uuidVal) {
@@ -395,4 +404,43 @@ function getOrCreateSheetWithHeaders(sheetName, headers) {
 function createJsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============================================================
+// FUNCIÓN DE DIAGNÓSTICO - Ejecutar desde el editor para probar
+// ============================================================
+function testInventory() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const invSheet = ss.getSheetByName(SHEET_NAME_OPTIONS);
+
+  if (!invSheet) {
+    Logger.log("❌ ERROR: No se encontró la hoja '" + SHEET_NAME_OPTIONS + "'");
+    return;
+  }
+
+  const invData = invSheet.getDataRange().getValues();
+  Logger.log("✅ Hoja encontrada: " + SHEET_NAME_OPTIONS);
+  Logger.log("📊 Total de filas (incluyendo encabezado): " + invData.length);
+
+  if (invData.length === 0) {
+    Logger.log("❌ La hoja está completamente vacía");
+    return;
+  }
+
+  const headers = invData[0].map(h => String(h).trim());
+  Logger.log("📋 Encabezados detectados: " + JSON.stringify(headers));
+
+  const idIdx      = headers.findIndex(h => /^id$|^code$|^identifiant$/i.test(h));
+  const stockIdx   = headers.findIndex(h => /^stock$/i.test(h));
+  const consumoIdx = headers.findIndex(h => /consom|consumo|d[eé]pense/i.test(h));
+  const promMesIdx = headers.findIndex(h => /moy\.\/mois|moy|prom|moyenne/i.test(h));
+  const limiteIdx  = headers.findIndex(h => /^limite$|^limit$/i.test(h));
+
+  Logger.log("🔎 idIdx=" + idIdx + " | stockIdx=" + stockIdx + " | consumoIdx=" + consumoIdx + " | promMesIdx=" + promMesIdx + " | limiteIdx=" + limiteIdx);
+  Logger.log("📦 Filas de datos (sin encabezado): " + (invData.length - 1));
+
+  if (invData.length > 1) {
+    Logger.log("🔍 Primera fila de datos: " + JSON.stringify(invData[1]));
+    if (invData.length > 2) Logger.log("🔍 Segunda fila de datos: " + JSON.stringify(invData[2]));
+  }
 }
