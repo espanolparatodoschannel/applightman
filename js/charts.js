@@ -344,8 +344,17 @@ export function updateDashboard() {
     renderChart('monthlyBulbsChart', 'bar', monthlyLabels, monthlyValues, monthlyColors, {
         datasetLabel: 'Ampoules',
         onClick: handleChartClick,
+        scales: {
+            y: { grace: '18%' }
+        },
         plugins: {
-            datalabels: { anchor: 'center', align: 'center', color: '#ffffff' }
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: textColor,
+                font: { weight: 'bold', family: 'Inter', size: 12 },
+                formatter: (val) => val > 0 ? val : ''
+            }
         }
     });
 
@@ -559,6 +568,18 @@ function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
                         }
                     }
                 }
+            },
+            tooltip: {
+                backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                titleColor: isDarkMode ? '#f8fafc' : '#0f172a',
+                bodyColor: isDarkMode ? '#cbd5e1' : '#334155',
+                borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                borderWidth: 1,
+                padding: 10,
+                cornerRadius: 8,
+                titleFont: { family: 'Inter', size: 13, weight: 'bold' },
+                bodyFont: { family: 'Inter', size: 12 },
+                boxPadding: 4
             },
             datalabels: {
                 display: true,
