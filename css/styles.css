@@ -587,6 +587,7 @@ body {
     position: relative;
 }
 
+.nav-item .material-symbols-rounded,
 .nav-item i {
     font-size: 1.5rem;
     transition: background-color var(--transition-snappy), color var(--transition-snappy);
@@ -594,6 +595,7 @@ body {
     border-radius: 16px; /* M3 Pill shape */
 }
 
+.nav-item:active .material-symbols-rounded,
 .nav-item:active i {
     transform: scale(0.85);
 }
@@ -603,6 +605,7 @@ body {
     font-weight: 600;
 }
 
+.nav-item.active .material-symbols-rounded,
 .nav-item.active i {
     background-color: var(--primary-light);
     color: var(--primary-dark);
@@ -730,11 +733,11 @@ body {
     width: 100%;
     min-height: 52px;
     padding: 0.875rem 1rem;
-    border: 2px solid transparent;
-    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
     font-size: 1.05rem;
     font-family: inherit;
-    background-color: var(--input-bg);
+    background-color: transparent;
     color: var(--text-primary);
     box-sizing: border-box;
     pointer-events: none;
@@ -743,9 +746,14 @@ body {
 }
 
 .date-input-container input[type="date"]:focus + .date-display-overlay {
-    background-color: var(--input-focus);
-    border-color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 0.875rem calc(1rem - 1px);
+    background-color: transparent;
     box-shadow: var(--shadow-glow);
+}
+
+.date-input-container:hover .date-display-overlay {
+    border-color: var(--text-secondary);
 }
 
 /* --- UI/UX Optimizations --- */

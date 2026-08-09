@@ -1,5 +1,5 @@
 // [FIX M-3] Versión incrementada para forzar actualización del caché
-const CACHE_NAME = 'lightman-cache-v74';
+const CACHE_NAME = 'lightman-cache-v78';
 
 const CORE_URLS = [
   './',
@@ -72,6 +72,11 @@ self.addEventListener('fetch', event => {
           });
         }
         return networkResponse;
+      }).catch(error => {
+        console.warn('ServiceWorker fetch failed, likely offline:', error);
+        // El cache.match ya ha devuelto undefined si no estaba en cache
+        // Así evitamos el "Uncaught (in promise)" en la consola
+        throw error;
       });
     })
   );

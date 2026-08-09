@@ -23,7 +23,7 @@ function ensureUUIDColumn() {
   const lastCol = sheet.getLastColumn();
   if (lastCol === 0) return;
   const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  if (headers.indexOf("UUID") === -1) {
+  if (headers && headers.indexOf("UUID") === -1) {
     sheet.insertColumnAfter(lastCol);
     sheet.getRange(1, lastCol + 1).setValue("UUID");
   }
@@ -191,9 +191,6 @@ function doPost(e) {
 
 function doGet(e) {
   try {
-    // [FIX M-6] setup() eliminado de doGet — solo debe ejecutarse una vez al instalar,
-    // no en cada lectura de datos. Ejecutar setup() manualmente desde el editor de GAS si es necesario.
-
     const action = e.parameter.action || 'getData';
 
     if (action === 'getData') {
@@ -337,9 +334,6 @@ function doGet(e) {
           let descVal = descIdx > -1 ? row[descIdx] : "";
           let idVal = idIdx > -1 ? row[idIdx] : "";
           let uuidVal = uuidIdx > -1 ? row[uuidIdx] : "";
-
-          // [FIX G-5] Corrección automática eliminada — modificar los datos directamente en Google Sheets
-          // si se necesita una corrección puntual.
 
           // Auto-populate UUID if missing
           if (uuidIdx > -1 && !uuidVal) {

@@ -223,14 +223,18 @@ export function updateDashboard() {
         ui.elements.statTopEtage.title = etageTxt;
     }
     const trendEtageEl = document.getElementById('stat-trend-etage');
+    const barEtageEl = document.getElementById('stat-bar-etage');
     if (trendEtageEl) {
         if (sortedEtages.length > 0) {
             const topQty = Object.values(etageBulbsByCategory[sortedEtages[0]]).reduce((s, v) => s + v, 0);
+            const etagePct = totalBulbs > 0 ? Math.min(100, Math.round((topQty / totalBulbs) * 100)) : 0;
             trendEtageEl.className = 'stat-trend positive';
-            trendEtageEl.textContent = `${topQty} ampoules util.`;
+            trendEtageEl.textContent = `${topQty} ampoules util. (${etagePct}%)`;
+            if (barEtageEl) barEtageEl.style.width = `${etagePct}%`;
         } else {
             trendEtageEl.className = 'stat-trend neutral';
             trendEtageEl.textContent = `Aucune donnée`;
+            if (barEtageEl) barEtageEl.style.width = '0%';
         }
     }
 
@@ -241,16 +245,20 @@ export function updateDashboard() {
         ui.elements.statTopProduct.title = topProdDesc ? `${topProdCode} - ${topProdDesc}` : topProdCode;
     }
     const trendProductEl = document.getElementById('stat-trend-product');
+    const barProductEl = document.getElementById('stat-bar-product');
     if (trendProductEl) {
         if (sortedProducts.length > 0) {
             const topProdQty = sortedProductQuantities[0] || 0;
             const topProdDesc = topProductsFullDesc[0] || "";
+            const prodPct = totalBulbs > 0 ? Math.min(100, Math.round((topProdQty / totalBulbs) * 100)) : 0;
             trendProductEl.className = 'stat-trend positive';
-            trendProductEl.textContent = topProdDesc ? `${topProdDesc} (${topProdQty} util.)` : `${topProdQty} remplacements`;
+            trendProductEl.textContent = topProdDesc ? `${topProdDesc} (${topProdQty} util.)` : `${topProdQty} remplacements (${prodPct}%)`;
             trendProductEl.title = topProdDesc;
+            if (barProductEl) barProductEl.style.width = `${prodPct}%`;
         } else {
             trendProductEl.className = 'stat-trend neutral';
             trendProductEl.textContent = `Aucune donnée`;
+            if (barProductEl) barProductEl.style.width = '0%';
         }
     }
 

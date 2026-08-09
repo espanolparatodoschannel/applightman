@@ -5,6 +5,58 @@ import * as charts from './charts.js';
 import * as api from './api.js';
 import { generateUUID, debounce } from './utils.js';
 
+const ThemeManager = {
+    init() {
+        const savedTheme = localStorage.getItem('lightman_theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const activeTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', activeTheme);
+        this.updateIcon(activeTheme === 'dark');
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('lightman_theme')) {
+                const newSystemTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newSystemTheme);
+                this.updateIcon(e.matches);
+            }
+        });
+        
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('lightman_theme', newTheme);
+                this.updateIcon(newTheme === 'dark');
+                
+                setTimeout(() => {
+                    charts.updateDashboard();
+                }, 0);
+            });
+        }
+    },
+    
+    updateIcon(isDark) {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (!themeToggle) return;
+        
+        if (isDark) {
+            themeToggle.style.color = '#fbbf24';
+            themeToggle.style.filter = 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.95))';
+            themeToggle.className = 'material-symbols-rounded';
+            themeToggle.textContent = 'lightbulb';
+        } else {
+            themeToggle.style.color = '';
+            themeToggle.style.filter = '';
+            themeToggle.className = 'material-symbols-rounded';
+            themeToggle.textContent = 'lightbulb';
+        }
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
     if (typeof ChartDataLabels !== 'undefined') {
@@ -96,25 +148,36 @@ function setupEventListeners() {
         });
     }
 
-    if (ui.elements.navItems) {
-        ui.elements.navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
+    document.addEventListener('click', (e) => {
+        const navItem = e.target.closest('.nav-item');
+        if (navItem) {
+            const targetId = navItem.getAttribute('data-target');
+            if (targetId) {
                 e.preventDefault();
-                const targetId = item.getAttribute('data-target');
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 
-                ui.elements.navItems.forEach(n => n.classList.remove('active'));
-                ui.elements.views.forEach(v => v.classList.remove('active'));
-                
-                item.classList.add('active');
+                navItem.classList.add('active');
+                const bottomNavItem = document.querySelector(`.bottom-nav .nav-item[data-target="${targetId}"]`);
+                if (bottomNavItem) bottomNavItem.classList.add('active');
+
                 const targetEl = document.getElementById(targetId);
-                if (targetEl) targetEl.classList.add('active');
+                if (targetEl) {
+                    targetEl.classList.add('active');
+                }
 
                 if (targetId === 'view-stats') {
                     charts.updateDashboard();
+                } else if (targetId === 'view-historique') {
+                    ui.renderHistory();
+                } else if (targetId === 'view-inventaire') {
+                    ui.renderInventory();
+                } else if (targetId === 'view-notes') {
+                    ui.renderNotes();
                 }
-            });
-        });
-    }
+            }
+        }
+    });
 
     if (ui.elements.filterMonth) {
         ui.elements.filterMonth.addEventListener('change', charts.updateDashboard);
@@ -472,52 +535,3 @@ function setupEventListeners() {
 
 }
 
-const ThemeManager = {
-    init() {
-        const savedTheme = localStorage.getItem('lightman_theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        const activeTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', activeTheme);
-        this.updateIcon(activeTheme === 'dark');
-        
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (!localStorage.getItem('lightman_theme')) {
-                const newSystemTheme = e.matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', newSystemTheme);
-                this.updateIcon(e.matches);
-            }
-        });
-        
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('lightman_theme', newTheme);
-                this.updateIcon(newTheme === 'dark');
-                
-                setTimeout(() => {
-                    charts.updateDashboard();
-                }, 0);
-            });
-        }
-    },
-    
-    updateIcon(isDark) {
-        const themeToggle = document.getElementById('theme-toggle');
-        if (!themeToggle) return;
-        
-        if (isDark) {
-            themeToggle.style.color = '#fbbf24';
-            themeToggle.style.filter = 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.95))';
-            themeToggle.className = 'material-symbols-rounded'; themeToggle.textContent = 'lightbulb'; /* dark/solid */
-        } else {
-            themeToggle.style.color = '';
-            themeToggle.style.filter = '';
-            themeToggle.className = 'material-symbols-rounded'; themeToggle.textContent = 'lightbulb';
-        }
-    }
-};

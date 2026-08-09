@@ -220,7 +220,7 @@ export function updateDateDisplay() {
             const monthIndex = parseInt(parts[1], 10) - 1;
             const day = parseInt(parts[2], 10);
             
-            const months = ["jan", "fév", "mar", "avr", "mai", "juin", "juil", "août", "sep", "oct", "nov", "déc"];
+            const months = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
             
             elements.dateDisplay.textContent = `${day}-${months[monthIndex]}-${year}`;
             elements.dateDisplay.classList.remove('placeholder-active');
@@ -344,7 +344,7 @@ export function renderHistory() {
         try {
             const d = new Date(r.fecha || r.date);
             if (!isNaN(d)) {
-                const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+                const months = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
                 dateStr = `${d.getDate()}-${months[d.getMonth()]}-${d.getFullYear()}`;
             } else {
                 dateStr = r.fecha || r.date || "-";
@@ -381,7 +381,7 @@ export function renderHistory() {
                         <span class="pro-id-badge" style="height: 32px; padding: 0 0.75rem; border-radius: 16px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap;"><span class="material-symbols-rounded">sell</span> ${r.id_item || '-'}</span>
                         
                         <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
-                            <span class="material-symbols-rounded ${r.isPending ? 'fa-solid : 'fa-solid">cloud-arrow-up'</span>
+                            <span class="material-symbols-rounded">${r.isPending ? 'cloud_upload' : 'cloud_done'}</span>
                         </div>
                         ${r.uuid && !r.isPending ? `
                         <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
@@ -761,8 +761,9 @@ export function renderInventory() {
         
         const card = document.createElement('div');
         card.className = 'inv-card';
-        const percentage = initialStock > 0 ? Math.max(0, Math.min(100, (displayStock / initialStock) * 100)) : 0;
-        let progressColor = 'var(--success)';
+        const maxCapacity = Math.max(displayStock + Number(consumo || 0), initialStock, 1);
+        const percentage = Math.max(0, Math.min(100, Math.round((displayStock / maxCapacity) * 100)));
+        let progressColor = 'var(--primary)';
         if (isCritical) progressColor = 'var(--error)';
         else if (percentage <= 30 || displayStock <= seuil * 2) progressColor = '#f59e0b'; // Amber for warning
 
