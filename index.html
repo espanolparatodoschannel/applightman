@@ -51,11 +51,11 @@
         <!-- VIEW: REGISTRO -->
         <section id="view-registro" class="view active">
             <div class="card">
-                <h2><span class="material-symbols-rounded">add_circle</span> Nouveau Remplacement</h2>
+                <h2><span class="material-symbols-rounded" style="color: var(--primary);">add_circle</span> Nouveau Remplacement</h2>
                 <form id="record-form">
 
                     <div class="form-group">
-                        <label for="date"><span class="material-symbols-rounded">calendar_today</span> Date</label>
+                        <label for="date"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">calendar_today</span> Date</label>
                         <div class="date-input-container">
                             <input type="date" id="date" name="date" required>
                             <span id="date-display" class="date-display-overlay"></span>
@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="tache"><span class="material-symbols-rounded">build</span> Type de tâche</label>
+                        <label for="tache"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">build</span> Type de tâche</label>
                         <select id="tache" name="tache" required>
                             <option value="" disabled selected>Sélectionnez le type de tâche</option>
                             <!-- Llenado fijo por JS -->
@@ -72,21 +72,21 @@
 
                     <div class="form-floating hidden-field" id="group-bon">
                         <input type="text" id="num_bon" name="num_bon" placeholder=" ">
-                        <label for="num_bon"><span class="material-symbols-rounded">tag</span> Bon de travail</label>
+                        <label for="num_bon"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Bon de travail</label>
                     </div>
 
                     <div class="form-floating hidden-field" id="group-soumission">
                         <input type="text" id="num_soumission" name="num_soumission" placeholder=" ">
-                        <label for="num_soumission"><span class="material-symbols-rounded">tag</span> Soumission</label>
+                        <label for="num_soumission"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Soumission</label>
                     </div>
 
                     <div class="form-floating hidden-field" id="group-tache-num">
                         <input type="text" id="num_tache" name="num_tache" placeholder=" ">
-                        <label for="num_tache"><span class="material-symbols-rounded">tag</span> Tournée</label>
+                        <label for="num_tache"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Tournée</label>
                     </div>
 
                     <div class="form-group">
-                        <label for="etage"><span class="material-symbols-rounded">domain</span> Étage</label>
+                        <label for="etage"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">domain</span> Étage</label>
                         <select id="etage" name="etage" required>
                             <option value="" disabled selected>Sélectionnez l'étage</option>
                             <!-- Llenado fijo por JS -->
@@ -94,7 +94,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="categorie"><span class="material-symbols-rounded">local_offer</span> Catégorie</label>
+                        <label for="categorie"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">local_offer</span> Catégorie</label>
                         <select id="categorie" name="categorie" required>
                             <option value="">Sélectionnez une catégorie</option>
                             <!-- Llenado por Google Sheets -->
@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description"><span class="material-symbols-rounded">subject</span> Description</label>
+                        <label for="description"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">lightbulb</span> Description</label>
                         <select id="description" name="description" required>
                             <option value="" disabled selected>Sélectionnez une description</option>
                             <!-- Llenado por Google Sheets -->
@@ -110,7 +110,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="quantite"><span class="material-symbols-rounded">tag</span> Quantité</label>
+                        <label for="quantite"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Quantité</label>
                         <div class="stepper-control">
                             <button type="button" class="stepper-btn" id="stepper-minus"><i
                                     class="fa-solid fa-minus"></i></button>
@@ -121,14 +121,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="id_item"><span class="material-symbols-rounded">qr_code_scanner</span> Id</label>
+                        <label for="id_item"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">qr_code_scanner</span> Id</label>
                         <input type="text" id="id_item" name="id_item" readonly
                             placeholder="Sera rempli automatiquement en sélectionnant la description">
                     </div>
 
                     <div class="form-floating">
                         <input type="text" id="note" name="note" placeholder=" ">
-                        <label for="note"><span class="material-symbols-rounded">comment</span> Note (optionnel)</label>
+                        <label for="note"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">comment</span> Note (optionnel)</label>
                     </div>
 
                     <div class="form-actions">
