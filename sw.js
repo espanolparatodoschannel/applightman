@@ -1,5 +1,5 @@
 // [FIX M-3] Versión incrementada para forzar actualización del caché
-const CACHE_NAME = 'lightman-cache-v78';
+const CACHE_NAME = 'lightman-cache-v79';
 
 const CORE_URLS = [
   './',

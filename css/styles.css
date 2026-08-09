@@ -1,33 +1,33 @@
 /* Modern, Premium, Mobile-First CSS */
 
 :root {
-    /* Light Theme Variables (Material 3 Baseline Blue) */
-    --primary: #0b57d0;       /* M3 Primary */
-    --primary-dark: #0842a0;
-    --primary-light: #d3e3fd; /* Primary Container */
-    --bg-main: #f8fafd;       /* Surface / Background */
-    --bg-card: #ffffff;       /* Surface Container Low */
-    --text-primary: #1f1f1f;  /* On Surface */
-    --text-secondary: #444746;/* On Surface Variant */
-    --border-color: #c7c7c7;  /* Outline Variant */
+    /* Light Theme Variables (Material 3 Expressive) */
+    --primary: #65558f;       /* M3 Expressive Primary (Purple) */
+    --primary-dark: #4f378b;
+    --primary-light: #eaddff; /* Primary Container */
+    --bg-main: #fef7ff;       /* Surface / Background */
+    --bg-card: #f7f2fa;       /* Surface Container Low */
+    --text-primary: #1d1b20;  /* On Surface */
+    --text-secondary: #49454f;/* On Surface Variant */
+    --border-color: #cac4d0;  /* Outline Variant */
     
-    --input-bg: #ffffff;
-    --input-focus: #ffffff;
+    --input-bg: #f3edf7;      /* Surface Container */
+    --input-focus: #f3edf7;
     
     --success: #146c2e;
     --error: #b3261e;
     
-    --nav-bg: rgba(248, 250, 253, 0.85);
-    --header-bg: rgba(248, 250, 253, 0.95);
+    --nav-bg: rgba(254, 247, 255, 0.85);
+    --header-bg: rgba(254, 247, 255, 0.95);
     
     --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15); /* M3 Elevation 1 */
     --shadow-md: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15); /* M3 Elevation 2 */
     --shadow-lg: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15); /* M3 Elevation 3 */
-    --shadow-glow: 0 0 0 4px rgba(11, 87, 208, 0.15);
+    --shadow-glow: 0 0 0 4px rgba(101, 85, 143, 0.15);
     
-    --radius-sm: 8px;
-    --radius-md: 12px;        /* M3 Standard Card Radius */
-    --radius-lg: 16px;
+    --radius-sm: 12px;
+    --radius-md: 24px;        /* M3 Expressive Card Radius */
+    --radius-lg: 28px;
     
     --transition-snappy: 0.2s cubic-bezier(0.2, 0, 0, 1);
     --transition-smooth: 0.3s cubic-bezier(0.2, 0, 0, 1);
@@ -43,24 +43,24 @@
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        /* Dark Theme Variables (Material 3) */
-        --primary: #a8c7fa;
-        --primary-dark: #0b57d0;
-        --primary-light: #0842a0;
+        /* Dark Theme Variables (Material 3 Expressive) */
+        --primary: #d0bcff;
+        --primary-dark: #65558f;
+        --primary-light: #4f378b;
         
-        --bg-main: #131314;
-        --bg-card: #1e1e1e;       /* Surface Container */
-        --text-primary: #e3e3e3;
-        --text-secondary: #c4c7c5;
-        --border-color: #444746;
+        --bg-main: #141218;
+        --bg-card: #211f26;       /* Surface Container */
+        --text-primary: #e6e0e9;
+        --text-secondary: #cac4d0;
+        --border-color: #49454f;
         
-        --input-bg: #1e1e1e;
-        --input-focus: #1e1e1e;
+        --input-bg: #211f26;
+        --input-focus: #211f26;
         
-        --nav-bg: rgba(19, 19, 20, 0.85);
-        --header-bg: rgba(19, 19, 20, 0.95);
+        --nav-bg: rgba(20, 18, 24, 0.85);
+        --header-bg: rgba(20, 18, 24, 0.95);
         
-        --shadow-glow: 0 0 0 4px rgba(168, 199, 250, 0.25);
+        --shadow-glow: 0 0 0 4px rgba(208, 188, 255, 0.25);
 
         --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4c7c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         --color-scheme: dark;
@@ -72,24 +72,24 @@
 }
 
 :root[data-theme="dark"] {
-    /* Dark Theme Variables (Material 3) */
-    --primary: #a8c7fa;
-    --primary-dark: #0b57d0;
-    --primary-light: #0842a0;
+    /* Dark Theme Variables (Material 3 Expressive) */
+    --primary: #d0bcff;
+    --primary-dark: #65558f;
+    --primary-light: #4f378b;
     
-    --bg-main: #131314;
-    --bg-card: #1e1e1e;       /* Surface Container */
-    --text-primary: #e3e3e3;
-    --text-secondary: #c4c7c5;
-    --border-color: #444746;
+    --bg-main: #141218;
+    --bg-card: #211f26;       /* Surface Container */
+    --text-primary: #e6e0e9;
+    --text-secondary: #cac4d0;
+    --border-color: #49454f;
     
-    --input-bg: #1e1e1e;
-    --input-focus: #1e1e1e;
+    --input-bg: #211f26;
+    --input-focus: #211f26;
     
-    --nav-bg: rgba(19, 19, 20, 0.85);
-    --header-bg: rgba(19, 19, 20, 0.95);
+    --nav-bg: rgba(20, 18, 24, 0.85);
+    --header-bg: rgba(20, 18, 24, 0.95);
     
-    --shadow-glow: 0 0 0 4px rgba(168, 199, 250, 0.25);
+    --shadow-glow: 0 0 0 4px rgba(208, 188, 255, 0.25);
 
     --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4c7c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     --color-scheme: dark;
@@ -107,7 +107,7 @@
 }
 
 body {
-    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-primary);
     display: flex;
