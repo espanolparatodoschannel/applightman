@@ -9,7 +9,7 @@ export async function fetchDataFromCloud(showBlockingLoader = true) {
     } else {
         if (ui.elements.syncBtn) {
             const icon = ui.elements.syncBtn.querySelector('i');
-            if (icon) icon.classList.add('fa-spin');
+            if (icon) icon.classList.add('md-spin');
         }
     }
 
@@ -42,7 +42,7 @@ export async function fetchDataFromCloud(showBlockingLoader = true) {
         } else {
             if (ui.elements.syncBtn) {
                 const icon = ui.elements.syncBtn.querySelector('i');
-                if (icon) icon.classList.remove('fa-spin');
+                if (icon) icon.classList.remove('md-spin');
             }
         }
     }

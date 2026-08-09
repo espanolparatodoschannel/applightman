@@ -76,17 +76,17 @@ export function showToast(message, type = 'success') {
     if (existing) existing.remove();
 
     const iconMap = {
-        'success': 'fa-circle-check',
-        'error': 'fa-circle-xmark',
-        'warning': 'fa-triangle-exclamation',
-        'info': 'fa-circle-info'
+        'success': 'check_circle',
+        'error': 'cancel',
+        'warning': 'warning',
+        'info': 'info'
     };
 
     const toast = document.createElement('div');
     toast.id = 'custom-toast';
     toast.className = 'toast-container';
     toast.innerHTML = `
-        <i class="fa-solid ${iconMap[type] || iconMap.info} toast-icon ${type}"></i>
+        <span class="material-symbols-rounded ${iconMap[type] || iconMap.info} toast-icon ${type}">circle</span>
         <span style="font-weight: 500; font-size: 0.95rem;">${escapeHtml(message)}</span>
     `;
     
@@ -111,7 +111,7 @@ export function showConfirm(message) {
         overlay.innerHTML = `
             <div class="confirm-box">
                 <div class="confirm-content">
-                    <i class="fa-solid fa-triangle-exclamation confirm-icon"></i>
+                    <span class="material-symbols-rounded confirm-icon">warning</span>
                     <p>${escapeHtml(message)}</p>
                 </div>
                 <div class="confirm-actions">
@@ -265,7 +265,7 @@ export function resetFormAndRefresh() {
     if (elements.form) {
         const submitBtn = elements.form.querySelector('button[type="submit"]');
         if (submitBtn) {
-            submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Enregistrer';
+            submitBtn.innerHTML = '<span class="material-symbols-rounded">save</span> Enregistrer';
         }
         const cancelBtn = document.getElementById('cancel-edit-btn');
         if (cancelBtn) {
@@ -332,7 +332,7 @@ export function renderHistory() {
     if (history.length === 0) {
         elements.historyContainer.innerHTML = `
             <div class="empty-state-container">
-                <i class="fa-solid fa-magnifying-glass empty-icon"></i>
+                <span class="material-symbols-rounded empty-icon">search</span>
                 <p class="empty-text">Aucun enregistrement correspondant.</p>
             </div>
         `;
@@ -366,7 +366,7 @@ export function renderHistory() {
             <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor}; position: relative;">
                 <div class="pro-card-header" style="display: flex; flex-direction: column; gap: 0.5rem; padding-right: 2.5rem;">
                     <div style="display: flex; align-items: flex-start;">
-                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3;"><i class="fa-solid fa-lightbulb" style="color: var(--text-secondary); margin-right: 0.35rem; font-size: 0.95rem;"></i>${displayDesc}</h4>
+                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3;"><span class="material-symbols-rounded" style="color: var(--text-secondary); margin-right: 0.35rem; font-size: 0.95rem;">lightbulb</span>${displayDesc}</h4>
                     </div>
                     
                     <div class="pro-qty-badge" style="position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; box-shadow: none;">
@@ -374,21 +374,21 @@ export function renderHistory() {
                     </div>
                     
                     <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
-                        <i class="fa-solid fa-briefcase" style="margin-right: 0.25rem;"></i> ${r.tache || 'N/A'}
+                        <span class="material-symbols-rounded" style="margin-right: 0.25rem;">work</span> ${r.tache || 'N/A'}
                     </div>
                     
                     <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; flex-wrap: wrap;">
-                        <span class="pro-id-badge" style="height: 32px; padding: 0 0.75rem; border-radius: 16px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap;"><i class="fa-solid fa-tag"></i> ${r.id_item || '-'}</span>
+                        <span class="pro-id-badge" style="height: 32px; padding: 0 0.75rem; border-radius: 16px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap;"><span class="material-symbols-rounded">sell</span> ${r.id_item || '-'}</span>
                         
                         <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
-                            <i class="${r.isPending ? 'fa-solid fa-cloud-arrow-up' : 'fa-solid fa-check'}"></i>
+                            <span class="material-symbols-rounded ${r.isPending ? 'fa-solid : 'fa-solid">cloud-arrow-up'</span>
                         </div>
                         ${r.uuid && !r.isPending ? `
                         <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
-                            <i class="fa-solid fa-pencil"></i>
+                            <span class="material-symbols-rounded">edit</span>
                         </button>
                         <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center;" title="Supprimer">
-                            <i class="fa-solid fa-trash-can"></i>
+                            <span class="material-symbols-rounded">delete</span>
                         </button>
                         ` : ''}
                     </div>
@@ -397,28 +397,28 @@ export function renderHistory() {
                 <div class="pro-card-body">
                     <div class="pro-meta-grid">
                         <div class="pro-meta-item">
-                            <i class="fa-solid fa-layer-group"></i>
+                            <span class="material-symbols-rounded">layers</span>
                             <div>
                                 <span class="meta-label">Étage</span>
                                 <span class="meta-value">${r.etage !== undefined && r.etage !== null && r.etage !== "" ? r.etage : '-'}</span>
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <i class="fa-solid fa-hashtag"></i>
+                            <span class="material-symbols-rounded">tag</span>
                             <div>
                                 <span class="meta-label">Num. Tâche</span>
                                 <span class="meta-value">${detailsVal}</span>
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <i class="fa-regular fa-folder-open" style="font-size: 1.1rem;"></i>
+                            <span class="material-symbols-rounded" style="font-size: 1.1rem;">folder_open</span>
                             <div>
                                 <span class="meta-label">Catégorie</span>
                                 <span class="meta-value">${r.categorie || '-'}</span>
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <i class="fa-regular fa-calendar"></i>
+                            <span class="material-symbols-rounded">calendar_today</span>
                             <div>
                                 <span class="meta-label">Date</span>
                                 <span class="meta-value">${dateStr}</span>
@@ -520,7 +520,7 @@ export function renderHistory() {
                 // Change submit button text
                 const submitBtn = elements.form.querySelector('button[type="submit"]');
                 if (submitBtn) {
-                    submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier';
+                    submitBtn.innerHTML = '<span class="material-symbols-rounded">save</span> Modifier';
                 }
                 
                 // Show cancel button
@@ -532,7 +532,7 @@ export function renderHistory() {
                     cancelBtn.className = 'btn-secondary';
                     cancelBtn.style.marginTop = '10px';
                     cancelBtn.style.width = '100%';
-                    cancelBtn.innerHTML = '<i class="fa-solid fa-times"></i> Annuler la modification';
+                    cancelBtn.innerHTML = '<span class="material-symbols-rounded">close</span> Annuler la modification';
                     cancelBtn.addEventListener('click', () => {
                         resetFormAndRefresh();
                         // Volver a historique
@@ -579,14 +579,14 @@ export function renderNotes() {
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <input type="checkbox" class="note-checkbox" data-id="${note.id}" ${checkedAttr} style="width: 18px; height: 18px; cursor: pointer;">
-                        <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);"><span class="material-symbols-rounded">schedule</span> ${dateStr}</span>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
                         <button class="icon-btn edit-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Modifier">
-                            <i class="fa-solid fa-pencil" style="font-size: 0.8rem;"></i>
+                            <span class="material-symbols-rounded" style="font-size: 0.8rem;">edit</span>
                         </button>
                         <button class="icon-btn delete-note-btn" data-id="${note.id}" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Supprimer">
-                            <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
+                            <span class="material-symbols-rounded" style="font-size: 0.8rem;">delete</span>
                         </button>
                     </div>
                 </div>
@@ -623,7 +623,7 @@ export function renderNotes() {
             if (note && noteInput && saveBtn) {
                 store.setEditingNoteId(id);
                 noteInput.value = note.text;
-                saveBtn.innerHTML = '<i class="fa-solid fa-save"></i> Modifier la Note';
+                saveBtn.innerHTML = '<span class="material-symbols-rounded">save</span> Modifier la Note';
                 
                 const noteColor = note.color || 'note-blue';
                 const colorRadio = document.querySelector(`input[name="note_color"][value="${noteColor}"]`);
@@ -637,11 +637,11 @@ export function renderNotes() {
                     cancelBtn.className = 'btn-secondary';
                     cancelBtn.style.marginTop = '10px';
                     cancelBtn.style.width = '100%';
-                    cancelBtn.innerHTML = '<i class="fa-solid fa-times"></i> Annuler la modification';
+                    cancelBtn.innerHTML = '<span class="material-symbols-rounded">close</span> Annuler la modification';
                     cancelBtn.addEventListener('click', () => {
                         store.setEditingNoteId(null);
                         noteInput.value = '';
-                        saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                        saveBtn.innerHTML = '<span class="material-symbols-rounded">save</span> Enregistrer la Note';
                         const defaultColor = document.querySelector('input[name="note_color"][value="note-blue"]');
                         if (defaultColor) defaultColor.checked = true;
                         cancelBtn.style.display = 'none';
@@ -795,15 +795,15 @@ export function renderInventory() {
         card.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <div class="inv-title" style="display: flex; align-items: flex-start; margin: 0; max-width: 100%;">
-                    <i class="fa-solid fa-lightbulb" style="flex-shrink: 0; color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;"></i>
+                    <span class="material-symbols-rounded" style="flex-shrink: 0; color: var(--text-secondary); margin-right: 0.35rem; margin-top: 0.2rem; font-size: 0.95rem;">lightbulb</span>
                     <span style="line-height: 1.3; flex: 1; min-width: 0; word-break: break-word; overflow-wrap: break-word;">${item.description || 'Sans description'}</span>
                 </div>
                 
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 100%;">
-                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-tag" style="margin-right: 0.25rem;"></i> ${item.id}</span>
-                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><i class="fa-regular fa-folder-open" style="margin-right: 0.25rem;"></i> ${item.categorie || 'Sans Catégorie'}</span>
-                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><i class="fa-solid fa-dollar-sign" style="margin-right: 0.25rem;"></i> ${formattedPrix}</span>
-                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: ${autonomieBg}; color: ${autonomieColor}; font-weight: 600; font-size: 0.75rem;" title="Autonomie estimée"><i class="fa-solid fa-hourglass-half" style="margin-right: 0.25rem;"></i> ${autonomieText}</span>
+                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(59, 130, 246, 0.1); color: var(--primary); font-weight: 500; font-size: 0.75rem;"><span class="material-symbols-rounded" style="margin-right: 0.25rem;">sell</span> ${item.id}</span>
+                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); font-weight: 500; font-size: 0.75rem;"><span class="material-symbols-rounded" style="margin-right: 0.25rem;">folder_open</span> ${item.categorie || 'Sans Catégorie'}</span>
+                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 500; font-size: 0.75rem;"><span class="material-symbols-rounded" style="margin-right: 0.25rem;">attach_money</span> ${formattedPrix}</span>
+                    <span class="pro-id-badge" style="height: 24px; padding: 0 0.75rem; border-radius: 12px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; background: ${autonomieBg}; color: ${autonomieColor}; font-weight: 600; font-size: 0.75rem;" title="Autonomie estimée"><span class="material-symbols-rounded" style="margin-right: 0.25rem;">hourglass_bottom</span> ${autonomieText}</span>
                 </div>
             </div>
             
@@ -837,7 +837,7 @@ export function renderInventory() {
     if (count === 0) {
         elements.inventoryContainer.innerHTML = `
             <div style="text-align:center; padding: 2rem; color: var(--text-secondary); background: var(--bg-color); border-radius: var(--radius-lg);">
-                <i class="fa-solid fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <span class="material-symbols-rounded" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;">inventory_2</span>
                 <p>Aucun article trouvé dans l'inventaire.</p>
             </div>
         `;

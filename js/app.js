@@ -57,7 +57,37 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
 
+function createRipple(event) {
+    const button = event.currentTarget;
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    const rect = button.getBoundingClientRect();
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${clientX - rect.left - radius}px`;
+    circle.style.top = `${clientY - rect.top - radius}px`;
+    circle.classList.add('ripple-effect');
+
+    const ripple = button.querySelector('.ripple-effect');
+    if (ripple) {
+        ripple.remove();
+    }
+
+    button.appendChild(circle);
+}
+
 function setupEventListeners() {
+    // Attach Material Ripple Effect
+    document.querySelectorAll('.btn-primary, .btn-secondary, .nav-item, .icon-btn').forEach(btn => {
+        btn.classList.add('ripple');
+        btn.addEventListener('mousedown', createRipple);
+        btn.addEventListener('touchstart', createRipple, { passive: true });
+    });
+
     if (ui.elements.dateInput) {
         ui.elements.dateInput.addEventListener('input', ui.updateDateDisplay);
         ui.elements.dateInput.addEventListener('change', ui.updateDateDisplay);
@@ -390,7 +420,7 @@ function setupEventListeners() {
                 if (store.editingNoteId) {
                     store.editNote(store.editingNoteId, text, color);
                     store.setEditingNoteId(null);
-                    ui.elements.saveNoteBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer la Note';
+                    ui.elements.saveNoteBtn.innerHTML = '<span class="material-symbols-rounded">save</span> Enregistrer la Note';
                     const cancelBtn = document.getElementById('cancel-edit-note-btn');
                     if (cancelBtn) cancelBtn.style.display = 'none';
                     ui.showToast('Note modifiée !', 'success');
@@ -483,11 +513,11 @@ const ThemeManager = {
         if (isDark) {
             themeToggle.style.color = '#fbbf24';
             themeToggle.style.filter = 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.95))';
-            themeToggle.className = 'fa-solid fa-lightbulb';
+            themeToggle.className = 'material-symbols-rounded'; themeToggle.textContent = 'lightbulb'; /* dark/solid */
         } else {
             themeToggle.style.color = '';
             themeToggle.style.filter = '';
-            themeToggle.className = 'fa-regular fa-lightbulb';
+            themeToggle.className = 'material-symbols-rounded'; themeToggle.textContent = 'lightbulb';
         }
     }
 };

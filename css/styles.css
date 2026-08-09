@@ -1,102 +1,102 @@
 /* Modern, Premium, Mobile-First CSS */
 
 :root {
-    /* Light Theme Variables */
-    --primary: #2563eb;       /* Modern Blue */
-    --primary-dark: #1d4ed8;
-    --primary-light: #60a5fa;
-    --bg-main: #f8fafc;       /* Slate 50 */
-    --bg-card: #ffffff;
-    --text-primary: #0f172a;  /* Slate 900 */
-    --text-secondary: #475569;/* Slate 600 */
-    --border-color: #e2e8f0;  /* Slate 200 */
+    /* Light Theme Variables (Material 3 Baseline Blue) */
+    --primary: #0b57d0;       /* M3 Primary */
+    --primary-dark: #0842a0;
+    --primary-light: #d3e3fd; /* Primary Container */
+    --bg-main: #f8fafd;       /* Surface / Background */
+    --bg-card: #ffffff;       /* Surface Container Low */
+    --text-primary: #1f1f1f;  /* On Surface */
+    --text-secondary: #444746;/* On Surface Variant */
+    --border-color: #c7c7c7;  /* Outline Variant */
     
-    --input-bg: #f1f5f9;      /* Slate 100 */
+    --input-bg: #ffffff;
     --input-focus: #ffffff;
     
-    --success: #10b981;
-    --error: #ef4444;
+    --success: #146c2e;
+    --error: #b3261e;
     
-    --nav-bg: rgba(255, 255, 255, 0.85);
-    --header-bg: rgba(255, 255, 255, 0.95);
+    --nav-bg: rgba(248, 250, 253, 0.85);
+    --header-bg: rgba(248, 250, 253, 0.95);
     
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-    --shadow-glow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15); /* M3 Elevation 1 */
+    --shadow-md: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15); /* M3 Elevation 2 */
+    --shadow-lg: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15); /* M3 Elevation 3 */
+    --shadow-glow: 0 0 0 4px rgba(11, 87, 208, 0.15);
     
     --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
+    --radius-md: 12px;        /* M3 Standard Card Radius */
+    --radius-lg: 16px;
     
-    --transition-snappy: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-snappy: 0.2s cubic-bezier(0.2, 0, 0, 1);
+    --transition-smooth: 0.3s cubic-bezier(0.2, 0, 0, 1);
 
     /* Unified Theme Styling Variables */
-    --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23444746' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     --color-scheme: light;
-    --btn-secondary-active: rgba(37, 99, 235, 0.1);
-    --nav-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-    --nav-border: rgba(148, 163, 184, 0.1);
-    --loader-bg: rgba(248, 250, 252, 0.8);
+    --btn-secondary-active: rgba(11, 87, 208, 0.1);
+    --nav-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+    --nav-border: transparent;
+    --loader-bg: rgba(248, 250, 253, 0.8);
 }
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        /* Dark Theme Variables */
-        --primary: #3b82f6;
-        --primary-dark: #2563eb;
-        --primary-light: #93c5fd;
+        /* Dark Theme Variables (Material 3) */
+        --primary: #a8c7fa;
+        --primary-dark: #0b57d0;
+        --primary-light: #0842a0;
         
-        --bg-main: #020617;       /* Slate 950 */
-        --bg-card: #0f172a;       /* Slate 900 */
-        --text-primary: #f8fafc;  /* Slate 50 */
-        --text-secondary: #94a3b8;/* Slate 400 */
-        --border-color: #1e293b;  /* Slate 800 */
+        --bg-main: #131314;
+        --bg-card: #1e1e1e;       /* Surface Container */
+        --text-primary: #e3e3e3;
+        --text-secondary: #c4c7c5;
+        --border-color: #444746;
         
-        --input-bg: #1e293b;
-        --input-focus: #0f172a;
+        --input-bg: #1e1e1e;
+        --input-focus: #1e1e1e;
         
-        --nav-bg: rgba(2, 6, 23, 0.85);
-        --header-bg: rgba(15, 23, 42, 0.95);
+        --nav-bg: rgba(19, 19, 20, 0.85);
+        --header-bg: rgba(19, 19, 20, 0.95);
         
-        --shadow-glow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+        --shadow-glow: 0 0 0 4px rgba(168, 199, 250, 0.25);
 
-        --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4c7c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         --color-scheme: dark;
-        --btn-secondary-active: rgba(59, 130, 246, 0.15);
-        --nav-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-        --nav-border: rgba(255, 255, 255, 0.05);
-        --loader-bg: rgba(2, 6, 23, 0.8);
+        --btn-secondary-active: rgba(168, 199, 250, 0.15);
+        --nav-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+        --nav-border: transparent;
+        --loader-bg: rgba(19, 19, 20, 0.8);
     }
 }
 
 :root[data-theme="dark"] {
-    /* Dark Theme Variables */
-    --primary: #3b82f6;
-    --primary-dark: #2563eb;
-    --primary-light: #93c5fd;
+    /* Dark Theme Variables (Material 3) */
+    --primary: #a8c7fa;
+    --primary-dark: #0b57d0;
+    --primary-light: #0842a0;
     
-    --bg-main: #020617;       /* Slate 950 */
-    --bg-card: #0f172a;       /* Slate 900 */
-    --text-primary: #f8fafc;  /* Slate 50 */
-    --text-secondary: #94a3b8;/* Slate 400 */
-    --border-color: #1e293b;  /* Slate 800 */
+    --bg-main: #131314;
+    --bg-card: #1e1e1e;       /* Surface Container */
+    --text-primary: #e3e3e3;
+    --text-secondary: #c4c7c5;
+    --border-color: #444746;
     
-    --input-bg: #1e293b;
-    --input-focus: #0f172a;
+    --input-bg: #1e1e1e;
+    --input-focus: #1e1e1e;
     
-    --nav-bg: rgba(2, 6, 23, 0.85);
-    --header-bg: rgba(15, 23, 42, 0.95);
+    --nav-bg: rgba(19, 19, 20, 0.85);
+    --header-bg: rgba(19, 19, 20, 0.95);
     
-    --shadow-glow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+    --shadow-glow: 0 0 0 4px rgba(168, 199, 250, 0.25);
 
-    --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4c7c5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     --color-scheme: dark;
-    --btn-secondary-active: rgba(59, 130, 246, 0.15);
-    --nav-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-    --nav-border: rgba(255, 255, 255, 0.05);
-    --loader-bg: rgba(2, 6, 23, 0.8);
+    --btn-secondary-active: rgba(168, 199, 250, 0.15);
+    --nav-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+    --nav-border: transparent;
+    --loader-bg: rgba(19, 19, 20, 0.8);
 }
 
 * {
@@ -107,7 +107,7 @@
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-primary);
     display: flex;
@@ -299,16 +299,16 @@ body {
 .form-group input,
 .form-group select {
     width: 100%;
-    min-height: 52px; /* Large touch target */
+    min-height: 52px;
     padding: 0.875rem 1rem;
-    border: 2px solid transparent;
-    border-radius: var(--radius-sm);
-    font-size: 1.05rem; /* Prevents iOS Zoom */
+    border: 1px solid var(--border-color);
+    border-radius: 4px; /* M3 Outlined text field radius */
+    font-size: 1.05rem;
     font-family: inherit;
-    background-color: var(--input-bg);
+    background-color: transparent;
     color: var(--text-primary);
     transition: all var(--transition-snappy);
-    appearance: none; /* Native look removal */
+    appearance: none;
 }
 
 /* Placeholders & Indications */
@@ -347,9 +347,9 @@ body {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    background-color: var(--input-focus);
-    border-color: var(--primary);
-    box-shadow: var(--shadow-glow);
+    border: 2px solid var(--primary);
+    padding: 0.875rem calc(1rem - 1px); /* Prevent shifting when border becomes 2px */
+    background-color: transparent;
 }
 
 .form-group input[readonly] {
@@ -365,26 +365,28 @@ body {
 /* Premium Buttons */
 .btn-primary {
     width: 100%;
-    min-height: 54px; /* Massive touch target for main action */
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
+    min-height: 54px;
+    background: var(--primary); /* M3 Flat Color */
+    color: var(--bg-main); /* On Primary */
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 100px; /* M3 Full Rounded */
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 500; /* M3 buttons are medium weight */
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    transition: all var(--transition-snappy);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: background-color var(--transition-snappy), box-shadow var(--transition-snappy), transform var(--transition-snappy);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15); /* M3 Elevation 1 */
     margin-top: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-primary:active {
-    transform: translateY(2px) scale(0.98);
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+    transform: translateY(1px);
+    box-shadow: none;
 }
 
 .btn-secondary {
@@ -392,17 +394,19 @@ body {
     min-height: 48px;
     background: transparent;
     color: var(--primary);
-    border: 2px solid var(--primary);
-    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color); /* M3 Outlined Button */
+    border-radius: 100px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    transition: all var(--transition-snappy);
+    transition: background-color var(--transition-snappy);
     margin-top: 0.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-secondary:active {
@@ -584,8 +588,10 @@ body {
 }
 
 .nav-item i {
-    font-size: 1.4rem;
-    transition: transform var(--transition-snappy);
+    font-size: 1.5rem;
+    transition: background-color var(--transition-snappy), color var(--transition-snappy);
+    padding: 4px 16px;
+    border-radius: 16px; /* M3 Pill shape */
 }
 
 .nav-item:active i {
@@ -593,31 +599,16 @@ body {
 }
 
 .nav-item.active {
-    color: var(--primary);
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 .nav-item.active i {
-    transform: translateY(-2px);
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
 }
 
-/* Active indicator dot */
-.nav-item::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background-color: var(--primary);
-    opacity: 0;
-    transform: scale(0);
-    transition: all var(--transition-snappy);
-}
-
-.nav-item.active::after {
-    opacity: 1;
-    transform: scale(1);
-}
+/* Active indicator dot removed in favor of M3 Pill */
 
 /* Loader */
 .loader-overlay {
@@ -837,8 +828,24 @@ body {
 }
 
 .form-actions .btn-primary {
-    margin-top: 0;
-    pointer-events: auto; /* Re-enable clicks on the button */
+    width: 100%;
+    min-height: 54px;
+    background: var(--primary); /* M3 Flat Color */
+    color: var(--bg-main); /* On Primary */
+    border: none;
+    border-radius: 100px; /* M3 Full Rounded */
+    font-size: 1.1rem;
+    font-weight: 500; /* M3 buttons are medium weight */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color var(--transition-snappy), box-shadow var(--transition-snappy), transform var(--transition-snappy);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15); /* M3 Elevation 1 */
+    margin-top: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
 /* 3. Desktop Grid Layout */
@@ -1461,4 +1468,32 @@ body {
     background-color: var(--bg-color);
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Material 3 Ripple Effect */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    background-color: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+}
+
+.btn-secondary .ripple-effect,
+.nav-item .ripple-effect,
+.icon-btn .ripple-effect {
+    background-color: rgba(11, 87, 208, 0.2); /* Primary color with opacity */
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
 }

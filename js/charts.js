@@ -864,7 +864,7 @@ export function renderStatsTable(dashboardRecords) {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                    <i class="fa-solid fa-box-open" style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                    <span class="material-symbols-rounded" style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem; opacity: 0.5;">inventory_2</span>
                     Aucune donnée disponible pour ces filtres.
                 </td>
             </tr>
