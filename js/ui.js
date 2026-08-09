@@ -711,14 +711,16 @@ export function renderInventory() {
         const consumo = (item.consumo !== undefined && item.consumo !== "") ? item.consumo : consumoCalc;
         
         // 2. Prom. mes
-        let promMes;
+        let rawProm;
         if (item.promMes !== undefined && item.promMes !== "") {
-            promMes = item.promMes;
+            rawProm = item.promMes;
         } else if (item['Prom. mes'] !== undefined && item['Prom. mes'] !== "") {
-            promMes = item['Prom. mes'];
+            rawProm = item['Prom. mes'];
         } else {
-            promMes = (Number(consumo) / totalMonths).toFixed(1);
+            rawProm = Number(consumo) / totalMonths;
         }
+        const promMesNum = Number(rawProm);
+        const promMes = !isNaN(promMesNum) ? promMesNum.toFixed(1) : (rawProm || "0.0");
 
         // 3. Stock
         const initialStock = parseInt(item.stock, 10) || 0;

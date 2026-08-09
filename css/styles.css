@@ -411,44 +411,79 @@ body {
 }
 
 /* Stats Grid */
+/* Premium KPI Cards (Stats Grid) */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
 }
 
 .stat-box {
-    background: linear-gradient(145deg, var(--input-bg), var(--bg-card));
-    padding: 1rem 0.75rem;
-    border-radius: var(--radius-md);
-    text-align: center;
+    background: var(--bg-card);
+    padding: 1.25rem 1.25rem 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    text-align: left;
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     width: 100%;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.stat-label {
-    display: block;
-    font-size: 0.8rem;
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-header {
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.5rem;
+    font-size: 0.88rem;
     font-weight: 600;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .stat-value {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.65rem;
     font-weight: 800;
     color: var(--primary);
-    background: linear-gradient(to right, var(--primary), var(--primary-light));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.6rem;
+    background: none;
+    -webkit-text-fill-color: initial;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.stat-trend {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stat-trend.positive {
+    color: var(--success);
+}
+
+.stat-trend.negative {
+    color: var(--error);
+}
+
+.stat-trend.neutral {
+    color: var(--text-secondary);
 }
 
 /* Charts */

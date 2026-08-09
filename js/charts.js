@@ -4,6 +4,9 @@ import * as store from './store.js';
 import * as ui from './ui.js';
 
 let charts = {};
+let statsTableSearchQuery = '';
+let isStatsTableCollapsed = true;
+let lastSelectedEtage = null;
 
 // Plugin de Chart.js para dibujar líneas señaladoras en gráficos circulares (pie)
 export const pieLinesPlugin = {
@@ -96,9 +99,24 @@ export function updateDashboard() {
         return `${monthNames[parseInt(m, 10) - 1]} ${y}`;
     });
     const monthlyValues = sortedMonths.map(key => monthlyData[key]);
+    const monthPalette = [
+        '#10b981', // Janv - Esmeralda
+        '#06b6d4', // Févr - Cian
+        '#8b5cf6', // Mars - Violeta
+        '#f59e0b', // Avr - Ámbar
+        '#ec4899', // Mai - Rosa
+        '#3b82f6', // Juin - Azul
+        '#6366f1', // Juil - Índigo
+        '#f97316', // Août - Naranja
+        '#14b8a6', // Sept - Teal
+        '#eab308', // Oct - Amarillo
+        '#a855f7', // Nov - Púrpura
+        '#ef4444'  // Déc - Rojo
+    ];
     const monthlyColors = sortedMonths.map(key => {
         const [y, m] = key.split('-');
-        return parseInt(m, 10) === 7 ? '#3b82f6' : '#10b981'; // Blue for July, Green for others
+        const mIdx = (parseInt(m, 10) - 1) % monthPalette.length;
+        return monthPalette[mIdx];
     });
 
     // 2. Top 5 Productos
@@ -154,15 +172,86 @@ export function updateDashboard() {
     });
 
     // Actualizar KPIs
+    if (ui.elements.statTotal) {
+        ui.elements.statTotal.textContent = totalBulbs.toLocaleString();
+        ui.elements.statTotal.title = totalBulbs.toLocaleString();
+    }
+
+    const trendTotalEl = document.getElementById('stat-trend-total');
+    if (trendTotalEl) {
+        if (sortedMonths.length >= 2) {
+            const currentM = sortedMonths[sortedMonths.length - 1];
+            const prevM = sortedMonths[sortedMonths.length - 2];
+            const currVal = monthlyData[currentM] || 0;
+            const prevVal = monthlyData[prevM] || 0;
+            if (prevVal > 0) {
+                const diffPct = Math.round(((currVal - prevVal) / prevVal) * 100);
+                if (diffPct > 0) {
+                    trendTotalEl.className = 'stat-trend positive';
+                    trendTotalEl.textContent = `+${diffPct}% vs mois dernier`;
+                } else if (diffPct < 0) {
+                    trendTotalEl.className = 'stat-trend negative';
+                    trendTotalEl.textContent = `${diffPct}% vs mois dernier`;
+                } else {
+                    trendTotalEl.className = 'stat-trend neutral';
+                    trendTotalEl.textContent = `0% vs mois dernier`;
+                }
+            } else {
+                trendTotalEl.className = 'stat-trend positive';
+                trendTotalEl.textContent = `+100% vs mois dernier`;
+            }
+        } else {
+            trendTotalEl.className = 'stat-trend neutral';
+            trendTotalEl.textContent = `Consommation globale`;
+        }
+    }
+
     if (ui.elements.statAvg) {
         const avg = sortedMonths.length > 0 ? (totalBulbs / sortedMonths.length).toFixed(1) : 0;
         ui.elements.statAvg.textContent = avg;
+        ui.elements.statAvg.title = avg;
     }
+    const trendAvgEl = document.getElementById('stat-trend-avg');
+    if (trendAvgEl) {
+        trendAvgEl.className = 'stat-trend neutral';
+        trendAvgEl.textContent = `Sur ${sortedMonths.length || 1} mois`;
+    }
+
     if (ui.elements.statTopEtage) {
-        ui.elements.statTopEtage.textContent = sortedEtages.length > 0 ? sortedEtages[0] : "-";
+        const etageTxt = sortedEtages.length > 0 ? `Étage ${sortedEtages[0]}` : "-";
+        ui.elements.statTopEtage.textContent = etageTxt;
+        ui.elements.statTopEtage.title = etageTxt;
     }
+    const trendEtageEl = document.getElementById('stat-trend-etage');
+    if (trendEtageEl) {
+        if (sortedEtages.length > 0) {
+            const topQty = Object.values(etageBulbsByCategory[sortedEtages[0]]).reduce((s, v) => s + v, 0);
+            trendEtageEl.className = 'stat-trend positive';
+            trendEtageEl.textContent = `${topQty} ampoules util.`;
+        } else {
+            trendEtageEl.className = 'stat-trend neutral';
+            trendEtageEl.textContent = `Aucune donnée`;
+        }
+    }
+
     if (ui.elements.statTopProduct) {
-        ui.elements.statTopProduct.textContent = sortedProducts.length > 0 ? sortedProducts[0] : "-";
+        const topProdCode = sortedProducts.length > 0 ? sortedProducts[0] : "-";
+        const topProdDesc = sortedProducts.length > 0 ? topProductsFullDesc[0] : "";
+        ui.elements.statTopProduct.textContent = topProdCode;
+        ui.elements.statTopProduct.title = topProdDesc ? `${topProdCode} - ${topProdDesc}` : topProdCode;
+    }
+    const trendProductEl = document.getElementById('stat-trend-product');
+    if (trendProductEl) {
+        if (sortedProducts.length > 0) {
+            const topProdQty = sortedProductQuantities[0] || 0;
+            const topProdDesc = topProductsFullDesc[0] || "";
+            trendProductEl.className = 'stat-trend positive';
+            trendProductEl.textContent = topProdDesc ? `${topProdDesc} (${topProdQty} util.)` : `${topProdQty} remplacements`;
+            trendProductEl.title = topProdDesc;
+        } else {
+            trendProductEl.className = 'stat-trend neutral';
+            trendProductEl.textContent = `Aucune donnée`;
+        }
     }
 
     // 6. Categorías
@@ -408,6 +497,7 @@ export function updateDashboard() {
         }
     });
 
+    renderStatsTable(dashboardRecords);
 }
 
 function renderChart(canvasId, type, labels, data, colors, customOptions = {}) {
@@ -640,4 +730,140 @@ export function populateFilters() {
             ui.elements.filterDescription.innerHTML += `<option value="${d}">${d}</option>`;
         });
     }
+}
+
+export function updateStatsTableCollapseUI() {
+    const bodyContainer = document.getElementById('stats-table-body-container');
+    const icon = document.getElementById('icon-toggle-stats-table');
+    const toggleText = document.getElementById('text-toggle-stats-table');
+
+    if (!bodyContainer) return;
+
+    if (isStatsTableCollapsed) {
+        bodyContainer.style.display = 'none';
+        if (icon) icon.style.transform = 'rotate(0deg)';
+        if (toggleText) toggleText.textContent = 'Afficher';
+    } else {
+        bodyContainer.style.display = 'block';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        if (toggleText) toggleText.textContent = 'Masquer';
+    }
+}
+
+export function initStatsTableListeners() {
+    const searchInput = document.getElementById('search-stats-table');
+    const headerEl = document.getElementById('stats-table-header');
+    const toggleBtn = document.getElementById('btn-toggle-stats-table');
+
+    const toggleCollapse = () => {
+        isStatsTableCollapsed = !isStatsTableCollapsed;
+        updateStatsTableCollapseUI();
+    };
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleCollapse();
+        });
+    }
+
+    if (headerEl) {
+        headerEl.addEventListener('click', (e) => {
+            if (e.target.closest('#search-stats-table') || e.target.closest('#btn-toggle-stats-table')) return;
+            toggleCollapse();
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            statsTableSearchQuery = e.target.value.toLowerCase().trim();
+            if (isStatsTableCollapsed && statsTableSearchQuery) {
+                isStatsTableCollapsed = false;
+                updateStatsTableCollapseUI();
+            }
+            const records = getFilteredRecords();
+            renderStatsTable(records);
+        });
+    }
+}
+
+export function renderStatsTable(dashboardRecords) {
+    const tableBody = document.getElementById('stats-table-body');
+    const subtitleEl = document.getElementById('light-table-subtitle');
+    if (!tableBody) return;
+
+    const selectedEtage = ui.elements.filterEtage ? ui.elements.filterEtage.value : 'all';
+
+    // Desplegar automáticamente si se selecciona un piso específico
+    if (selectedEtage !== 'all' && lastSelectedEtage !== selectedEtage) {
+        isStatsTableCollapsed = false;
+        lastSelectedEtage = selectedEtage;
+    } else if (selectedEtage === 'all' && lastSelectedEtage !== 'all' && lastSelectedEtage !== null) {
+        lastSelectedEtage = 'all';
+    }
+
+    updateStatsTableCollapseUI();
+
+    // Agrupar dashboardRecords por Description
+    const descMap = {};
+
+    dashboardRecords.forEach(r => {
+        const idKey = r.id_item || "Inconnu";
+        const foundOpt = store.appOptions.opciones.find(opt => opt.id === idKey);
+        const desc = (foundOpt && foundOpt.description) ? foundOpt.description : (r.description || idKey);
+        const qty = Number(r.quantite || 0);
+
+        if (!descMap[desc]) {
+            descMap[desc] = 0;
+        }
+        descMap[desc] += qty;
+    });
+
+    let list = Object.keys(descMap).map(desc => ({
+        description: desc,
+        quantite: descMap[desc]
+    }));
+
+    if (statsTableSearchQuery) {
+        list = list.filter(item => item.description.toLowerCase().includes(statsTableSearchQuery));
+    }
+
+    // Ordenar de mayor a menor cantidad
+    list.sort((a, b) => b.quantite - a.quantite);
+
+    if (subtitleEl) {
+        if (selectedEtage !== 'all') {
+            subtitleEl.textContent = `Étage: ${selectedEtage} • ${list.length} type(s) de lumière`;
+        } else {
+            subtitleEl.textContent = `Tous les étages • ${list.length} type(s) de lumière (Masqué par défaut)`;
+        }
+    }
+
+    if (list.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <i class="fa-solid fa-box-open" style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                    Aucune donnée disponible pour ces filtres.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    let html = '';
+    list.forEach(item => {
+        html += `
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.15s ease;">
+                <td style="padding: 0.75rem 1rem; vertical-align: middle; font-weight: 600; color: var(--text-primary);">
+                    ${item.description}
+                </td>
+                <td style="padding: 0.75rem 1rem; vertical-align: middle; text-align: right; font-size: 1.05rem; font-weight: 700; color: var(--primary);">
+                    ${item.quantite}
+                </td>
+            </tr>
+        `;
+    });
+
+    tableBody.innerHTML = html;
 }

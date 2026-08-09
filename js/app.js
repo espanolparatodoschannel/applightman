@@ -101,6 +101,7 @@ function setupEventListeners() {
             if (ui.elements.filterDescription) ui.elements.filterDescription.value = 'all';
             charts.updateDashboard();
         });
+        charts.initStatsTableListeners();
     }
 
     if (ui.elements.filterHistoryMonth) {

@@ -142,25 +142,47 @@
 
         <!-- VIEW: ESTADISTICAS -->
         <section id="view-stats" class="view">
-            <div class="card">
-                <h2><i class="fa-solid fa-chart-pie"></i> Statistiques</h2>
+            <div class="card" style="padding: 1.25rem;">
+                <h2 style="margin-bottom: 1.25rem;"><i class="fa-solid fa-chart-pie"></i> Statistiques</h2>
                 <div class="stats-grid">
                     <div class="stat-box">
-                        <span class="stat-label">Total Ampoules</span>
+                        <div class="stat-header">
+                            <span>Total Ampoules</span>
+                        </div>
                         <span id="stat-total" class="stat-value">0</span>
+                        <div id="stat-trend-total" class="stat-trend neutral">
+                            <span>vs mois dernier</span>
+                        </div>
                     </div>
+                    
                     <div class="stat-box">
-                        <span class="stat-label">Moyenne mensuelle</span>
+                        <div class="stat-header">
+                            <span>Moyenne mensuelle</span>
+                        </div>
                         <span id="stat-avg" class="stat-value">0</span>
+                        <div id="stat-trend-avg" class="stat-trend neutral">
+                            <span>Moy. calculée</span>
+                        </div>
                     </div>
+                    
                     <div class="stat-box">
-                        <span class="stat-label">Étage le plus actif</span>
+                        <div class="stat-header">
+                            <span>Étage le plus actif</span>
+                        </div>
                         <span id="stat-top-etage" class="stat-value">-</span>
+                        <div id="stat-trend-etage" class="stat-trend neutral">
+                            <span>Consommation máx.</span>
+                        </div>
                     </div>
+                    
                     <div class="stat-box">
-                        <span class="stat-label">Produit favori</span>
-                        <span id="stat-top-product" class="stat-value"
-                            style="font-size: 1.2rem; word-break: break-all;">-</span>
+                        <div class="stat-header">
+                            <span>Produit favori</span>
+                        </div>
+                        <span id="stat-top-product" class="stat-value">-</span>
+                        <div id="stat-trend-product" class="stat-trend neutral">
+                            <span>Le plus remplacé</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -218,6 +240,44 @@
 
 
             <div id="charts-container">
+                <!-- Tabla Acordeón: Consumo por Description -->
+                <div class="card chart-card stats-table-card" style="grid-column: 1 / -1; min-height: auto; margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+                    <div id="stats-table-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; flex-wrap: wrap; gap: 0.75rem;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-table-list" style="color: var(--primary);"></i> Consommation par type de lumière (Description)
+                            </h3>
+                            <span id="light-table-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-top: 0.2rem;"></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <div class="search-input-container" style="min-width: 170px; height: 34px;">
+                                <i class="fa-solid fa-magnifying-glass search-icon" style="font-size: 0.8rem;"></i>
+                                <input type="text" id="search-stats-table" placeholder="Filtrer description..." style="font-size: 0.85rem; padding-left: 2rem; height: 34px;">
+                            </div>
+                            <button id="btn-toggle-stats-table" type="button" style="background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm); padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s;">
+                                <span id="text-toggle-stats-table">Afficher</span>
+                                <i id="icon-toggle-stats-table" class="fa-solid fa-chevron-down" style="transition: transform 0.3s ease; font-size: 0.75rem; color: var(--primary);"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="stats-table-body-container" style="display: none; margin-top: 1rem; transition: all 0.3s ease;">
+                        <div id="stats-table-wrapper" style="overflow-x: auto; max-height: 420px; overflow-y: auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                            <table class="stats-custom-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+                                <thead>
+                                    <tr style="background: var(--input-bg); border-bottom: 2px solid var(--border-color); position: sticky; top: 0; z-index: 5;">
+                                        <th style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem;">Description</th>
+                                        <th style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; text-align: right;">Quantité</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stats-table-body">
+                                    <!-- Filas inyectadas por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card chart-card">
                     <h3>Ampoules changées par mois</h3>
                     <div class="chart-container">
