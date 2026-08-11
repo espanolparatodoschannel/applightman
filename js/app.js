@@ -257,7 +257,7 @@ function setupEventListeners() {
     }
     if (ui.elements.tacheSelect) {
         ui.elements.tacheSelect.addEventListener('change', (e) => {
-            const val = e.target.value.trim().toLowerCase();
+            const val = (e.target.value || "").trim().toLowerCase();
             
             ui.elements.groupBon.classList.add('hidden-field');
             ui.elements.groupSoumission.classList.add('hidden-field');
@@ -269,15 +269,13 @@ function setupEventListeners() {
             ui.elements.numSoumissionInput.value = "";
             ui.elements.numTacheInput.value = "";
             
-
-
-            if (val === 'bon de travail') {
+            if (val.includes('bon') || val.includes('trabajo') || val.includes('travail')) {
                 ui.elements.groupBon.classList.remove('hidden-field');
                 ui.elements.numBonInput.required = true;
-            } else if (val === 'soumission') {
+            } else if (val.includes('soumission')) {
                 ui.elements.groupSoumission.classList.remove('hidden-field');
                 ui.elements.numSoumissionInput.required = true;
-            } else if (val === 'tournée' || val === 'tournee') {
+            } else if (val.includes('tourn') || val.includes('ronde')) {
                 ui.elements.groupTacheNum.classList.remove('hidden-field');
                 ui.elements.numTacheInput.required = true;
             }
@@ -286,15 +284,15 @@ function setupEventListeners() {
 
     if (ui.elements.catSelect) {
         ui.elements.catSelect.addEventListener('change', (e) => {
-            const selectedCat = e.target.value;
-            const currentDesc = ui.elements.descSelect.value;
+            const selectedCat = (e.target.value || "").trim();
+            const currentDesc = (ui.elements.descSelect.value || "").trim();
             
-            let filteredOpts = store.appOptions.opciones;
+            let filteredOpts = store.appOptions.opciones || [];
             if (selectedCat !== "") {
-                filteredOpts = store.appOptions.opciones.filter(opt => opt.categorie === selectedCat);
+                filteredOpts = filteredOpts.filter(opt => opt.categorie && opt.categorie.trim() === selectedCat);
             }
             
-            const filteredDesc = filteredOpts.map(opt => opt.description).filter(Boolean);
+            const filteredDesc = filteredOpts.map(opt => opt.description ? opt.description.trim() : "").filter(Boolean);
             ui.populateSelect('description', filteredDesc);
             
             if (filteredDesc.includes(currentDesc)) {
@@ -308,14 +306,16 @@ function setupEventListeners() {
 
     if (ui.elements.descSelect) {
         ui.elements.descSelect.addEventListener('change', (e) => {
-            const selectedDesc = e.target.value;
-            const foundOpt = store.appOptions.opciones.find(opt => opt.description === selectedDesc);
+            const selectedDesc = (e.target.value || "").trim();
+            const opciones = store.appOptions.opciones || [];
+            const foundOpt = opciones.find(opt => opt.description && opt.description.trim() === selectedDesc);
             
             if (foundOpt) {
-                if (foundOpt.categorie && ui.elements.catSelect.value !== foundOpt.categorie) {
-                    ui.elements.catSelect.value = foundOpt.categorie;
-                    const filteredOpts = store.appOptions.opciones.filter(opt => opt.categorie === foundOpt.categorie);
-                    const filteredDesc = filteredOpts.map(opt => opt.description).filter(Boolean);
+                const optCat = foundOpt.categorie ? foundOpt.categorie.trim() : "";
+                if (optCat && (ui.elements.catSelect.value || "").trim() !== optCat) {
+                    ui.elements.catSelect.value = optCat;
+                    const filteredOpts = opciones.filter(opt => opt.categorie && opt.categorie.trim() === optCat);
+                    const filteredDesc = filteredOpts.map(opt => opt.description ? opt.description.trim() : "").filter(Boolean);
                     ui.populateSelect('description', filteredDesc);
                 }
                 ui.elements.descSelect.value = selectedDesc;
@@ -333,15 +333,16 @@ function setupEventListeners() {
             if (isSubmitting) return;
             
             const formData = new FormData(ui.elements.form);
+            const qtyRaw = parseInt(formData.get('quantite'));
             const record = {
                 uuid: generateUUID(),
                 fecha: formData.get('date'),
                 id_item: formData.get('id_item') || "", 
-                description: formData.get('description'),
-                categorie: formData.get('categorie'),
-                quantite: parseInt(formData.get('quantite')),
-                etage: formData.get('etage'),
-                tache: formData.get('tache'),
+                description: formData.get('description') || "",
+                categorie: formData.get('categorie') || "",
+                quantite: isNaN(qtyRaw) || qtyRaw < 1 ? 1 : qtyRaw,
+                etage: formData.get('etage') || "",
+                tache: formData.get('tache') || "",
                 num_bon: formData.get('num_bon') || "",
                 num_soumission: formData.get('num_soumission') || "",
                 num_tache: formData.get('num_tache') || "",
@@ -357,8 +358,12 @@ function setupEventListeners() {
 
                     const clean = (val) => String(val || "").replace(/#/g, "").trim().toLowerCase();
 
+                    const descOrIdMatch = record.id_item ? 
+                        clean(oldRecord.id_item) === clean(record.id_item) : 
+                        clean(oldRecord.description) === clean(record.description);
+
                     return oldDateStr === newDateStr &&
-                           clean(oldRecord.id_item) === clean(record.id_item) &&
+                           descOrIdMatch &&
                            clean(oldRecord.etage) === clean(record.etage) &&
                            clean(oldRecord.tache) === clean(record.tache) &&
                            String(oldRecord.quantite) === String(record.quantite) &&
@@ -395,6 +400,9 @@ function setupEventListeners() {
                     ui.renderHistory();
                     charts.updateDashboard();
                 }
+            } catch (err) {
+                console.error("Submit Handler Error:", err);
+                ui.showToast("Une erreur est survenue lors de l'enregistrement.", "error");
             } finally {
                 isSubmitting = false;
                 if (submitBtn) submitBtn.disabled = false;

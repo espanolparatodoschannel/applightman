@@ -154,18 +154,16 @@ export function populateSelect(id, values) {
     const selectElement = document.getElementById(id);
     if (!selectElement) return;
     
-    const placeholder = selectElement.options[0];
+    const placeholder = selectElement.options[0] ? selectElement.options[0].cloneNode(true) : null;
     selectElement.innerHTML = '';
     if (placeholder) selectElement.appendChild(placeholder);
     
-    const uniqueValues = [...new Set(values)];
+    const uniqueValues = [...new Set((values || []).map(v => v !== undefined && v !== null ? String(v).trim() : '').filter(Boolean))];
     uniqueValues.forEach(val => {
-        if(val) {
-            const opt = document.createElement('option');
-            opt.value = val;
-            opt.textContent = val;
-            selectElement.appendChild(opt);
-        }
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        selectElement.appendChild(opt);
     });
 }
 

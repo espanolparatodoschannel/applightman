@@ -12,7 +12,7 @@ export const mockOptions = {
         { id: "LED-01", description: "Foco LED 10W", categorie: "Éclairage Général" }
     ],
     etage: ["25", "24", "23", "22", "21", "20", "19", "18", "17", "16A", "16", "15", "14", "12", "11", "10", "9", "8", "7A", "7", "6", "5", "4", "3", "2", "1", "RDC", "SS1", "SS2", "SS3"],
-    tache: ["Bon de trabajo", "Tournée"]
+    tache: ["Bon de travail", "Tournée"]
 };
 
 export let appOptions = {
