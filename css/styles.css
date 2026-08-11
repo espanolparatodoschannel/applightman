@@ -866,7 +866,7 @@ body {
     padding: 1.5rem 0 0.5rem;
     margin-top: 1rem;
     z-index: 10;
-    pointer-events: none; /* Let clicks pass through the gradient part */
+    /* pointer-events removed: was blocking button clicks */
 }
 
 .form-actions .btn-primary {
@@ -879,6 +879,7 @@ body {
     font-size: 1.1rem;
     font-weight: 500; /* M3 buttons are medium weight */
     cursor: pointer;
+    pointer-events: auto; /* Ensure button is always clickable */
     display: flex;
     align-items: center;
     justify-content: center;
