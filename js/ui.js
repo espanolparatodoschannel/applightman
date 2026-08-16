@@ -24,6 +24,7 @@ export const elements = {
     groupBon: document.getElementById('group-bon'),
     groupSoumission: document.getElementById('group-soumission'),
     groupTacheNum: document.getElementById('group-tache-num'),
+    locataireSelect: document.getElementById('locataire'),
     etageSelect: document.getElementById('etage'),
     numBonInput: document.getElementById('num_bon'),
     numSoumissionInput: document.getElementById('num_soumission'),
@@ -32,6 +33,7 @@ export const elements = {
     syncBadge: document.getElementById('sync-badge'),
     filterMonth: document.getElementById('filter-month'),
     filterEtage: document.getElementById('filter-etage'),
+    filterLocataire: document.getElementById('filter-locataire'),
     filterTache: document.getElementById('filter-tache'),
     filterCategorie: document.getElementById('filter-categorie'),
     filterDescription: document.getElementById('filter-description'),
@@ -48,6 +50,7 @@ export const elements = {
     
     filterHistoryMonth: document.getElementById('filter-history-month'),
     filterHistoryEtage: document.getElementById('filter-history-etage'),
+    filterHistoryLocataire: document.getElementById('filter-history-locataire'),
     filterHistoryTache: document.getElementById('filter-history-tache'),
     filterHistoryCategorie: document.getElementById('filter-history-categorie'),
     clearHistoryFiltersBtn: document.getElementById('clear-history-filters-btn'),
@@ -171,6 +174,7 @@ export function populateAllSelects() {
     if (!store.appOptions) return;
     
     populateSelect('tache', store.appOptions.tache || []);
+    populateSelect('locataire', store.appOptions.locataire || []);
     populateSelect('etage', store.appOptions.etage || []);
     
     const allDescriptions = store.appOptions.opciones.map(opt => opt.description).filter(Boolean);
@@ -289,6 +293,7 @@ export function renderHistory() {
         history = store.filterRecords(history, {
             month: elements.filterHistoryMonth.value,
             etage: elements.filterHistoryEtage ? elements.filterHistoryEtage.value : 'all',
+            locataire: elements.filterHistoryLocataire ? elements.filterHistoryLocataire.value : 'all',
             tache: elements.filterHistoryTache ? elements.filterHistoryTache.value : 'all',
             categorie: elements.filterHistoryCategorie ? elements.filterHistoryCategorie.value : 'all'
         });
@@ -305,6 +310,7 @@ export function renderHistory() {
             const desc = resolvedDesc.toLowerCase();
             const id = String(r.id_item || "").toLowerCase();
             const etage = String(r.etage || "").trim().toLowerCase();
+            const locataire = String(r.locataire || "").toLowerCase();
             const numTache = String(r.num_tache || "").toLowerCase();
             const numBon = String(r.num_bon || "").toLowerCase();
             const numSoumission = String(r.num_soumission || "").toLowerCase();
@@ -318,7 +324,8 @@ export function renderHistory() {
                        matchEtage || 
                        numTache.includes(term) ||
                        numBon.includes(term) ||
-                       numSoumission.includes(term);
+                       numSoumission.includes(term) ||
+                       locataire.includes(term);
             });
         });
     }
@@ -364,29 +371,34 @@ export function renderHistory() {
             <div class="pro-history-card history-item-animate" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s; border-left: 4px solid ${catColor}; position: relative;">
                 <div class="pro-card-header" style="display: flex; flex-direction: column; gap: 0.5rem; padding-right: 2.5rem;">
                     <div style="display: flex; align-items: flex-start;">
-                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3;"><span class="material-symbols-rounded" style="color: var(--text-secondary); margin-right: 0.35rem; font-size: 0.95rem;">lightbulb</span>${displayDesc}</h4>
+                        <h4 class="pro-desc" style="margin: 0; line-height: 1.3; display: flex; align-items: center; gap: 0.35rem;">
+                            <span class="material-symbols-rounded" style="color: var(--primary); font-size: 1.15rem; flex-shrink: 0;">lightbulb</span>
+                            ${displayDesc}
+                        </h4>
                     </div>
                     
-                    <div class="pro-qty-badge" style="position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; box-shadow: none;">
+                    <div class="pro-qty-badge" style="position: absolute; top: 1rem; right: 1rem; width: 34px; height: 34px; box-shadow: none;">
                         <span class="qty-val" style="font-size: 1rem; font-weight: 700;">${r.quantite}</span>
                     </div>
                     
-                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
-                        <span class="material-symbols-rounded" style="margin-right: 0.25rem;">work</span> ${r.tache || 'N/A'}
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 0.35rem;">
+                        <span class="material-symbols-rounded" style="font-size: 1rem; color: var(--primary);">build</span> ${r.tache || 'N/A'}
                     </div>
                     
                     <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; flex-wrap: wrap;">
-                        <span class="pro-id-badge" style="height: 32px; padding: 0 0.75rem; border-radius: 16px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap;"><span class="material-symbols-rounded">sell</span> ${r.id_item || '-'}</span>
+                        <span class="pro-id-badge" style="height: 28px; padding: 0 0.65rem; border-radius: 14px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; gap: 0.3rem;">
+                            <span class="material-symbols-rounded" style="font-size: 0.95rem;">qr_code_scanner</span> ${r.id_item || '-'}
+                        </span>
                         
-                        <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
-                            <span class="material-symbols-rounded">${r.isPending ? 'cloud_upload' : 'cloud_done'}</span>
+                        <div style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; ${r.isPending ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);' : 'background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);'}" title="${r.isPending ? 'En attente de synchronisation' : 'Synchronisé'}">
+                            <span class="material-symbols-rounded" style="font-size: 1rem;">${r.isPending ? 'cloud_upload' : 'cloud_done'}</span>
                         </div>
                         ${r.uuid && !r.isPending ? `
-                        <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
-                            <span class="material-symbols-rounded">edit</span>
+                        <button class="icon-btn edit-btn" data-uuid="${r.uuid}" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0; display: flex; align-items: center; justify-content: center;" title="Modifier">
+                            <span class="material-symbols-rounded" style="font-size: 1rem;">edit</span>
                         </button>
-                        <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center;" title="Supprimer">
-                            <span class="material-symbols-rounded">delete</span>
+                        <button class="icon-btn delete-btn" data-uuid="${r.uuid}" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--error); padding: 0; display: flex; align-items: center; justify-content: center;" title="Supprimer">
+                            <span class="material-symbols-rounded" style="font-size: 1rem;">delete</span>
                         </button>
                         ` : ''}
                     </div>
@@ -395,10 +407,17 @@ export function renderHistory() {
                 <div class="pro-card-body">
                     <div class="pro-meta-grid">
                         <div class="pro-meta-item">
-                            <span class="material-symbols-rounded">layers</span>
+                            <span class="material-symbols-rounded">domain</span>
                             <div>
                                 <span class="meta-label">Étage</span>
                                 <span class="meta-value">${r.etage !== undefined && r.etage !== null && r.etage !== "" ? r.etage : '-'}</span>
+                            </div>
+                        </div>
+                        <div class="pro-meta-item">
+                            <span class="material-symbols-rounded">apartment</span>
+                            <div>
+                                <span class="meta-label">Locataire</span>
+                                <span class="meta-value">${r.locataire || '-'}</span>
                             </div>
                         </div>
                         <div class="pro-meta-item">
@@ -409,7 +428,7 @@ export function renderHistory() {
                             </div>
                         </div>
                         <div class="pro-meta-item">
-                            <span class="material-symbols-rounded" style="font-size: 1.1rem;">folder_open</span>
+                            <span class="material-symbols-rounded">local_offer</span>
                             <div>
                                 <span class="meta-label">Catégorie</span>
                                 <span class="meta-value">${r.categorie || '-'}</span>
@@ -474,6 +493,7 @@ export function renderHistory() {
                     updateDateDisplay();
                 }
                 if (elements.etageSelect) elements.etageSelect.value = record.etage;
+                if (elements.locataireSelect) elements.locataireSelect.value = record.locataire || "";
                 if (elements.tacheSelect) {
                     elements.tacheSelect.value = record.tache;
                     elements.tacheSelect.dispatchEvent(new Event('change'));

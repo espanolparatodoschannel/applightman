@@ -53,6 +53,7 @@ export function getFilteredRecords() {
     let filtered = store.filterRecords(store.records, {
         month: ui.elements.filterMonth ? ui.elements.filterMonth.value : 'all',
         etage: ui.elements.filterEtage ? ui.elements.filterEtage.value : 'all',
+        locataire: ui.elements.filterLocataire ? ui.elements.filterLocataire.value : 'all',
         tache: tVal,
         categorie: ui.elements.filterCategorie ? ui.elements.filterCategorie.value : 'all',
         description: ui.elements.filterDescription ? ui.elements.filterDescription.value : 'all'
@@ -342,6 +343,8 @@ export function updateDashboard() {
             ui.elements.filterHistoryEtage.value = label || 'all';
         } else if (canvasId === 'taskTypeChart' && ui.elements.filterHistoryTache) {
             ui.elements.filterHistoryTache.value = label || 'all';
+        } else if (canvasId === 'locataireChart' && ui.elements.filterHistoryLocataire) {
+            ui.elements.filterHistoryLocataire.value = label || 'all';
         } else if (ui.elements.searchHistory) {
             ui.elements.searchHistory.value = label;
         }
@@ -423,6 +426,52 @@ export function updateDashboard() {
                     if (sum === 0) return '';
                     const percentageValue = (value * 100 / sum);
                     const threshold = window.innerWidth < 480 ? 12 : 6;
+                    if (percentageValue < threshold) return '';
+                    return `${value}`;
+                },
+                color: '#ffffff',
+                font: { weight: 'bold', family: 'Inter', size: window.innerWidth < 480 ? 12 : 14 }
+            }
+        }
+    });
+
+    // 3.2 Distribución por Locataire (Gráfico de Pastel)
+    const locataireData = {};
+    dashboardRecords.forEach(r => {
+        const loc = (r.locataire && String(r.locataire).trim() !== "") ? String(r.locataire).trim() : "Non assigné";
+        locataireData[loc] = (locataireData[loc] || 0) + Number(r.quantite || 0);
+    });
+
+    const locataireKeys = Object.keys(locataireData).sort((a, b) => locataireData[b] - locataireData[a]);
+    const locataireVals = locataireKeys.map(k => locataireData[k]);
+    const locatairePalette = [
+        '#3b82f6', // Azul
+        '#10b981', // Esmeralda
+        '#f59e0b', // Ámbar
+        '#8b5cf6', // Violeta
+        '#ec4899', // Rosa
+        '#06b6d4', // Cian
+        '#f97316', // Naranja
+        '#14b8a6', // Teal
+        '#6366f1', // Índigo
+        '#64748b'  // Gris pizarra
+    ];
+    const locataireColorsArr = locataireKeys.map((_, i) => locatairePalette[i % locatairePalette.length]);
+
+    renderChart('locataireChart', 'pie', locataireKeys, locataireVals, locataireColorsArr, {
+        datasetLabel: 'Ampoules',
+        onClick: handleChartClick,
+        layout: { padding: { top: 20, bottom: 20, left: 40, right: 40 } },
+        plugins: {
+            datalabels: {
+                display: 'auto',
+                formatter: (value, context) => {
+                    let sum = 0;
+                    const dataArr = context.chart.data.datasets[0].data;
+                    dataArr.forEach(data => sum += Number(data));
+                    if (sum === 0) return '';
+                    const percentageValue = (value * 100 / sum);
+                    const threshold = window.innerWidth < 480 ? 10 : 5;
                     if (percentageValue < threshold) return '';
                     return `${value}`;
                 },
@@ -728,6 +777,25 @@ export function populateFilters() {
             ui.elements.filterHistoryTache.innerHTML += `<option value="${t}">${t}</option>`;
         }
     });
+
+    const locataires = new Set(store.appOptions.locataire || []);
+    store.records.forEach(r => {
+        if (r.locataire) locataires.add(String(r.locataire).trim());
+    });
+
+    if (ui.elements.filterLocataire) {
+        ui.elements.filterLocataire.innerHTML = '<option value="all">Tous les locataires</option>';
+        Array.from(locataires).filter(Boolean).sort().forEach(loc => {
+            ui.elements.filterLocataire.innerHTML += `<option value="${loc}">${loc}</option>`;
+        });
+    }
+
+    if (ui.elements.filterHistoryLocataire) {
+        ui.elements.filterHistoryLocataire.innerHTML = '<option value="all">Tous les locataires</option>';
+        Array.from(locataires).filter(Boolean).sort().forEach(loc => {
+            ui.elements.filterHistoryLocataire.innerHTML += `<option value="${loc}">${loc}</option>`;
+        });
+    }
 
     const categories = new Set();
     const descriptions = new Set();

@@ -182,6 +182,7 @@ function setupEventListeners() {
     if (ui.elements.filterMonth) {
         ui.elements.filterMonth.addEventListener('change', charts.updateDashboard);
         ui.elements.filterEtage.addEventListener('change', charts.updateDashboard);
+        if (ui.elements.filterLocataire) ui.elements.filterLocataire.addEventListener('change', charts.updateDashboard);
         ui.elements.filterTache.addEventListener('change', charts.updateDashboard);
         if (ui.elements.filterCategorie) ui.elements.filterCategorie.addEventListener('change', charts.updateDashboard);
         if (ui.elements.filterDescription) ui.elements.filterDescription.addEventListener('change', charts.updateDashboard);
@@ -189,6 +190,7 @@ function setupEventListeners() {
         ui.elements.clearFiltersBtn.addEventListener('click', () => {
             ui.elements.filterMonth.value = 'all';
             ui.elements.filterEtage.value = 'all';
+            if (ui.elements.filterLocataire) ui.elements.filterLocataire.value = 'all';
             ui.elements.filterTache.value = 'all';
             if (ui.elements.filterCategorie) ui.elements.filterCategorie.value = 'all';
             if (ui.elements.filterDescription) ui.elements.filterDescription.value = 'all';
@@ -200,11 +202,13 @@ function setupEventListeners() {
     if (ui.elements.filterHistoryMonth) {
         ui.elements.filterHistoryMonth.addEventListener('change', ui.renderHistory);
         ui.elements.filterHistoryEtage.addEventListener('change', ui.renderHistory);
+        if (ui.elements.filterHistoryLocataire) ui.elements.filterHistoryLocataire.addEventListener('change', ui.renderHistory);
         ui.elements.filterHistoryTache.addEventListener('change', ui.renderHistory);
         if (ui.elements.filterHistoryCategorie) ui.elements.filterHistoryCategorie.addEventListener('change', ui.renderHistory);
         ui.elements.clearHistoryFiltersBtn.addEventListener('click', () => {
             ui.elements.filterHistoryMonth.value = 'all';
             ui.elements.filterHistoryEtage.value = 'all';
+            if (ui.elements.filterHistoryLocataire) ui.elements.filterHistoryLocataire.value = 'all';
             ui.elements.filterHistoryTache.value = 'all';
             if (ui.elements.filterHistoryCategorie) ui.elements.filterHistoryCategorie.value = 'all';
             if (ui.elements.searchHistory) ui.elements.searchHistory.value = '';
@@ -341,6 +345,7 @@ function setupEventListeners() {
                 description: formData.get('description') || "",
                 categorie: formData.get('categorie') || "",
                 quantite: isNaN(qtyRaw) || qtyRaw < 1 ? 1 : qtyRaw,
+                locataire: formData.get('locataire') || "",
                 etage: formData.get('etage') || "",
                 tache: formData.get('tache') || "",
                 num_bon: formData.get('num_bon') || "",
@@ -364,6 +369,7 @@ function setupEventListeners() {
 
                     return oldDateStr === newDateStr &&
                            descOrIdMatch &&
+                           clean(oldRecord.locataire) === clean(record.locataire) &&
                            clean(oldRecord.etage) === clean(record.etage) &&
                            clean(oldRecord.tache) === clean(record.tache) &&
                            String(oldRecord.quantite) === String(record.quantite) &&

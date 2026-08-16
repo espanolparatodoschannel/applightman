@@ -70,19 +70,27 @@
                         </select>
                     </div>
 
-                    <div class="form-floating hidden-field" id="group-bon">
-                        <input type="text" id="num_bon" name="num_bon" placeholder=" ">
+                    <div class="form-group hidden-field" id="group-bon">
                         <label for="num_bon"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Bon de travail</label>
+                        <input type="text" id="num_bon" name="num_bon" placeholder="Numéro du bon de travail">
                     </div>
 
-                    <div class="form-floating hidden-field" id="group-soumission">
-                        <input type="text" id="num_soumission" name="num_soumission" placeholder=" ">
+                    <div class="form-group hidden-field" id="group-soumission">
                         <label for="num_soumission"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Soumission</label>
+                        <input type="text" id="num_soumission" name="num_soumission" placeholder="Numéro de soumission">
                     </div>
 
-                    <div class="form-floating hidden-field" id="group-tache-num">
-                        <input type="text" id="num_tache" name="num_tache" placeholder=" ">
+                    <div class="form-group hidden-field" id="group-tache-num">
                         <label for="num_tache"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">tag</span> Tournée</label>
+                        <input type="text" id="num_tache" name="num_tache" placeholder="Numéro de la tournée">
+                    </div>
+
+                    <div class="form-group" id="group-locataire">
+                        <label for="locataire"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">apartment</span> Locataire</label>
+                        <select id="locataire" name="locataire">
+                            <option value="" selected>Sélectionnez le locataire</option>
+                            <!-- Llenado por Google Sheets -->
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -126,9 +134,9 @@
                             placeholder="Sera rempli automatiquement en sélectionnant la description">
                     </div>
 
-                    <div class="form-floating">
-                        <input type="text" id="note" name="note" placeholder=" ">
+                    <div class="form-group">
                         <label for="note"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">comment</span> Note (optionnel)</label>
+                        <input type="text" id="note" name="note" placeholder="Ajouter une note ou précision">
                     </div>
 
                     <div class="form-actions">
@@ -227,6 +235,13 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-locataire"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">apartment</span> Locataire</label>
+                            <select id="filter-locataire" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Tous les locataires</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
                             <label for="filter-tache"
                                 style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">checklist</span> Type de tâche</label>
                             <select id="filter-tache" style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
@@ -307,6 +322,13 @@
                     <h3>Par type de tâche (Total)</h3>
                     <div class="chart-container">
                         <canvas id="taskTypeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <h3><span class="material-symbols-rounded" style="color: var(--primary); font-size: 1.15rem; vertical-align: -2px;">apartment</span> Consommation par Locataire</h3>
+                    <div class="chart-container">
+                        <canvas id="locataireChart"></canvas>
                     </div>
                 </div>
 
@@ -410,6 +432,14 @@
                             <select id="filter-history-etage"
                                 style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
                                 <option value="all">Tous les étages</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="filter-history-locataire"
+                                style="font-size: 0.8rem; margin-bottom: 0.25rem; font-weight: 600;"><span class="material-symbols-rounded" style="color: var(--primary); margin-right: 0.25rem;">apartment</span> Locataire</label>
+                            <select id="filter-history-locataire"
+                                style="font-size: 0.85rem; padding: 0.4rem; height: 36px;">
+                                <option value="all">Tous les locataires</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">

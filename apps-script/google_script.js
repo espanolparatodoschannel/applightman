@@ -4,6 +4,7 @@
 const SHEET_NAME_OPTIONS = "Opciones";
 const SHEET_NAME_ETAGES = "Étages";
 const SHEET_NAME_TACHES = "Tâches";
+const SHEET_NAME_LOCATAIRES = "Locataire";
 const SHEET_NAME_RECORDS = "Registros";
 const SHEET_NAME_INVENTAIRE = "Inventaire";
 
@@ -11,8 +12,9 @@ function setup() {
   getOrCreateSheetWithHeaders(SHEET_NAME_OPTIONS, ["Id", "Description", "Catégorie"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_ETAGES, ["Étages"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_TACHES, ["Tâches"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_LOCATAIRES, ["Locataire"]);
   getOrCreateSheetWithHeaders(SHEET_NAME_INVENTAIRE, ["Id", "Description", "Catégorie", "Name", "Prix", "Stock", "Limite", "Dépense", "Solde"]);
-  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "Tournée", "Bon de travail", "Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
+  getOrCreateSheetWithHeaders(SHEET_NAME_RECORDS, ["Date", "Type de tâche", "Tournée", "Bon de travail", "Soumission", "Locataire", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"]);
   ensureUUIDColumn();
 }
 
@@ -47,7 +49,7 @@ function doPost(e) {
       }
 
       if (headers.length === 0 || (headers.length === 1 && headers[0] === "")) {
-        headers = ["Date", "Type de tâche", "Tournée", "Bon de travail", "Soumission", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"];
+        headers = ["Date", "Type de tâche", "Tournée", "Bon de travail", "Soumission", "Locataire", "Étage", "Catégorie", "Description", "Quantité", "Id", "Note", "UUID"];
         sheet.appendRow(headers);
       }
 
@@ -55,6 +57,8 @@ function doPost(e) {
       let fechaIdx = headers.indexOf("Date");
       if (fechaIdx === -1) fechaIdx = headers.indexOf("Fecha");
       const etageIdx = headers.indexOf("Étage");
+      let locataireIdx = headers.indexOf("Locataire");
+      if (locataireIdx === -1) locataireIdx = headers.indexOf("Locataires");
       const descIdx = headers.indexOf("Description");
       const catIdx = headers.indexOf("Catégorie");
       const quantIdx = headers.indexOf("Quantité");
@@ -90,6 +94,7 @@ function doPost(e) {
         if (idIdx > -1) row[idIdx] = record.id_item;
         if (fechaIdx > -1) row[fechaIdx] = record.fecha;
         if (etageIdx > -1) row[etageIdx] = record.etage;
+        if (locataireIdx > -1) row[locataireIdx] = record.locataire;
         if (descIdx > -1) row[descIdx] = record.description;
         if (catIdx > -1) row[catIdx] = record.categorie;
         if (quantIdx > -1) row[quantIdx] = record.quantite;
@@ -163,6 +168,7 @@ function doPost(e) {
                 const h = headers[c];
                 if (h === "Date" || h === "Fecha") updatedRow.push(record.fecha || "");
                 else if (h === "Étage") updatedRow.push(record.etage || "");
+                else if (h === "Locataire" || h === "Locataires") updatedRow.push(record.locataire || "");
                 else if (h === "Catégorie") updatedRow.push(record.categorie || "");
                 else if (h === "Description") updatedRow.push(record.description || "");
                 else if (h === "Quantité") updatedRow.push(record.quantite || 0);
@@ -252,6 +258,31 @@ function doGet(e) {
         }
       }
 
+      // 3.5 Obtener Locataires
+      const locatairesList = [];
+      const locatairesSheet = getSheetByNameCaseInsensitive(ss, SHEET_NAME_LOCATAIRES);
+      if (locatairesSheet) {
+        const locData = locatairesSheet.getDataRange().getValues();
+        if (locData.length > 1) {
+          const headers = locData[0];
+          let locIdx = -1;
+          for (let h = 0; h < headers.length; h++) {
+            if (/locataire/i.test(String(headers[h]).trim())) {
+              locIdx = h;
+              break;
+            }
+          }
+          if (locIdx === -1) locIdx = 0; // fallback columna A
+
+          for (let i = 1; i < locData.length; i++) {
+            const val = locData[i][locIdx];
+            if (val !== undefined && val !== null && String(val).trim() !== "") {
+              locatairesList.push(String(val).trim());
+            }
+          }
+        }
+      }
+
       // 4. Obtener Inventaire (desde hoja Opciones)
       // Columnas de la hoja: Id | Description | Catégorie | Name | Prix | Moy./mois | Inv. Inicial | Consom. | Stock | Limite
       let inventoryList = [];
@@ -295,7 +326,7 @@ function doGet(e) {
         }
       }
 
-      // 4. Obtener Registros limitados a los últimos 500 para evitar timeout
+      // 5. Obtener Registros limitados a los últimos 500 para evitar timeout
       const recordsSheet = ss.getSheetByName(SHEET_NAME_RECORDS);
       const lastRow = recordsSheet.getLastRow();
       const lastCol = recordsSheet.getLastColumn();
@@ -306,6 +337,8 @@ function doGet(e) {
         let fechaIdx = headers.indexOf("Date");
         if (fechaIdx === -1) fechaIdx = headers.indexOf("Fecha");
         const etageIdx = headers.indexOf("Étage");
+        let locataireIdx = headers.indexOf("Locataire");
+        if (locataireIdx === -1) locataireIdx = headers.indexOf("Locataires");
         const descIdx = headers.indexOf("Description");
         const catIdx = headers.indexOf("Catégorie");
         const quantIdx = headers.indexOf("Quantité");
@@ -345,6 +378,7 @@ function doGet(e) {
           records.push({
             date: fechaIdx > -1 ? row[fechaIdx] : "",
             etage: etageIdx > -1 ? row[etageIdx] : "",
+            locataire: locataireIdx > -1 ? row[locataireIdx] : "",
             description: descVal,
             categorie: catIdx > -1 ? row[catIdx] : "",
             quantite: quantIdx > -1 ? row[quantIdx] : 0,
@@ -370,6 +404,7 @@ function doGet(e) {
         opciones: opcionesList,
         etage: etagesList,
         tache: tachesList,
+        locataire: locatairesList,
         inventory: inventoryList
       };
 
@@ -383,7 +418,7 @@ function doGet(e) {
 // Funciones Auxiliares
 function getOrCreateSheetWithHeaders(sheetName, headers) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(sheetName);
+  let sheet = getSheetByNameCaseInsensitive(ss, sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     if (headers && headers.length > 0) {
@@ -393,6 +428,22 @@ function getOrCreateSheetWithHeaders(sheetName, headers) {
     sheet.appendRow(headers);
   }
   return sheet;
+}
+
+function getSheetByNameCaseInsensitive(ss, name) {
+  if (!ss) return null;
+  const direct = ss.getSheetByName(name);
+  if (direct) return direct;
+
+  const target = String(name).trim().toLowerCase();
+  const sheets = ss.getSheets();
+  for (let i = 0; i < sheets.length; i++) {
+    const sName = sheets[i].getName().trim().toLowerCase();
+    if (sName === target || sName === target + 's' || sName + 's' === target) {
+      return sheets[i];
+    }
+  }
+  return null;
 }
 
 function createJsonResponse(data) {
@@ -424,11 +475,11 @@ function testInventory() {
   const headers = invData[0].map(h => String(h).trim());
   Logger.log("📋 Encabezados detectados: " + JSON.stringify(headers));
 
-  const idIdx      = headers.findIndex(h => /^id$|^code$|^identifiant$/i.test(h));
-  const stockIdx   = headers.findIndex(h => /^stock$/i.test(h));
+  const idIdx = headers.findIndex(h => /^id$|^code$|^identifiant$/i.test(h));
+  const stockIdx = headers.findIndex(h => /^stock$/i.test(h));
   const consumoIdx = headers.findIndex(h => /consom|consumo|d[eé]pense/i.test(h));
   const promMesIdx = headers.findIndex(h => /moy\.\/mois|moy|prom|moyenne/i.test(h));
-  const limiteIdx  = headers.findIndex(h => /^limite$|^limit$/i.test(h));
+  const limiteIdx = headers.findIndex(h => /^limite$|^limit$/i.test(h));
 
   Logger.log("🔎 idIdx=" + idIdx + " | stockIdx=" + stockIdx + " | consumoIdx=" + consumoIdx + " | promMesIdx=" + promMesIdx + " | limiteIdx=" + limiteIdx);
   Logger.log("📦 Filas de datos (sin encabezado): " + (invData.length - 1));

@@ -12,13 +12,15 @@ export const mockOptions = {
         { id: "LED-01", description: "Foco LED 10W", categorie: "Éclairage Général" }
     ],
     etage: ["25", "24", "23", "22", "21", "20", "19", "18", "17", "16A", "16", "15", "14", "12", "11", "10", "9", "8", "7A", "7", "6", "5", "4", "3", "2", "1", "RDC", "SS1", "SS2", "SS3"],
-    tache: ["Bon de travail", "Tournée"]
+    tache: ["Bon de travail", "Tournée"],
+    locataire: ["Sun Life", "Industrie Canada", "BGO", "Avenir Global Inc."]
 };
 
 export let appOptions = {
     opciones: [],
     etage: [],
     tache: [],
+    locataire: [],
     inventory: []
 };
 
@@ -158,7 +160,7 @@ export function clearCompletedNotes() {
 }
 
 // [FIX M-7] Función centralizada de filtrado — usada por charts.js y ui.js para evitar duplicación de lógica
-export function filterRecords(records, { month = 'all', etage = 'all', tache = 'all', categorie = 'all', description = 'all' } = {}) {
+export function filterRecords(records, { month = 'all', etage = 'all', tache = 'all', locataire = 'all', categorie = 'all', description = 'all' } = {}) {
     let filtered = [...records];
 
     if (month !== 'all') {
@@ -177,6 +179,10 @@ export function filterRecords(records, { month = 'all', etage = 'all', tache = '
 
     if (tache !== 'all') {
         filtered = filtered.filter(r => r.tache === tache);
+    }
+
+    if (locataire !== 'all') {
+        filtered = filtered.filter(r => String(r.locataire || "").trim() === locataire);
     }
 
     if (categorie !== 'all') {
